@@ -8,7 +8,7 @@ class PRe2Regex(regex: String) extends PRegexLike(regex) {
   private val pattern = Pattern.compile(regex)
 
   override def matches(target: String): List[List[String]] = {
-    val r = pattern.matcher(target)
+    val r       = pattern.matcher(target)
     val builder = ListBuffer.empty[List[String]]
     while (r.find()) {
       val result = (1 to r.groupCount()).toList.map { i =>

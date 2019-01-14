@@ -56,7 +56,8 @@ class PArrayTest extends FunSuite with MustMatchers {
   test("int combineAll")(PArray(PInt(1), PInt(2), PInt(3), PInt(4)).combineAll() must equal(PInt(10)))
   test("double combineAll")(PArray(PDouble(1.1), PDouble(2.1)).combineAll() must equal(PDouble(3.2)))
   test("combineAll should fail on an array with multiple types")(PArray(PString("hello"), PInt(2)).combineAll() must equal(InvalidCaller))
-  test("combineAll should work with a nothing")(PArray(PString("hello"), Filtered, PString("world")).combineAll must equal(PString("helloworld")))
+  test("combineAll should work with a nothing")(
+    PArray(PString("hello"), Filtered, PString("world")).combineAll must equal(PString("helloworld")))
 
   // Test data
 

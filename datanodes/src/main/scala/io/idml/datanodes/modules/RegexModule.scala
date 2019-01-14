@@ -15,7 +15,9 @@ trait RegexModule {
           PRegexFactory
             .getRegex(r)
             .matches(s)
-            .map { inner => PArray(inner.map(PString.apply).toBuffer[PtolemyValue]) }
+            .map { inner =>
+              PArray(inner.map(PString.apply).toBuffer[PtolemyValue])
+            }
             .toBuffer[PtolemyValue])
       case (PString(_), _) => InvalidParameters
       case _               => InvalidCaller

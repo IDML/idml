@@ -22,14 +22,14 @@ trait MathsModule {
     }
   }
 
-   private def doSigRound(sd: PtolemyValue, mode: RoundingMode): PtolemyValue = {
-     (this.toDoubleOption, sd) match {
-       case (Some(d), i: PInt) if i.value < 1 => InvalidParameters
-       case (Some(d), i: PInt) => PDouble(BigDecimal(d.doubleValue()).round(new MathContext(i.value.toInt, mode)).doubleValue())
-       case (None, _) => InvalidCaller
-       case (Some(_), _) => InvalidParameters
-     }
-   }
+  private def doSigRound(sd: PtolemyValue, mode: RoundingMode): PtolemyValue = {
+    (this.toDoubleOption, sd) match {
+      case (Some(d), i: PInt) if i.value < 1 => InvalidParameters
+      case (Some(d), i: PInt)                => PDouble(BigDecimal(d.doubleValue()).round(new MathContext(i.value.toInt, mode)).doubleValue())
+      case (None, _)                         => InvalidCaller
+      case (Some(_), _)                      => InvalidParameters
+    }
+  }
 
   private def parseHexInner(signed: Boolean): PtolemyValue = {
     this match {
@@ -69,9 +69,9 @@ trait MathsModule {
   def sigfig(sd: PtolemyValue): PtolemyValue = doSigRound(sd, RoundingMode.HALF_UP)
 
   private def extractDouble(v: PtolemyValue): Option[Double] = v match {
-    case PInt(i) => Some(i.toDouble)
+    case PInt(i)    => Some(i.toDouble)
     case PDouble(d) => Some(d)
-    case _ => None
+    case _          => None
   }
 
   def pow(e: PtolemyValue): PtolemyValue = (extractDouble(this), extractDouble(e)) match {
@@ -82,12 +82,12 @@ trait MathsModule {
 
   def exp(): PtolemyValue = extractDouble(this) match {
     case Some(d) => PDouble(java.lang.Math.exp(d))
-    case None => InvalidCaller
+    case None    => InvalidCaller
   }
 
   def sqrt(): PtolemyValue = extractDouble(this) match {
     case Some(d) => PDouble(Math.sqrt(d))
-    case None => InvalidCaller
+    case None    => InvalidCaller
   }
 
   def /(target: PtolemyValue): PtolemyValue = {

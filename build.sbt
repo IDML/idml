@@ -15,11 +15,15 @@ lazy val lang = project
 
 lazy val datanodes = project
 
-lazy val core = project.dependsOn(datanodes).dependsOn(lang).enablePlugins(BuildInfoPlugin).settings(
-  buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
-  buildInfoPackage := "io.idml",
- buildInfoOptions += BuildInfoOption.BuildTime
-)
+lazy val core = project
+  .dependsOn(datanodes)
+  .dependsOn(lang)
+  .enablePlugins(BuildInfoPlugin)
+  .settings(
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoPackage := "io.idml",
+    buildInfoOptions += BuildInfoOption.BuildTime
+  )
 
 lazy val geo = project.dependsOn(core)
 
@@ -29,9 +33,17 @@ lazy val utils = project.dependsOn(core).dependsOn(geo).dependsOn(jsoup)
 
 lazy val repl = project.dependsOn(core).dependsOn(geo).dependsOn(jsoup).dependsOn(hashing)
 
-lazy val tool = project.dependsOn(core).dependsOn(geo).dependsOn(jsoup).dependsOn(utils).dependsOn(repl).dependsOn(idmld).dependsOn(hashing).settings(
-  assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript))
-)
+lazy val tool = project
+  .dependsOn(core)
+  .dependsOn(geo)
+  .dependsOn(jsoup)
+  .dependsOn(utils)
+  .dependsOn(repl)
+  .dependsOn(idmld)
+  .dependsOn(hashing)
+  .settings(
+    assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript))
+  )
 
 lazy val geodb = project.dependsOn(core).dependsOn(geo)
 

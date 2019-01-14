@@ -11,9 +11,10 @@ import scala.util.Try
 
 object UrlModule {
   val regex =
-    Pattern.compile("""\b((?:https?://|www\d{0,3}\.|[a-z0-9.\-]+\.[a-z]{2,4}/)(?:[^\p{Z}\s()<>]+|\(([^\p{Z}\s()<>]+|(\([^\p{Z}\s()<>]+\)))*\))+(?:\(([^\p{Z}\s()<>]+|(\([^\p{Z}\s()<>]+\)))*\)|[^\p{Z}\s!()\[\]{};:\'\".,<>?«»“”‘’]))""")
+    Pattern.compile(
+      """\b((?:https?://|www\d{0,3}\.|[a-z0-9.\-]+\.[a-z]{2,4}/)(?:[^\p{Z}\s()<>]+|\(([^\p{Z}\s()<>]+|(\([^\p{Z}\s()<>]+\)))*\))+(?:\(([^\p{Z}\s()<>]+|(\([^\p{Z}\s()<>]+\)))*\)|[^\p{Z}\s!()\[\]{};:\'\".,<>?«»“”‘’]))""")
   def findAllIn(p: Pattern)(s: String): List[String] = {
-    val m = p.matcher(s)
+    val m       = p.matcher(s)
     val results = mutable.Buffer.empty[String]
     while (m.find()) {
       results.append(s.slice(m.start(), m.end()))

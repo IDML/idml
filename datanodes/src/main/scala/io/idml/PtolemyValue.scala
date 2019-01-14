@@ -40,11 +40,11 @@ object PtolemyValue {
     case _: PtolemyArray   => 3
     case _: PtolemyBool    => 4
     // sort doubles and ints together
-    case _: PtolemyDouble  => 5
-    case _: PtolemyInt     => 5
-    case _: PtolemyObject  => 6
-    case _: PtolemyString  => 7
-    case _                 => 8
+    case _: PtolemyDouble => 5
+    case _: PtolemyInt    => 5
+    case _: PtolemyObject => 6
+    case _: PtolemyString => 7
+    case _                => 8
   }
 
   /** typeclass instances */

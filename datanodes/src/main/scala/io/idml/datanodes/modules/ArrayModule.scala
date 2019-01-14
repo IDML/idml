@@ -113,13 +113,15 @@ trait ArrayModule {
 
   def flatten(depth: PtolemyValue): PtolemyValue = (this, depth) match {
     case (a: PtolemyValue, i: PInt) =>
-      (1L to i.value.toLong).foldLeft(a){(x, y) => x.flatten()}
+      (1L to i.value.toLong).foldLeft(a) { (x, y) =>
+        x.flatten()
+      }
     case _ => InvalidCaller
   }
 
   def zip(other: PtolemyValue): PtolemyValue = (this, other) match {
     case (a: PtolemyArray, b: PtolemyArray) =>
-      PArray(a.items.zip(b.items).map{ case (l, r) => PArray(l, r) }.toBuffer[PtolemyValue])
+      PArray(a.items.zip(b.items).map { case (l, r) => PArray(l, r) }.toBuffer[PtolemyValue])
     case (_: PtolemyArray, _) =>
       InvalidParameters
     case (_, _: PtolemyArray) =>
@@ -128,12 +130,12 @@ trait ArrayModule {
       InvalidCaller
   }
 
-   def enumerate(): PtolemyValue = this match {
-     case (a: PtolemyArray) =>
-       PArray(a.items.zipWithIndex.map{case (item, idx) => PArray(PtolemyValue(idx), item)}.toBuffer[PtolemyValue])
-     case _ =>
-       InvalidCaller
-   }
+  def enumerate(): PtolemyValue = this match {
+    case (a: PtolemyArray) =>
+      PArray(a.items.zipWithIndex.map { case (item, idx) => PArray(PtolemyValue(idx), item) }.toBuffer[PtolemyValue])
+    case _ =>
+      InvalidCaller
+  }
 
   import cats._, cats.implicits._, cats.syntax._
 
