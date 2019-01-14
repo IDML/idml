@@ -1,0 +1,20 @@
+[
+  {
+    "name": "split by a character",
+    "mapping": "output = input.split(\"a\")",
+    "input": {"input": "abababab"},
+    "output": {"output": ["", "b", "b", "b", "b"]}
+  },
+  {
+    "name": "split by a regex",
+    "mapping": "output = input.split(\"(a|b)\")",
+    "input": {"input": "acbcab"} ,
+    "output": {"output": ["", "c", "c"]}
+  },
+  {
+    "name": "split on whitespace",
+    "mapping": "output = input.split(\"[ \\t\\n]+\")",
+    "input": {"input": "foo bar   baz \n tabbed"},
+    "output": {"output": ["foo", "bar", "baz", "tabbed"]}
+  }
+]

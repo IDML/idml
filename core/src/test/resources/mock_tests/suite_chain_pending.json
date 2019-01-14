@@ -1,0 +1,17 @@
+{
+  "tests": [
+    {
+      "name": "This is a mock test",
+      "chain": ["a = b"],
+      "input": {"b": true},
+      "output": {"a": true}
+    },
+    {
+      "name": "This is another mock test",
+      "chain": ["a = b"],
+      "input": {"b": false},
+      "pending": true,
+      "output": {"a": "broken"}
+    }
+  ]
+}

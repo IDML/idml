@@ -1,0 +1,14 @@
+[
+  {
+    "name": "enumerate",
+    "mapping": "output = input.enumerate()",
+    "input": {
+      "input": ["a", "b", "c", "d"]
+    },
+    "output": {
+      "output": [
+        [ 0, "a" ], [ 1, "b" ], [ 2, "c" ], [ 3, "d" ]
+      ]
+    }
+  }
+]

@@ -1,0 +1,107 @@
+[
+
+  {
+    "name": "first item",
+    "mapping": "b = a[0]",
+    "input": {"a": [10]},
+    "output": {"b": 10}
+  },
+
+  {
+    "name": "first item - missing",
+    "mapping": "b = a[0]",
+    "input": {"a": []},
+    "output": {}
+  },
+
+  {
+    "name": "second item",
+    "mapping": "b = a[1]",
+    "input": {"a": [10, 11]} ,
+    "output": {"b": 11}
+  },
+
+  {
+    "name": "second item - don't wrap",
+    "mapping": "b = a[1]",
+    "input": {"a": [10]} ,
+    "output": {}
+  },
+
+  {
+    "name": "second item - missing",
+    "mapping": "b = a[1]",
+    "input": {"a": []},
+    "output": {}
+  },
+
+  {
+    "name": " last item",
+    "mapping": "b = a[-1]",
+    "input": {"a": [10, 11]},
+    "output": {"b": 11}
+  },
+
+  {
+    "name": "last item - wrap",
+    "mapping": "b = a[-1]",
+    "input": {"a": [10]},
+    "output": {"b": 10}
+  },
+
+  {
+    "name": "last item - missing",
+    "mapping": "b = a[-1]",
+    "input": {"a": []},
+    "output": {}
+  },
+
+  {
+    "name": "allow wrapping on all negative indexes",
+    "mapping": "b = a[-10]",
+    "input": {"a": [10, 11, 12, 13]},
+    "output": {"b": 12}
+  },
+
+  {
+    "name": "don't wrap positive indexes",
+    "mapping": "b = a[3]",
+    "input": {"a": [10, 11, 12]},
+    "output": {}
+  },
+
+  {
+    "name": "allow expressions after indexed item - missing",
+    "mapping": "b = a[1].b",
+    "input": {"a": [10, 11]},
+    "output": {}
+  },
+
+  {
+    "name": "allow expressions after indexed item",
+    "mapping": "b = a[1].b",
+    "input": {"a": [{"a": 10}, {"b": 11}]},
+    "output": {"b": 11}
+  },
+
+  {
+    "name": "allow multiple indexes - missing",
+    "mapping": "b = a[1][1]",
+    "input": {"a": [10, 11]} ,
+    "output": {}
+  },
+
+  {
+    "name": "allow multiple indexes",
+    "mapping": "b = a[1][1]",
+    "input": {"a": [[10,11], [11, 12]]},
+    "output": {"b": 12}
+  },
+
+  {
+    "name": "multiple indexes on a single array",
+    "mapping": "a = d[0] \n b = d[1] \n c = d[2]",
+    "input": {"d": [10, 11, 12]},
+    "output": {"a": 10, "b": 11, "c": 12}
+  }
+]

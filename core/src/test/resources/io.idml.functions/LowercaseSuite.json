@@ -1,0 +1,44 @@
+[
+  {
+    "name": "lower case 1",
+    "mapping": "output = input.lowercase()",
+    "input": {"input": "abc"},
+    "output": {"output": "abc"}
+  },
+  {
+    "name": "lower case 2",
+    "mapping": "output = input.lowercase()",
+    "input": {"input": "ABC"},
+    "output": {"output": "abc"}
+  },
+  {
+    "name": "lower case 3",
+    "mapping": "output = input.lowercase()",
+    "input": {"input": "Abc"},
+    "output": {"output": "abc"}
+  },
+  {
+    "name": "lower case 4",
+    "mapping": "output = input.lowercase()",
+    "input": {"input": false},
+    "output": {"output": false}
+  },
+  {
+    "name": "lower case 5",
+    "mapping": "output = input.lowercase()",
+    "input": {"input": 1234},
+    "output": {"output": 1234}
+  },
+  {
+    "name": "lower case 6",
+    "mapping": "output = input.lowercase()",
+    "input": {"input": null},
+    "output": {"output": null}
+  },
+  {
+    "name": "lower case 7",
+    "mapping": "output = input.lowercase()",
+    "input": {"input": {"input": "Abc"}},
+    "output": {"output": {"input": "Abc"}}
+  }
+]

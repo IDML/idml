@@ -1,0 +1,26 @@
+[
+  {
+    "name": "get with integer",
+    "mapping": "x = a.get(1) \n y = a[1] ",
+    "input": {"a": [123, 456]},
+    "output": {"x": 456, "y": 456}
+  },
+  {
+    "name": "get with string",
+    "mapping": "x = get(\"b\") \n y = b",
+    "input": {"a": 123, "b": 456},
+    "output": {"x": 456, "y": 456}
+  },
+  {
+    "name": "get with path - int",
+    "mapping": "x = a.get(b)",
+    "input":  {"b": 1, "a": [123, 456]},
+    "output": {"x": 456}
+  },
+  {
+    "name": "get with path - string",
+    "mapping": "x = a.get(b)",
+    "input": {"b": "my_field", "a": {"other_field": 123, "my_field": 456}},
+    "output": {"x": 456}
+  }
+]

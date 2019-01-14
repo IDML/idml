@@ -1,0 +1,180 @@
+[
+  {
+    "name": "groupBySafe should group things by the expression",
+    "mapping": "output = input.groupBySafe(this.lowercase())",
+    "input": {
+      "input": [
+        "hello",
+        "HELLO",
+        "world",
+        "WORLD"
+      ]
+    },
+    "output": {
+      "output": [
+        {
+          "key": "world",
+          "values": [
+            "world",
+            "WORLD"
+          ]
+        },
+        {
+          "key": "hello",
+          "values": [
+            "hello",
+            "HELLO"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "groupBySafe should be able to group on ints",
+    "mapping": "output = input.groupBySafe(if this > 5 then 1 else 2)",
+    "input": {
+      "input": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    "output": {
+      "output": [
+        {
+          "key": 2,
+          "values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        {
+          "key": 1,
+          "values": [
+            6,
+            7,
+            8,
+            9,
+            10
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "groupBySafe should make it's values accessible",
+    "mapping": "output = input.groupBySafe(if this > 5 then true else false).extract(this.values.min())",
+    "input": {
+      "input": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    "output": {
+      "output": [
+        1,
+        6
+      ]
+    }
+  },
+  {
+    "name": "groupBySafe should make it's keys accessible",
+    "mapping": "output = input.groupBySafe(if this > 5 then true else false).extract(this.key)",
+    "input": {
+      "input": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    "output": {
+      "output": [
+        false,
+        true
+      ]
+    }
+  },
+  {
+    "name": "groupBySafe should be able to group on an array",
+    "mapping": "output = input.groupBySafe([this.breed, this.age])",
+    "input": {
+      "input": [
+        {
+          "breed": "blue",
+          "age": 3,
+          "name": "Martin"
+        },
+        {
+          "breed": "tabby",
+          "age": 2,
+          "name": "Marge"
+        },
+        {
+          "breed": "blue",
+          "age": 3,
+          "name": "Terry"
+        }
+      ]
+    },
+    "output": {
+      "output": [
+        {
+          "values": [
+            {
+              "breed": "tabby",
+              "age": 2,
+              "name": "Marge"
+            }
+          ],
+          "key": [
+            "tabby",
+            2
+          ]
+        },
+        {
+          "values": [
+            {
+              "breed": "blue",
+              "age": 3,
+              "name": "Martin"
+            },
+            {
+              "breed": "blue",
+              "age": 3,
+              "name": "Terry"
+            }
+          ],
+          "key": [
+            "blue",
+            3
+          ]
+        }
+      ]
+    }
+  }
+]

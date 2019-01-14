@@ -1,0 +1,15 @@
+[
+  {
+    "name": "variable assignment - missing value",
+    "mapping": "b = a \n c = @b",
+    "input": {},
+    "output": {}
+  },
+
+  {
+    "name": "variable assignment",
+    "mapping": "b = a \n c = @b",
+    "input": {"a": 10},
+    "output": {"b": 10, "c": 10}
+  }
+]

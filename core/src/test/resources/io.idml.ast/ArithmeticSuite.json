@@ -1,0 +1,145 @@
+[
+  {
+    "name": "adding a number to input",
+    "mapping": "output = input + 2",
+    "input": {"input": 2},
+    "output": {"output": 4}
+  },
+
+  {
+    "name": "adding together two literals",
+    "mapping": "output = 2 + 2 ",
+    "input": {},
+    "output": {"output": 4}
+  },
+
+
+
+  {
+    "name": "adding together three literals",
+    "mapping": "output = 2 + 2 + 2",
+    "input": {},
+    "output": {"output": 6}
+  },
+
+
+
+  {
+    "name": "multiply input by a number",
+    "mapping": "output = input * 3",
+    "input": {"input": 6},
+    "output": {"output": 18}
+  },
+
+
+
+  {
+    "name": "multiply two literals together",
+    "mapping": "output = 7 * 2",
+    "input": {},
+    "output": {"output": 14}
+  },
+
+  {
+    "name": "multiply lots of literals together",
+    "mapping": "output = 9 * 8 * 7 * 6 * 5 * 4 * 3 * 2 * 1",
+    "input": {},
+    "output": {"output": 362880}
+  },
+
+
+
+  {
+    "name": "divide input by a number",
+    "mapping": "output = input / 2",
+    "input": {"input": 6},
+    "output": {"output": 3.0}
+  },
+
+
+
+  {
+    "name": "divide uneven input by a number",
+    "mapping": "output = input / 2",
+    "input": {"input": 7},
+    "output": {"output": 3.5}
+  },
+
+  {
+    "name": "divide by zero",
+    "mapping": "output = input / 0",
+    "inpit": {"input": 2},
+    "output": {}
+  },
+
+
+
+  {
+    "name": "subtract number from input",
+    "mapping": "output = input - 72",
+    "input": {"input": 72},
+    "output": {"output": 0}
+  },
+
+
+
+  {
+    "name": "subtract input from number",
+    "mapping": "output = 72 - input",
+    "input": {"input": 72},
+    "output": {"output": 0}
+  },
+
+  {
+    "name": "subtract two doubles",
+    "mapping": "output = 3.142 - 2.71828",
+    "input": {},
+    "output": {"output": 0.4237199999999999}
+  },
+
+  {
+    "name": "subtract two doubles that give an int",
+    "mapping": "output = 3.5 - 2.5",
+    "input": {},
+    "output": {"output": 1.0}
+  },
+
+
+
+  {
+    "name": "precedence test 1",
+    "mapping": "output = 7 - 2 + 7 * 1 / 2",
+    "input": {},
+    "output": {"output": 1.5}
+  },
+
+
+
+  {
+    "name": "precedence test 2",
+    "mapping": "output = 2*6+3-4/2-5+20/5*3+50",
+    "input": {},
+    "output": {"output": -54.0}
+  },
+
+  {
+    "name": "Precedence test 3 with brackets",
+    "mapping": "output = (2+2)*7",
+    "input": {},
+    "output": {"output": 28}
+  },
+
+  {
+    "name": "possible clashing between minus and negative numbers",
+    "mapping": "output = 2--2",
+    "input": {},
+    "output": {"output": 4}
+  },
+
+  {
+    "name": "possible clashing between minus and negative numbers 2",
+    "mapping": "output = 2-2",
+    "input": {},
+    "output": {"output": 0}
+  }
+]

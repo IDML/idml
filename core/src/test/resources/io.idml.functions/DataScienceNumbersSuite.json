@@ -1,0 +1,20 @@
+[
+  {
+    "name": "exp should raise an exponent",
+    "mapping": "output = (2).exp().round(3)",
+    "input": {},
+    "output": {"output": 7.389}
+  },
+  {
+    "name": "pow should let you apply powers",
+    "mapping": "output = (2).pow(3)",
+    "input": {},
+    "output": {"output": 8.0}
+  },
+  {
+    "name": "sqrt should do a square root",
+    "mapping": "output = (9).sqrt()",
+    "input": {},
+    "output": {"output": 3.0}
+  }
+]

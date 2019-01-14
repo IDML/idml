@@ -1,0 +1,72 @@
+[
+
+
+  {
+    "name": "numeric literals",
+    "mapping": "int = 10",
+    "input": {},
+    "output": {"int": 10}
+  },
+
+  {
+    "name": "simple string literals",
+    "mapping": "single_string = 'abc' \n double_string = \"abc\"",
+    "input": {},
+    "output": 	{
+      "single_string": "abc",
+      "double_string": "abc"
+    }
+  },
+
+  {
+    "name": "escaped quotes in string literals",
+    "mapping": "single_string_with_quotes = 'a\\'b\\'c' \n double_string_with_quotes = \"a\\\"b\\\"c\"",
+    "input": {},
+    "output": 	{
+      "single_string_with_quotes": "a'b'c",
+      "double_string_with_quotes": "a\"b\"c"
+    }
+  },
+
+  {
+    "name": "float literal pi",
+    "mapping": "pi = 3.142",
+    "input": {},
+    "output": {"pi": 3.142}
+  },
+
+  {
+    "name": "float literal e",
+    "mapping": "e = 2.718281828459045235360287471352662497757247093",
+    "input": {},
+    "output": {"e": 2.718281828459045235360287471352662497757247093 }
+  },
+
+  {
+    "name": "float literal microtime",
+    "mapping": "now = 183041740861.3434",
+    "input": {},
+    "output": {"now": 183041740861.3434}
+  },
+
+  {
+    "name": "negative float literal",
+    "mapping": "foobar = -7.1",
+    "input": {},
+    "output":{"foobar": -7.1}
+  },
+
+  {
+    "name": "zero float",
+    "mapping": "zero = 0.0",
+    "input": {},
+    "output": {"zero": 0.0}
+  },
+
+  {
+    "name": "negative zero float",
+    "mapping": "negativezero = -0.0",
+    "input": {},
+    "output": {"negativezero": 0.0}
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "name": "the temporary variable operator should assign temporary variables",
+    "mapping": "let foo = \"bar\"",
+    "input": {},
+    "output": {}
+  },
+
+  {
+    "name": "temporary variables should be usable",
+    "mapping": "let hello = \"hello\"\nlet world = \"world\"\nresult = $hello + \" \" + $world",
+    "input": {},
+    "output": {"result": "hello world"}
+  }
+
+]

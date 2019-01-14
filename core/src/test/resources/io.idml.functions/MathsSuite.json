@@ -1,0 +1,62 @@
+[
+  {
+    "name": "quick maths",
+    "mapping": "output = 2 + 2 - 1",
+    "input": {},
+    "output": {"output": 3}
+  },
+  {
+    "name": "rounding to decimal places",
+    "mapping": "output = 3.142.round(2)",
+    "input": {},
+    "output": {"output": 3.14}
+  },
+  {
+    "name": "rounding to negative decimal places",
+    "mapping": "output = 123456.789.round(-2)",
+    "input": {},
+    "output": {"output": 123500.0}
+  },
+  {
+    "name": "flooring to decimal places",
+    "mapping": "output = 9.876.floor(1)",
+    "input": {},
+    "output": {"output": 9.8}
+  },
+  {
+    "name": "ceiling to decimal places",
+    "mapping": "output = 9.876.ceil(1)",
+    "input": {},
+    "output": {"output": 9.9}
+  },
+  {
+    "name": "round with no arguments",
+    "mapping": "output = 123.456.round()",
+    "input": {},
+    "output": {"output": 123}
+  },
+  {
+    "name": "floor with no arguments",
+    "mapping": "output = 123.456.floor()",
+    "input": {},
+    "output": {"output": 123}
+  },
+  {
+    "name": "ceil with no arguments",
+    "mapping": "output = 123.456.ceil()",
+    "input": {},
+    "output": {"output": 124}
+  },
+  {
+    "name": "sigfig rounding",
+    "mapping": "output = 123.456.sigfig(2)",
+    "input": {},
+    "output": {"output": 120}
+  },
+  {
+    "name": "sigfig rounding 2",
+    "mapping": "output = 123.456.sigfig(4)",
+    "input": {},
+    "output": {"output": 123.5}
+  }
+]

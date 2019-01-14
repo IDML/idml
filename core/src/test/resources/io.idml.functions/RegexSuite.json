@@ -1,0 +1,14 @@
+[
+  {
+    "name": "pull multiple matches out",
+    "mapping": "result = input.matches(\"(a)\")",
+    "input": {"input": "aaa"},
+    "output": {"result": [["a"], ["a"], ["a"]]}
+  },
+  {
+    "name": "do a full match and pull groups out",
+    "mapping": "result = input.match(\"(a)\")",
+    "input": {"input": "a"},
+    "output": {"result": ["a"]}
+  }
+]

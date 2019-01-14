@@ -1,0 +1,20 @@
+[
+  {
+    "name": "one character match",
+    "mapping": "output = input.isMatch(\"a\")",
+    "input": {"input": "a"},
+    "output": {"output": true}
+  },
+  {
+    "name": "multi character match",
+    "mapping": "output = input.isMatch(\"foo\")",
+    "input": {"input": "foo"},
+    "output": {"output": true}
+  },
+  {
+    "name": "wildcard match",
+    "mapping": "output = input.isMatch(\".*coo.*\")",
+    "input": {"input": "cats are cool"},
+    "output": {"output": true}
+  }
+]

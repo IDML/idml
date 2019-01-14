@@ -1,0 +1,153 @@
+[
+  // Top level
+  {
+    "name": "simple coalesce with labels",
+    "mapping": "output = (first | second) ",
+    "input": {"first": 1, "second": 2},
+    "output": {"output": 1}
+  },
+
+  {
+    "name": "coalesce with string literal",
+    "mapping": "output = (first | second | \"not_found\")",
+    "input": {"first_no": 1, "second_no": 2},
+    "output": {"output": "not_found"}
+  },
+
+  {
+    "name": "coalesce picks middle value",
+    "mapping": "output = (missing | present | missing)",
+    "input": {"present": 10},
+    "output": {"output": 10}
+  },
+
+  {
+    "name": "coalesce picks last value",
+    "mapping": "output = (missing | missing | present)",
+    "input": {"present": 10},
+    "output": {"output": 10}
+  },
+
+  {
+    "name": "coalesce picks none",
+    "mapping": " output = (missing | missing | missing) ",
+    "input": {"present": 10} ,
+    "output": {}
+  },
+
+  {
+    "name": "coalesce followed by expressions",
+    "mapping": "output = (missing | present).nested",
+    "input":{"present": {"nested": 10}},
+    "output": {"output": 10}
+  },
+
+  {
+    "name": "coalesces containing nested expressions",
+    "mapping": "output = (missing | missing.missing | present.nested.nested).nested",
+    "input":{"present": {"nested": {"nested": {"nested": 10}}}},
+    "output": {"output": 10}
+  },
+
+  // Depth 1 with `this`
+
+  {
+    "name": "depth 1 simple coalesce with labels and this",
+    "mapping": "output = input.(this.first | this.second) ",
+    "input": {"input": {"first": 1, "second": 2}},
+    "output": {"output": 1}
+  },
+
+  {
+    "name": "depth 1 coalesce with string literal and this",
+    "mapping": "output = input.(first | second | \"not_found\")",
+    "input": {"input": {"first_no": 1, "second_no": 2}},
+    "output": {"output": "not_found"}
+  },
+
+  {
+    "name": "depth 1 coalesce picks middle value and this",
+    "mapping": "output = input.(missing | present | missing)",
+    "input": {"input":  {"present": 10}},
+    "output": {"output": 10}
+  },
+
+  {
+    "name": "depth 1 coalesce picks last value and this",
+    "mapping": "output = input.(missing | missing | present)",
+    "input": {"input": {"present": 10}},
+    "output": {"output": 10}
+  },
+
+  {
+    "name": "depth 1 coalesce picks none and this",
+    "mapping": " output = input.(missing | missing | missing) ",
+    "input": {"input": {"present": 10}},
+    "output": {}
+  },
+
+  {
+    "name": "depth 1 coalesce followed by expressions and this",
+    "mapping": "output = input.(missing | present).nested",
+    "input": {"input": {"present": {"nested": 10}}},
+    "output": {"output": 10}
+  },
+
+  {
+    "name": "depth 1 coalesces containing nested expressions and this",
+    "mapping": "output = input.(missing | missing.missing | present.nested.nested).nested",
+    "input": {"input": {"present": {"nested": {"nested": {"nested": 10}}}}},
+    "output": {"output": 10}
+  },
+
+  // Depth 1 implied `this`
+
+  {
+    "name": "depth 1 simple coalesce with labels",
+    "mapping": "output = input.(first | second) ",
+    "input": {"input": {"first": 1, "second": 2}},
+    "output": {"output": 1}
+  },
+
+  {
+    "name": "depth 1 coalesce with string literal",
+    "mapping": "output = input.(first | second | \"not_found\")",
+    "input": {"input": {"first_no": 1, "second_no": 2}},
+    "output": {"output": "not_found"}
+  },
+
+  {
+    "name": "depth 1 coalesce picks middle value",
+    "mapping": "output = input.(missing | present | missing)",
+    "input": {"input":  {"present": 10}},
+    "output": {"output": 10}
+  },
+
+  {
+    "name": "depth 1 coalesce picks last value",
+    "mapping": "output = input.(missing | missing | present)",
+    "input": {"input": {"present": 10}},
+    "output": {"output": 10}
+  },
+
+  {
+    "name": "depth 1 coalesce picks none",
+    "mapping": " output = input.(missing | missing | missing) ",
+    "input": {"input": {"present": 10}},
+    "output": {}
+  },
+
+  {
+    "name": "depth 1 coalesce followed by expressions",
+    "mapping": "output = input.(missing | present).nested",
+    "input": {"input": {"present": {"nested": 10}}},
+    "output": {"output": 10}
+  },
+
+  {
+    "name": "depth 1 coalesces containing nested expressions",
+    "mapping": "output = input.(missing | missing.missing | present.nested.nested).nested",
+    "input": {"input": {"present": {"nested": {"nested": {"nested": 10}}}}},
+    "output": {"output": 10}
+  }
+]

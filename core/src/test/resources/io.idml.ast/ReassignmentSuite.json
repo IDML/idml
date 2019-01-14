@@ -1,0 +1,50 @@
+[
+  {
+    "name": "forcing a type cast",
+    "mapping": "x.a = a \n x.a : string()",
+    "input": {"a": 10},
+    "output": {"x": {"a": "10"}}
+  },
+
+  {
+    "name": "adding a requirement for a field that is present",
+    "mapping": "x.a = a \n x.a : required()",
+    "input": {"a": 10},
+    "output": {"x": {"a": 10}}
+  },
+/*
+  {
+    "name": "adding a requirement for a field that is missing",
+    "mapping": "x.a : required()",
+    "input": {"a": 10},
+    "output": "FailedRequirementException: Failed requirement: x.a = PMissingFiel"
+  },*/
+
+  {
+    "name": "functions can be nested",
+    "mapping": "x : int().default('123'.int())",
+    "input": {},
+    "output": {"x": 123}
+  },
+
+  {
+    "name": "schemas shouldn't create paths where unsuitable",
+    "mapping": "social.media.types: array()",
+    "input": {},
+    "output": {}
+  },
+
+  {
+    "name": "schemas should allow paths to exist even if empty things are put in them",
+    "mapping": "social.media.types: array() \n social.media.fish = a \n social.media.fish: required()",
+    "input":  {"a": "terry"},
+    "output": {"social": {"media": {"fish": "terry"}}}
+  },
+
+  {
+    "name": "schemas should delete partial paths where appropriate",
+    "mapping": "social.media.types: array() \n social.media.fish = a \n social.media.fish: required() \n social.cats.count: int()",
+    "input": {"a": "terry"},
+    "output": {"social": {"media": {"fish": "terry"}}}
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "name": "This is a mock test",
+      "input": {},
+      "mapping": "a = b"
+    },
+    {
+      "name": "This is another mock test",
+      "input": {},
+      "mapping": "a = b"
+    }
+  ]
+}

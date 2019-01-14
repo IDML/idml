@@ -1,0 +1,84 @@
+[
+  {
+    "name": "the assignments operator `=` is used to map fields from an input object to the output object",
+    "mapping": "output = input",
+    "input": {"input": "my_value"},
+    "output": {"output": "my_value"}
+
+  },
+
+  {
+
+    "name": "multiple assignments in one mapping",
+    "mapping": "output  = input \n output2 = input2",
+    "input": {"input": "my_value", "input2": "my_other_value"},
+    "output": {"output": "my_value", "output2": "my_other_value"}
+  },
+
+  {
+    "name": "an existing value can be overwritten",
+    "mapping": "output  = input \n output = input2",
+    "input": {"input": "my_value", "input2": "my_other_value"},
+    "output":  {"output": "my_other_value"}
+  },
+
+  {
+    "name": "appending to an object",
+    "mapping": "output = input \n output.new_field = input2",
+
+    "input": 	{
+      "input": {
+        "my_field": "some_value"
+      },
+      "input2": "new_value"
+    },
+
+    "output": {
+      "output": {
+        "my_field": "some_value",
+        "new_field": "new_value"
+      }
+    }
+  },
+
+  {
+    "name": "creating an object and then overwriting it",
+    "mapping": "output.removed = input \n output = input",
+    "input": {"input": "my_value"},
+    "output": {"output": "my_value"}
+  },
+
+  {
+    "name": "assigned objects are not modified on the right-hand side",
+
+    "mapping": "x = x \n x.b = b \n y = x",
+
+    "input": {"x": {"a": 10}, "b": 11},
+
+    "output": {"x": {"a": 10,  "b": 11}, "y": {"a": 10}}
+  },
+  {
+    "name": "should be able to set root to an object",
+    "mapping": "root = {\"hello\":\"world\"}",
+    "input": {},
+    "output": {"hello": "world"}
+  },
+  {
+    "name": "should not be able to set root to a non-object",
+    "mapping": "a = 1\n root = 2\n b = 3",
+    "input": {},
+    "output": {"a": 1, "b": 3}
+  },
+  {
+    "name": "should be able to pass through root",
+    "mapping": "root = root",
+    "input": {"hello": "world"},
+    "output": {"hello": "world"}
+  },
+  {
+    "name": "should be able to pass through a complex root",
+    "mapping": "root = root",
+    "input": {"a": {"b": {"c": 1234, "also": "some text", "and": ["an array"]}}},
+    "output": {"a": {"b": {"c": 1234, "also": "some text", "and": ["an array"]}}}
+  }
+]

@@ -1,0 +1,43 @@
+[
+  {
+    "name": "get the size of an empty array",
+    "mapping": "a = b.size()",
+    "input": {"b": []},
+    "output": {"a": 0}
+  },
+
+  {
+    "name": "get the size of an array with two items",
+    "mapping": "a = b.size()",
+    "input": {"b": [true, true]},
+    "output": {"a": 2}
+  },
+
+  {
+    "name": "get the size of an empty string",
+    "mapping": "a = b.size()",
+    "input": {"b": ""},
+    "output": {"a": 0}
+  },
+
+  {
+    "name": "get the size of a string of size four",
+    "mapping": "a = b.size()",
+    "input": {"b": "1234"},
+    "output": {"a": 4}
+  },
+
+  {
+    "name": "get the size of a missing field",
+    "mapping": "a = b.size()",
+    "input": {},
+    "output": {}
+  },
+
+  {
+    "name": "get the size of something else",
+    "mapping": "a = b.size()",
+    "input": {"b": true},
+    "output": {}
+  }
+]

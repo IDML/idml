@@ -1,0 +1,43 @@
+[
+  {
+    "name": "can be used in mappings",
+    "mapping": "a = b.prepend(true)",
+    "input": {},
+    "output": {}
+  },
+
+  {
+    "name": "does nothing if the caller is missing",
+    "mapping": "a = b.prepend(true)",
+    "input": {},
+    "output": {}
+  },
+
+  {
+    "name": "does nothing if the caller is not an array",
+    "mapping": "a = b.prepend(true)",
+    "input": {"b": true},
+    "output": {}
+  },
+
+  {
+    "name": "passes through the caller untouched if the parameter is missing",
+    "mapping": "a = b.prepend(missing)",
+    "input": {"b": [true]},
+    "output": {"a": [true]}
+  },
+
+  {
+    "name": "adds a value to the start of an array",
+    "mapping": "a = b.prepend(false)",
+    "input": {"b": [true]},
+    "output": {"a": [false, true]}
+  },
+
+  {
+    "name": "does not modify the original array",
+    "mapping": "a = b.prepend(false)\n c = b",
+    "input": {"b": [true]},
+    "output": {"a": [false, true], "c": [true]}
+  }
+]

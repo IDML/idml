@@ -1,0 +1,53 @@
+[
+  {
+    "name": "if expressions should assign",
+    "mapping": "result = if 1 == 1 then true else false",
+    "input": {},
+    "output": {"result": true}
+  },
+
+  {
+    "name": "if expressions should work on complex things",
+    "mapping": "result = if a.thingy exists then 2 + 2 else 7 * 3",
+    "input": {"a": {"thingy": "I exist"}},
+    "output": {"result": 4}
+  },
+
+  {
+    "name": "if expressions should work without an else",
+    "mapping": "result = if 2>1 then \"yes\"",
+    "input": {},
+    "output": {"result": "yes"}
+  },
+
+  {
+    "name": "if expressions should work without an else part 2",
+    "mapping": "result = if 1>2 then \"yes\"",
+    "input": {},
+    "output": {}
+  },
+  {
+    "name": "array 'contains' operator",
+    "mapping": "output = if xs contains 2 then \"yes\" else \"no\"",
+    "input": {"xs": [1,2,3]},
+    "output": {"output": "yes"}
+  },
+  {
+    "name": "array 'contains' operator 2",
+    "mapping": "output = if xs contains 4 then \"yes\" else \"no\"",
+    "input": {},
+    "output": {"output": "no"}
+  },
+  {
+    "name": "array 'in' operator",
+    "mapping": "output = if 2 in xs then \"yes\" else \"no\"",
+    "input": {"xs": [1,2,3]},
+    "output": {"output": "yes"}
+  },
+  {
+    "name": "array 'in' operator 2",
+    "mapping": "output = if 4 in xs then \"yes\" else \"no\"",
+    "input": {},
+    "output": {"output": "no"}
+  }
+]

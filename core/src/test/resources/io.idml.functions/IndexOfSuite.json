@@ -1,0 +1,37 @@
+[
+  {
+    "name": "combining indexOf with get for late-bound field lookup",
+
+    "mapping": "@/com.datasift.ptolemy.functions/IndexOfWithGet.ini",
+
+    "input": {
+      "input_type": "vet data",
+      "headers": ["name", "species"],
+      "input": [
+        ["bob",   "dog"],
+        ["terry", "cat"],
+        ["steve", "chicken"]
+      ]
+    },
+
+    "output": {
+      "output": [
+        {
+          "name"    : "bob",
+          "species" : "dog",
+          "type"    : "vet data"
+        },
+        {
+          "name"    : "terry",
+          "species" : "cat",
+          "type"    : "vet data"
+        },
+        {
+          "name"    : "steve",
+          "species" : "chicken",
+          "type"    : "vet data"
+        }
+      ]
+    }
+  }
+]

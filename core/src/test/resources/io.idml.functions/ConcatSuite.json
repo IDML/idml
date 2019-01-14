@@ -1,0 +1,32 @@
+[
+  {
+    "name": "concat some strings",
+    "mapping": "output = input.concat(\" \")",
+    "input": {"input": ["hello", "world"]},
+    "output": {"output": "hello world" }
+  },
+  {
+    "name": "concat sparse arrays",
+    "mapping": "output = input.a.wrapArray().append(input.b).append(input.c).concat(\" \")",
+    "input": {"input": {"b": "hello"}},
+    "output": {"output": "hello"}
+  },
+  {
+    "name": "concat sparse arrays 2",
+    "mapping": "output = input.a.wrapArray().append(input.b).append(input.c).concat(\" \")",
+    "input": {"input": {"a": "hello"}},
+    "output": {"output": "hello"}
+  },
+  {
+    "name": "concat sparse arrays 3",
+    "mapping": "output = input.a.wrapArray().append(input.b).append(input.c).concat(\" \")",
+    "input": {"input": {"c": "hello"}},
+    "output": {"output": "hello"}
+  },
+  {
+    "name": "concat sparse arrays 4",
+    "mapping": "output = input.a.wrapArray().append(input.b).append(input.c).concat(\" \")",
+    "input": {"input": {}},
+    "output": {}
+  }
+]

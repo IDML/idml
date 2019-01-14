@@ -1,0 +1,8 @@
+[
+  {
+    "name": "apply a function to each item in an array",
+    "mapping": "output = input.array(int())",
+    "input": {"input": ["123", "456", "789"]} ,
+    "output": {"output": [123, 456, 789]}
+  }
+]

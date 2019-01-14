@@ -1,0 +1,81 @@
+[
+  {
+    "name": "accept basic email",
+    "mapping": "output = input.email()",
+    "input": {"input": "andi.miller@datasift.com"},
+    "output": {"output": "andi.miller@datasift.com"}
+  },
+
+  {
+    "name": "accept rfc 822 email",
+    "mapping": "output = input.email()",
+    "input": {"input": "Andi Miller <andi.miller@datasift.com>"},
+    "output": {"output": "Andi Miller <andi.miller@datasift.com>"}
+  },
+
+  {
+    "name": "reject invalid email",
+    "mapping": "output = input.email()",
+    "input": {"input": "invalidemailaddress"},
+    "output": {}
+  },
+
+  {
+    "name": "email magic methods - basic",
+    "mapping": "@/com.datasift.ptolemy.functions/EmailSuiteMagicMethods.ini",
+    "input": {"input": "andi.miller@datasift.com"},
+    "output": {
+      "name": null, // FIXME: shouldn't this be 'missing'?
+      "address": "andi.miller@datasift.com",
+      "username": "andi.miller",
+      "domain": "datasift.com"
+    }
+  },
+
+  {
+    "name": "email magic methods - rfc 822",
+    "mapping": "@/com.datasift.ptolemy.functions/EmailSuiteMagicMethods.ini",
+    "input": {"input": "Andi Miller <andi.miller@datasift.com>"},
+    "output": {
+      "name": "Andi Miller",
+      "address": "andi.miller@datasift.com",
+      "username": "andi.miller",
+      "domain": "datasift.com"
+    }
+  },
+
+  {
+    "name": "badly formatted emails should be discarded - minimal",
+    "mapping": "output = input.email()",
+    "input": {"input": "<@>"},
+    "output": {}
+  },
+
+  {
+    "name": "badly formatted emails should be discarded - random",
+    "mapping": "output = input.email()",
+    "input": {"input": "kjlas;d12£!$£@%£$"},
+    "output": {}
+  },
+
+  {
+    "name": "badly formatted emails should be discarded - no domain",
+    "mapping": "output = input.email()",
+    "input": {"input": "a <a@>"},
+    "output": {}
+  },
+
+  {
+    "name": "badly formatted emails should be discarded - no username",
+    "mapping": "output = input.email()",
+    "input": {"input": "a <@a>"},
+    "output": {}
+  },
+
+  {
+    "name": "badly formatted emails should be discarded - content after address",
+    "mapping": "output = input.email()",
+    "input": {"input": "a <a@a> a"},
+    "output": {"output": "a <a@a>"}
+  }
+]

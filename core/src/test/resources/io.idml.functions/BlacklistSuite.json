@@ -1,0 +1,72 @@
+[
+  {
+    "name": "can blacklist one field",
+    "mapping": "a = b.blacklist(\"p\")",
+    "input": {
+      "b": {
+        "p": true,
+        "q": true
+      }
+    },
+    "output": {
+      "a": {
+        "q": true
+      }
+    }
+  },
+
+  {
+    "name": "can blacklist two fields",
+    "mapping": "a = b.blacklist(\"p\", \"q\")",
+    "input": {
+      "b": {
+        "p": true,
+        "q": true,
+        "r": true
+      }
+    },
+    "output": {
+      "a": {
+        "r": true
+      }
+    }
+  },
+
+
+  {
+    "name": "object is unchanged if nothing is blacklisted",
+    "mapping": "a = b.blacklist()",
+    "input": {
+      "b": {
+        "p": true
+      }
+    },
+    "output": {
+      "a": {
+        "p": true
+      }
+    }
+  },
+
+  {
+    "name": "blacklist doesn't affect original object",
+    "mapping": "a = b.blacklist(\"p\", \"q\") \n c = b",
+    "input": {
+      "b": {
+        "p": true,
+        "q": true,
+        "r": true
+      }
+    },
+    "output": {
+      "a": {
+        "r": true
+      },
+      "c": {
+        "p": true,
+        "q": true,
+        "r": true
+      }
+    }
+  }
+]

@@ -1,0 +1,46 @@
+[
+  {
+    "name": "top-level wildcard",
+    "mapping": "x = *",
+    "input": {"b": 10, "c": 11},
+    "output": {"x": {"b": 10, "c": 11}}
+  },
+  {
+    "name": "depth-1 wildcard",
+    "mapping": "x = a.*",
+    "input": {"a": {"b": 10, "c": 11}},
+    "output": {"x": {"b": 10, "c": 11}}
+  }
+
+/*,
+  {
+    "name": "expressions after wildcards - we'll find a.b.c",
+    "mapping": "x = a.*.c",
+    "input": {"a": {"b": {"c": 10}}},
+    "output": {"x": 10}
+  },
+  {
+    "name": "expressions after wildcards - don't find a.c",
+    "mapping": "x = a.*.c",
+    "input": {"a": {"b": {"c": 10}, "c": 11}},
+    "output": {"x": {"b": {"c": 10}}}
+  },
+  {
+    "name": "expressions after wildcards - don't find a.c.d",
+    "mapping": "x = a.*.c",
+    "input": {"a": {"b": {"c": 10}, "c": {"d": 11}}},
+    "output": {"x": 10}
+  },
+  {
+    "name": "expressions after wildcards - find a.b.c and a.c.c",
+    "mapping": "x = a.*.c",
+    "input": {"a": {"b": {"c": 10}}},
+    "output": {"x": {"b": 10}}
+  },
+  {
+    "name": "multiple wildcards",
+    "mapping": "x = a.*.*",
+    "input": {"a": {"b": {"c": 10}, "c": {"d": 11}, "e": 12}},
+    "output": {"x": {"b": {"c": 10}, "c": {"d": 11}}}
+  }*/
+]

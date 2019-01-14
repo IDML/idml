@@ -1,0 +1,20 @@
+[
+  {
+    "name": "unique should work the same as normal unique",
+    "mapping": "output = input.unique(this)",
+    "input": {"input": [1,1,2,2,3,3]},
+    "output": {"output": [1,2,3]}
+  },
+  {
+    "name": "unique should take a basic transform and return the first for each key",
+    "mapping": "output = input.unique(this.lowercase())",
+    "input": {"input": ["a", "A", "b", "B"]},
+    "output": {"output": ["a", "b"]}
+  },
+  {
+    "name": "unique should return the untransformed item",
+    "mapping": "output = input.unique(this.uppercase())",
+    "input": {"input": ["a", "A", "b", "B"]},
+    "output": {"output": ["a", "b"]}
+  }
+]

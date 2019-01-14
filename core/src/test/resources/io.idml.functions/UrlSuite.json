@@ -1,0 +1,63 @@
+[
+  {
+    "name": "accept http",
+    "mapping": "output = input.url()",
+    "input": {"input": "http://www.google.com/?q=apple"},
+    "output": {"output": "http://www.google.com/?q=apple"}
+  },
+  {
+    "name": "accept https",
+    "mapping": "output = input.url()",
+    "input": {"input": "https://www.google.com/?q=apple"},
+    "output": {"output": "https://www.google.com/?q=apple"}
+  },
+  {
+    "name": "accept ftp",
+    "mapping": "output = input.url()",
+    "input": {"input": "https://www.google.com/?q=apple"},
+    "output": {"output": "https://www.google.com/?q=apple"}
+  },
+  {
+    "name": "reject urls without a protocol",
+    "mapping": "output = input.url()",
+    "input": {"input": "www.google.com/?q=apple"} ,
+    "output": {}
+  },
+  {
+    "name": "reject other values",
+    "mapping": "output = input.url()",
+    "input": {"input": "1234"} ,
+    "output": {}
+  },
+  {
+    "name": "url magic methods",
+    "mapping": "@/com.datasift.ptolemy.functions/UrlSuiteMagicMethods.ini",
+    "input": {"x": "http://www.google.com/abc?q=apple"} ,
+    "output": 	{
+      "protocol": "http",
+      "host": "www.google.com",
+      "path": "/abc",
+      "query": "q=apple"
+    }
+  },
+  {
+    "name": "url extraction",
+    "mapping": "output = input.urls()",
+    "input": {"input": "hello http://google.co.uk world this has some URLs in it https://google.com."},
+    "output": {
+      "output": ["http://google.co.uk", "https://google.com"]
+    }
+  },
+  {
+    "name": "awkward url extraction",
+    "mapping": "output = input.urls()",
+    "input": {"input": "HTTPS://HELLO.WORLD.COM/STUFFffff..._%20.jpg http://fooooooooooooooooo.bar.moe/123/456/789/test-_asd123 https://gitter.im/http4s/http4s https://inbox.google.com/u/2/?pli=1"},
+    "output": {
+      "output": [
+        "http://fooooooooooooooooo.bar.moe/123/456/789/test-_asd123",
+        "https://gitter.im/http4s/http4s",
+        "https://inbox.google.com/u/2/?pli=1"
+      ]
+    }
+  }
+]

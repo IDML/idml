@@ -1,0 +1,51 @@
+[
+  {
+    "name": "matching on a literal",
+    "mapping": "output = match 2\n| this == 2 => \"two\"",
+    "input": {},
+    "output": {"output": "two"}
+  },
+
+  {
+    "name": "matching on a literal and falling through",
+    "mapping": "output = match 2\n| this == 1 => \"one\"",
+    "input": {},
+    "output": {}
+  },
+
+  {
+    "name": "matching on input",
+    "mapping": "output = match input\n| this == 1 => \"one\"\n| this == 2 => \"two\"",
+    "input": {"input": 2},
+    "output": {"output": "two"}
+  },
+
+  {
+    "name": "matching on input with a complex predicate",
+    "mapping": "output = match input\n| this < 10 and this > 5 => true\n",
+    "input": {"input": 7},
+    "output": {"output": true}
+  },
+
+  {
+    "name": "matching on input with a complex predicate and failing",
+    "mapping": "output = match input\n| this < 10 and this > 5 => true\n",
+    "input": {"input": 42},
+    "output": {}
+  },
+
+  {
+    "name": "underscore should be a final case block",
+    "mapping": "output = match input | this == true => 1 | _ => 2 | _ => 3",
+    "input": {},
+    "output": {"output": 2}
+  },
+
+  {
+    "name": "falling through should not happen",
+    "mapping": "output = match input | _ => a | _ => b | _ => 3",
+    "input": {},
+    "output": {}
+  }
+
+]

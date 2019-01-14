@@ -1,0 +1,128 @@
+[
+  {
+    "name": "slice the first item",
+    "mapping": "b = a[0:1]",
+    "input": {"a": [10, 11]},
+    "output": {"b": [10]}
+  },
+  {
+    "name": "slice the first item - empty",
+    "mapping": "b = a[0:1]",
+    "input": {"a": []},
+    "output": {"b": []}
+  },
+  {
+    "name": "slice the first item - missing",
+    "mapping": "b = a[0:1]",
+    "input": {},
+    "output": {}
+  },
+  {
+    "name": "slice the first and second item - three items",
+    "mapping": "b = a[0:2]",
+    "input": {"a": [10, 11, 12]},
+    "output": {"b": [10, 11]}
+  },
+  {
+    "name": "slice the first and second item - two items",
+    "mapping": "b = a[0:2]",
+    "input": {"a": [10, 11]},
+    "output": {"b": [10, 11]}
+  },
+  {
+    "name": "slice the first and second item - empty",
+    "mapping": "b = a[0:2]",
+    "input": {"a": []},
+    "output": {"b": []}
+  },
+  {
+    "name": "compatibility check with JavaScript's slice - three items",
+    "mapping": "b = a[1:2] \n c = a[1] \n d = a[1:1]",
+    "input": {"a": [10, 11, 12]},
+    "output": {"b": [11], "c": 11, "d": []}
+  },
+  {
+    "name": "compatibility check with JavaScript's slice - no overlap",
+    "mapping": "b = a[1:2] \n c = a[1] \n d = a[1:1]",
+    "input": {"a": [10]},
+    "output": {"b": [], "d": []}
+  },
+  {
+    "name": "compatibility check with JavaScript's slice - empty",
+    "mapping": "b = a[1:2] \n c = a[1] \n d = a[1:1]",
+    "input": {"a": []},
+    "output": {"b": [], "d": []}
+  },
+  {
+    "name": "slice second and third item - four items",
+    "mapping": "b = a[1:3]",
+    "input": {"a": [10, 11, 12, 13]},
+    "output": {"b": [11, 12]}
+  },
+  {
+    "name": "slice second and third item - three items",
+    "mapping": "b = a[1:3]",
+    "input": {"a": [10, 11, 12]},
+    "output": {"b": [11, 12]}
+  },
+  {
+    "name": "slice second and third items - one item",
+    "mapping": "b = a[1:3]",
+    "input": {"a": [10]},
+    "output": {"b": []}
+  },
+  {
+    "name": "slice second and third item - empty",
+    "mapping": "b = a[1:3]",
+    "input": {"a": []},
+    "output": {"b": []}
+  },
+  {
+    "name": "slice first three items",
+    "mapping": "b = a[:3]",
+    "input": {"a": [10, 11, 12, 13]},
+    "output": {"b": [10, 11, 12]}
+  },
+  {
+    "name": "slice first three items - two items",
+    "mapping": "b = a[:3]",
+    "input": {"a": [10, 11]},
+    "output": {"b": [10, 11]}
+  },
+  {
+    "name": "slice first three items - empty",
+    "mapping": "b = a[:3]",
+    "input": {"a": []},
+    "output": {"b": []}
+  },
+  {
+    "name": "slice everything after third",
+    "mapping": "b = a[2:]",
+    "input": {"a": [10, 11, 12, 13]},
+    "output": {"b": [12, 13]}
+  },
+  {
+    "name": "slice everything after third - two items",
+    "mapping": "b = a[2:]",
+    "input": {"a": [10, 11]},
+    "output": {"b": []}
+  },
+  {
+    "name": "slice everything after third - empty",
+    "mapping": "b = a[2:]",
+    "input": {"a": []},
+    "output": {"b": []}
+  },
+  {
+    "name": "slice strings dynamically",
+    "mapping": "r = s.slice(a, b)",
+    "input": {"s": "abcdef", "a": 1, "b": 3},
+    "output": {"r": "bc"}
+  },
+  {
+    "name": "slice strings normally",
+    "mapping": "r = \"hello\"[1:3]",
+    "input": {},
+    "output": {"r": "el"}
+  }
+]

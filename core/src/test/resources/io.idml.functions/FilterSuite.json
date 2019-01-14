@@ -1,0 +1,217 @@
+[
+  // Filters functions after paths
+
+  {
+    "name": "paths: false filter",
+    "mapping": "a = p.filter(missing exists)",
+    "input": {"p": true},
+    "output": {}
+  },
+
+  {
+    "name": "paths: root scope",
+    "mapping": "a = p.filter(root.q exists)",
+    "input": {"p": true, "q": true},
+    "output": {"a": true}
+  },
+
+  {
+    "name": "paths: implicit scope",
+    "mapping": "a = p.filter(q exists).r",
+    "input": {"p": {"q": true, "r": true}},
+    "output": {"a": true}
+  },
+  {
+    "name": "paths: this scope",
+    "mapping": "a = p.filter(this.q exists).r",
+    "input": {"p": {"q": true, "r": true}},
+    "output": {"a": true}
+  },
+
+  // Filters after literals
+
+  {
+    "name": "literals: false filter",
+    "mapping": "a = true.filter(missing exists)",
+    "input": {"p": true},
+    "output": {}
+  },
+
+  {
+    "name": "literals: root scope",
+    "mapping": "a = true.filter(root.q exists)",
+    "input": {"p": true, "q": true},
+    "output": {"a": true}
+  },
+
+  {
+    "name": "literals: implicit scope (true.q doesn't exist)",
+    "mapping": "a = true.filter(q exists)",
+    "input": {"p": true, "q": true},
+    "output": {}
+  },
+
+  {
+    "name": "literals: this scope (true.q doesn't exist)",
+    "mapping": "a = true.filter(this.q exists)",
+    "input": {"p": true, "q": true},
+    "output": {}
+  },
+
+  // Filters after 'this'
+
+  {
+    "name": "this: false filter",
+    "mapping": "a = this.filter(missing exists)",
+    "input": {"p": true},
+    "output": {}
+  },
+
+  {
+    "name": "this: root scope",
+    "mapping": "a = this.filter(root.p exists)",
+    "input": {"p": true},
+    "output": {"a": {"p": true}}
+  },
+
+  {
+    "name": "this: implicit scope",
+    "mapping": "a = this.filter(p exists)",
+    "input": {"p": true},
+    "output": {"a": {"p": true}}
+  },
+
+  {
+    "name": "this: this scope",
+    "mapping": "a = this.filter(this.p exists)",
+    "input": {"p": true},
+    "output": {"a": {"p": true}}
+  },
+
+  // Filters after 'root'
+
+  {
+    "name": "root: false filter",
+    "mapping": "a = root.filter(missing exists)",
+    "input": {"p": true},
+    "output": {}
+  },
+
+  {
+    "name": "root: root scope",
+    "mapping": "a = root.filter(root.p exists)",
+    "input": {"p": true},
+    "output": {"a": {"p": true}}
+  },
+
+  {
+    "name": "root: implicit scope",
+    "mapping": "a = root.filter(p exists)",
+    "input": {"p": true},
+    "output": {"a": {"p": true}}
+  },
+
+  {
+    "name": "root: this scope",
+    "mapping": "a = root.filter(this.p exists)",
+    "input": {"p": true},
+    "output": {"a": {"p": true}}
+  },
+
+  // Paths after filters
+
+
+  {
+    "name": "post-filter: false filter",
+    "mapping": "a = p.filter(missing exists).q",
+    "input": {"p": {"q": true}},
+    "output": {}
+  },
+
+  {
+    "name": "post-filter: paths",
+    "mapping": "a = p.filter(q exists).q",
+    "input": {"p": {"q": true}},
+    "output": {"a": true}
+  },
+
+  {
+    "name": "post-filter: functions",
+    "mapping": "a = p.filter(root.q exists).average()",
+    "input": {"p": [1, 1, 1], "q": 123},
+    "output": {"a": 1}
+  },
+
+  {
+    "name": "post-filter: index",
+    "mapping": "a = p.filter(root.q exists)[1]",
+    "input": {"p": [1, 2, 3], "q": true},
+    "output": {"a": 2}
+  },
+
+  {
+    "name": "post-filter: slice",
+    "mapping": "a = p.filter(root.q exists)[1:3]",
+    "input": {"p": [1, 2, 3, 4], "q": true},
+    "output": {"a": [2, 3]}
+  },
+
+  {
+    "name": "post-filter: filter",
+    "mapping": "a = p.filter(root.q exists).filter(root.q exists)",
+    "input": {"p": true, "q": true},
+    "output": {"a": true}
+  },
+
+  // Filtering arrays
+
+  {
+    "name": "arrays: false filter",
+    "mapping": "a = p.filter(missing exists)",
+    "input": {"p": [1, 2, 3, 4] },
+    "output": {}
+  },
+
+  {
+    "name": "arrays: partially true filter",
+    "mapping": "a = p.filter(this == 2 or this == 4)",
+    "input": {"p": [1, 2, 3, 4] },
+    "output": {"a": [2, 4]}
+  },
+
+  {
+    "name": "arrays: transform filtered items",
+    "mapping": "a = p.filter(this == 2 or this == 4).map(string())",
+    "input": {"p": [1, 2, 3, 4] },
+    "output": {"a": ["2", "4"]}
+  },
+
+  {
+    "name": "arrays: filter less than 3",
+    "mapping": "a = p.filter(this < 3)",
+    "input": {"p": [1, 2, 3, 4] },
+    "output": {"a": [1,2]}
+  },
+
+
+   {
+    "name": "arrays: filter greater than 3",
+    "mapping": "a = p.filter(this > 3)",
+    "input": {"p": [1, 2, 3, 4] },
+    "output": {"a": [4]}
+  },
+
+  {
+    "name": "arrays: filter less or equal to 3",
+    "mapping": "a = p.filter(this <= 3)",
+    "input": {"p": [1, 2, 3, 4] },
+    "output": {"a": [1,2,3]}
+  },
+
+  {
+    "name": "arrays: filter great than or equal to 3",
+    "mapping": "a = p.filter(this >= 3)",
+    "input": {"p": [1, 2, 3, 4] },
+    "output": {"a": [3,4]}
+  }
+]

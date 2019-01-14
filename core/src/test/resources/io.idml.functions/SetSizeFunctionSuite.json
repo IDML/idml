@@ -1,0 +1,85 @@
+[
+  {
+    "name": "pass through an empty array",
+    "mapping": "a = b.size(1)",
+    "input": {"b": []},
+    "output": {"a": []}
+  },
+
+  {
+    "name": "scale an array with two items",
+    "mapping": "a = b.size(1)",
+    "input": {"b": [true, false]},
+    "output": {"a": [true]}
+  },
+
+  {
+    "name": "pass through an empty string",
+    "mapping": "a = b.size(1)",
+    "input": {"b": ""},
+    "output": {"a": ""}
+  },
+
+  {
+    "name": "scale a string of size four",
+    "mapping": "a = b.size(1)",
+    "input": {"b": "1234"},
+    "output": {"a": "1"}
+  },
+
+  {
+    "name": "ignore missing fields",
+    "mapping": "a = b.size(1)",
+    "input": {},
+    "output": {}
+  },
+
+  {
+    "name": "can't resize some things",
+    "mapping": "a = b.size(1)",
+    "input": {"b": true},
+    "output": {}
+  },
+
+  {
+    "name": "invalid sizes for arrays",
+    "mapping": "a = b.size(-1)",
+    "input": {"b": [true, false]},
+    "output": {}
+  },
+
+  {
+    "name": "invalid sizes for strings",
+    "mapping": "a = b.size(-1)",
+    "input": {"b": "1234"},
+    "output": {}
+  },
+
+  {
+    "name": "zero size for arrays",
+    "mapping": "a = b.size(0)",
+    "input": {"b": [true, false]},
+    "output": {"a": []}
+  },
+
+  {
+    "name": "zero size for strings",
+    "mapping": "a = b.size(0)",
+    "input": {"b": "1234"},
+    "output": {"a": ""}
+  },
+
+  {
+    "name": "size that exceeds the string length",
+    "mapping": "a = b.size(10)",
+    "input": {"b": "1234"},
+    "output": {"a": "1234"}
+  },
+
+  {
+    "name": "size that exceeds the array length",
+    "mapping": "a = b.size(10)",
+    "input": {"b": [true, false]},
+    "output": {"a": [true, false]}
+  }
+]

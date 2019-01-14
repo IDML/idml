@@ -1,0 +1,56 @@
+[
+  {
+    "name": "sort(this) and sort should both sort numbers",
+    "mapping": "output1 = input.sort(this)\n output2 = input.sort()",
+    "input": {"input": [9,1,8,2,7,3,6,4,5]},
+    "output": {"output1": [1,2,3,4,5,6,7,8,9], "output2": [1,2,3,4,5,6,7,8,9]}
+  },
+  {
+    "name": "sort should work on mixed-type lists",
+    "mapping": "output = input.sort()",
+    "input": {"input": [1,2, "hello", 3, "world", null, -100]},
+    "output": {"output": [ null, -100, 1, 2, 3, "hello", "world" ]}
+  },
+  {
+    "name": "you should be able to sort by a custom expression",
+    "mapping": "output = input.sort(0 - this)",
+    "input": {"input": [9,1,8,2,7,3,6,4,5]},
+    "output": {"output": [9,8,7,6,5,4,3,2,1]}
+  },
+  {
+    "name": "do something sensible if the expression evaluates to null",
+    "mapping": "output = input.sort(this.int())",
+    "input": {"input": [5,4,"1", null, {}]},
+    "output": {"output": ["1", 4, 5]}
+  },
+  {
+    "name": "you should be able to sort a list of floats and ints",
+    "mapping": "output = input.sort()",
+    "input": {"input": [9.0, 8.0, 7, 5, 6, 4, 3.0, 5.5, 0.0]},
+    "output": {"output": [ 0.0, 3.0, 4, 5, 5.5, 6, 7, 8.0, 9.0 ]}
+  },
+  {
+    "name": "use comparators via operators",
+    "mapping": "result = if 5 > 4 then true else false",
+    "input": {},
+    "output": {"result": true}
+  },
+  {
+    "name": "use comparators via operators on floats",
+    "mapping": "result = if 3.142 > 2.941 then true else false",
+    "input": {},
+    "output": {"result": true}
+  },
+  {
+    "name": "use comparators via operators with mixed floats and ints",
+    "mapping": "result = if 5.0 > 4 then true else false",
+    "input": {},
+    "output": {"result": true}
+  } ,
+  {
+    "name": "use comparators via operators with mixed floats and ints 2",
+    "mapping": "result = if 5.0 < 4 then true else false",
+    "input": {},
+    "output": {"result": false}
+  }
+]

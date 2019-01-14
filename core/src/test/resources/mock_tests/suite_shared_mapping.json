@@ -1,0 +1,15 @@
+{
+  "mapping": "a = b",
+  "tests": [
+    {
+      "name": "This is a mock test",
+      "input": {"b": true},
+      "output": {"a": true}
+    },
+    {
+      "name": "This is another mock test",
+      "input": {"b": false},
+      "output": {"a": false}
+    }
+  ]
+}

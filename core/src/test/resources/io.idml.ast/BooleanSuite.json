@@ -1,0 +1,51 @@
+[
+  {
+    "name": "true",
+    "mapping": "t = true",
+    "input": {},
+    "output": {"t": true}
+  },
+
+  {
+    "name": "false",
+    "mapping": "f = false",
+    "input": {},
+    "output": {"f": false}
+  },
+
+  {
+    "name": "filter with true",
+    "mapping": "output = input [ root.condition == true ]",
+    "input": {"input": "tokendata", "condition": true},
+    "output": {"output": "tokendata"}
+  },
+
+  {
+    "name": "filter with false",
+    "mapping": "output = input [ root.condition == false ]",
+    "input": {"input": "tokendata", "condition": false},
+    "output": {"output": "tokendata"}
+  },
+
+  {
+    "name": "bypassing booleans with backticks",
+    "mapping": "output = `true`",
+    "input": {"true": "hello"} ,
+    "output": {"output": "hello"}
+  },
+
+  {
+    "name": "bypassing booleans with backticks in absolute paths",
+    "mapping": "output = root.`true`",
+    "input": {"true": "hello"},
+    "output": {"output": "hello"}
+  },
+
+  {
+    "name": "name a variable true using backticks",
+    "mapping": "`true` = thing",
+    "input": {"thing": "hello world"},
+    "output": {"true": "hello world"}
+  }
+
+]

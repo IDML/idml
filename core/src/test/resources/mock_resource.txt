@@ -1,0 +1,1 @@
+This only exists so ResourceResolver can be integration tested

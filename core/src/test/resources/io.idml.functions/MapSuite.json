@@ -1,0 +1,8 @@
+[
+  {
+    "name": "map should map arrays",
+    "mapping": "result = xs.map(this * 2)",
+    "input": {"xs":[1,2,3]},
+    "output": {"result":[2,4,6]}
+  }
+]

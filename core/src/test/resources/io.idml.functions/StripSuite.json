@@ -1,0 +1,14 @@
+[
+  {
+    "name": "strip should strip whitespace from strings",
+    "mapping": "output = input.strip()",
+    "input": {"input": "  hello world  \t\n"},
+    "output": {"output": "hello world"}
+  },
+  {
+    "name": "strip should strip weird whitespace",
+    "mapping": "output = input.strip()",
+    "input": {"input": " foo bar \u00a0\n\t"},
+    "output": {"output": "foo bar"}
+  }
+]

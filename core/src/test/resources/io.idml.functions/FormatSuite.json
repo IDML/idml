@@ -1,0 +1,86 @@
+[
+  {
+    "name": "insert a simple string",
+    "mapping": "output = input.format(arg1)",
+    "input": {"input": "%s", "arg1": "hello, world!"},
+    "output": {"output": "hello, world!"}
+  },
+  {
+    "name": "join two strings",
+    "mapping": "output = input.format(arg1, arg2)",
+    "input": {"input": "%s %s", "arg1": "hello,", "arg2": "world!" },
+    "output": {"output": "hello, world!"}
+  },
+  {
+    "name": "return nothing if a parameter is missing",
+    "mapping": "output = \"%s %s\".format(\"a\", missing)",
+    "input": {},
+    "output": {}
+  },
+  {
+    "name": "pad numbers",
+    "mapping": "output = input.format(arg1)",
+    "input": {"input": "%10d", "arg1": 42 },
+    "output": {"output": "        42"}
+  },
+  {
+    "name": "lots of arguments",
+    "mapping": "output = input.format(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z)",
+    "input": {"input": "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", "a" :"a", "b" :"b", "c" :"c", "d" :"d", "e" :"e", "f" :"f", "g" :"g", "h" :"h", "i" :"i", "j" :"j", "k" :"k", "l" :"l", "m" :"m", "n" :"n", "o" :"o", "p" :"p", "q" :"q", "r" :"r", "s" :"s", "t" :"t", "u" :"u", "v" :"v", "w" :"w", "x" :"x", "y" :"y", "z" :"z" },
+    "output": {"output": "abcdefghijklmnopqrstuvwxyz"}
+  },
+  {
+    "name": "truncate a string",
+    "mapping": "output = input.format(arg1)",
+    "input": {"input": "%.3s", "arg1": "hello" },
+    "output": {"output": "hel"}
+  },
+  {
+    "name": "format a double",
+    "mapping": "output = input.format(arg1)",
+    "input": {"input": "%.2f", "arg1": 3.142 },
+    "output": {"output": "3.14"}
+  },
+  {
+    "name": "convert integer to hex",
+    "mapping": "output = input.format(arg1)",
+    "input": {"input": "%#08x", "arg1": 7 },
+    "output": {"output": "0x000007"}
+  },
+  {
+    "name": "truncate a double by significant figures",
+    "mapping": "output = input.format(arg1)",
+    "input": {"input": "%.2g", "arg1": 0.00097281289},
+    "output": {"output": "0.00097"}
+  },
+  {
+    "name": "covert a double to scientific notation",
+    "mapping": "output = input.format(arg1)",
+    "input": {"input": "%e", "arg1": 0.00097281289} ,
+    "output": {"output": "9.728129e-04"}
+  },
+  {
+    "name": "right align a string",
+    "mapping": "output = input.format(arg1)",
+    "input": {"input": "%5s", "arg1": "abc"} ,
+    "output": {"output": "  abc"}
+  },
+  {
+    "name": "put a number into a string",
+    "mapping": "output = input.format(arg1)",
+    "input": {"input": "my number is %d", "arg1": 42},
+    "output": {"output": "my number is 42"}
+  },
+  {
+    "name": "format using a string literal",
+    "mapping": "output = \"%s - %d\".format(s, d) ",
+    "input": {"s": "mystring", "d": 12},
+    "output": {"output": "mystring - 12"}
+  },
+  {
+    "name": "",
+    "mapping": "output = \"%s - %d\".format(\"foo\", 71) ",
+    "input": {},
+    "output": {"output": "foo - 71"}
+  }
+]

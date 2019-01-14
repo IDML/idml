@@ -1,0 +1,30 @@
+[
+  {
+    "name": "match with no groups or results",
+    "mapping": "output = input.match(\"a\")",
+    "input": {"input": "a"},
+    "output": {"output": []}
+  },
+
+  {
+    "name": "match with no groups with regex style argument",
+    "mapping": "output = input.match(\"a\")",
+    "input":  {"input": "a"},
+    "output":  {"output": []}
+  },
+
+  {
+    "name": "match with no groups",
+    "mapping": " output = input.match(\"(a+)\")",
+    "input": {"input": "aaa"},
+    "output": {"output": ["aaa"]}
+  },
+
+  {
+    "name": "match a load of groups",
+    "mapping": "output = input.match(\"(foo) (bar) (baz)\")",
+    "input": {"input": "foo bar baz"},
+    "output": {"output": ["foo", "bar", "baz"]}
+  }
+
+]

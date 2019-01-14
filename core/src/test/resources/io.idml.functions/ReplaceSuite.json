@@ -1,0 +1,20 @@
+[
+  {
+    "name": "replace a letter",
+    "mapping": " output = input.replace(\"f\", \"z\")",
+    "input": {"input": "foo"},
+    "output": {"output": "zoo"}
+  },
+  {
+    "name": "replace a word",
+    "mapping": "output = input.replace(\"bar\", \"zoo\")",
+    "input": {"input": "foo bar baz"},
+    "output": {"output": "foo zoo baz"}
+  },
+  {
+    "name": "replace a lot of letters",
+    "mapping": "output = input.replace(\".\", \"dog\")",
+    "input": {"input": "foo"},
+    "output": {"output": "dogdogdog"}
+  }
+]

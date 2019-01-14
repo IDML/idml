@@ -1,0 +1,34 @@
+[
+
+  {
+    "name": "when labels contain characters that prevent them from being written as normal labels, text can be surrounded by backticks",
+    "mapping": "x = `backticks: my incredible message!`.string()",
+    "input": {"backticks: my incredible message!": "abc"},
+    "output": {"x": "abc"}
+  },
+
+  {
+    "name": "root label",
+    "mapping": "`root` = `root`.string()",
+    "input": {
+      "root": "root_value"
+    },
+    "output": {
+      "root": "root_value"
+    }
+  },
+
+
+  {
+    "name": "this label",
+    "mapping": "`this` = `this`.string()",
+    "input": {
+      "this": "this_value"
+    },
+    "output": {
+      "this": "this_value"
+    }
+  }
+
+
+]

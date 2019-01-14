@@ -1,0 +1,38 @@
+[
+  {
+    "name": "softmax should work the way it says it does on the wikipedia page",
+    "mapping": "output = input.softmax().extract(this.round(3))",
+    "input": {"input": [1,2,3,4,1,2,3]},
+    "output": {"output": [0.024, 0.064, 0.175, 0.475, 0.024, 0.064, 0.175]}
+  },
+  {
+    "name": "average should do a normal average",
+    "mapping": "output = input.average()",
+    "input": {"input": [1,2,3,4,5]},
+    "output": {"output": 3.0}
+  },
+  {
+    "name": "median should work on uneven length lists",
+    "mapping": "output = input.median()",
+    "input": {"input": [1,2,3,4,5]},
+    "output": {"output": 3}
+  },
+  {
+    "name": "median should work on even length lists",
+    "mapping": "output = input.median()",
+    "input": {"input": [1,2,3,4]},
+    "output": {"output": 2.5}
+  },
+  {
+    "name": "variance should calculate variance",
+    "mapping": "output = input.variance()",
+    "input": {"input": [1,2,3,4,5]},
+    "output": {"output": 2.0}
+  },
+  {
+    "name": "stdDev should calculate standard deviation",
+    "mapping": "output = input.stdDev().round(3)",
+    "input": {"input": [1,2,3,4,5]},
+    "output": {"output": 1.414}
+  }
+]

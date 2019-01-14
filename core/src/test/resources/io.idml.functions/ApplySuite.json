@@ -1,0 +1,76 @@
+[
+  {
+    "name": "apply should always return an object",
+    "mapping": "[main] output = apply(\"my_block\") \n [my_block] my_field = \"some_value\"",
+    "input": {},
+    "output": {"output": {"my_field": "some_value"}}
+  },
+
+  {
+    "name": "paths inside blocks are relative",
+    "mapping": "[main] a = x.apply(\"my_block\") \n [my_block] b = y",
+    "input": 	{
+      "x": {
+        "y": 12
+      }
+    },
+    "output": {
+      "a": {
+        "b": 12
+      }
+    }
+  },
+
+  {
+    "name": "blocks can iterate arrays",
+    "mapping": "[main]a = x.apply(\"my_block\") \n [my_block] b = y + 1",
+    "input": 	{
+      "x": [
+        {"y": 10},
+        {"y": 20},
+        {"y": 30}
+      ]
+    },
+    "output": 	{
+      "a": [
+        {"b": 11},
+        {"b": 21},
+        {"b": 31}
+      ]
+    }
+  },
+
+  {
+    "name": "blocks can be deeply nested",
+    "mapping": "[main] a.b = apply(\"my_block\") \n [my_block] c.d = \"some_value\"",
+    "input": {},
+    "output": 	{
+      "a": {
+        "b": {
+          "c": {
+            "d": "some_value"
+          }
+        }
+      }
+    }
+  },
+
+  {
+    "name": "referring to document root inside blocks",
+    "mapping": "[main] output = apply_on_me.apply(\"my_block\") \n [my_block] from_relative_path = my_value \n from_absolute_path = root.top_level_object.my_value",
+    "input": {
+      "apply_on_me": {
+        "my_value": "relative_path_value"
+      },
+      "top_level_object": {
+        "my_value": "absolute_path_value"
+      }
+    },
+    "output": {
+      "output": {
+        "from_relative_path": "relative_path_value",
+        "from_absolute_path": "absolute_path_value"
+      }
+    }
+  }
+]

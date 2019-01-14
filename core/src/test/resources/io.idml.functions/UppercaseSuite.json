@@ -1,0 +1,58 @@
+[
+  {
+    "name": "upper case 1",
+    "mapping": "output = input.uppercase()",
+    "input": {"input": "abc"},
+    "output": {"output": "ABC"}
+  },
+  {
+    "name": "upper case 2",
+    "mapping": "output = input.uppercase()",
+    "input": {"input": "ABC"},
+    "output": {"output": "ABC"}
+  },
+  {
+    "name": "upper case 3",
+    "mapping": "output = input.uppercase()",
+    "input": {"input": "Abc"},
+    "output": {"output": "ABC"}
+  },
+  {
+    "name": "upper case 4",
+    "mapping": "output = input.uppercase()",
+    "input": {"input": false},
+    "output": {"output": false}
+  },
+  {
+    "name": "upper case 5",
+    "mapping": "output = input.uppercase()",
+    "input": {"input": 1234},
+    "output": {"output": 1234}
+  },
+  {
+    "name": "upper case 6",
+    "mapping": "output = input.uppercase()",
+    "input": {"input": null},
+    "output": {"output": null}
+  },
+  {
+    "name": "upper case 7",
+    "mapping": "output = input.uppercase()",
+    "input": {"input": {"input": "Abc"}},
+    "output": {"output": {"input": "Abc"}}
+  },
+  {
+    "name": "DQ-904",
+    "mapping": "web.content = email.number.uppercase()",
+    "input": {
+      "email": {
+        "number": "aBc aca"
+      }
+    },
+    "output": {
+      "web": {
+        "content": "ABC ACA"
+      }
+    }
+  }
+]

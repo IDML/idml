@@ -1,0 +1,92 @@
+[
+  {
+    "name": "validating a date",
+    "mapping": "output = input.date()",
+    "input": {"input": "Tue, 20 May 2014 11:22:34 +0000"},
+    "output": {"output": "Tue, 20 May 2014 11:22:34 +0000"}
+  },
+  {
+    "name": "a date that is missing a day value",
+    "mapping": "output = input.date()",
+    "input": {"input": "Tue 2014 11:22:34 +0000"},
+    "output": {}
+  },
+  {
+    "name": "a date with an invalid day value",
+    "mapping": "output = input.date()",
+    "input": {"input": "Tue, 33 May 2014 11:22:34 +0000"} ,
+    "output": {}
+  },
+  {
+    "name": "timezones",
+    "mapping": "output = input.date()",
+    "input": {"input": "Tue, 20 May 2014 11:22:34 +0500"},
+    "output": {"output": "Tue, 20 May 2014 11:22:34 +0500"}
+  },
+  {
+    "name": "parsing unix timestamps",
+    "mapping": "output = input.date()",
+    "input": {"input": 1400581354},
+    "output": {"output": "Tue, 20 May 2014 10:22:34 +0000"}
+  },
+  {
+    "name": "rfc 822",
+    "mapping": "output = input.date()",
+    "input": {"input": "Tue, 20 May 2014 11:22:34 +0000"} ,
+    "output": {"output": "Tue, 20 May 2014 11:22:34 +0000"}
+  },
+  {
+    "name": "twitter dates",
+    "mapping": "output = input.date()",
+    "input":  {"input": "Wed Dec 14 03:35:48 +0000 2011"},
+    "output": {"output": "Wed, 14 Dec 2011 03:35:48 +0000"}
+  },
+  {
+    "name": "iso 8601 date and time with timezone",
+    "mapping": "output = input.date()",
+    "input": {"input": "2014-05-20T11:22:34+00:00"},
+    "output": {"output": "Tue, 20 May 2014 11:22:34 +0000"}
+  },
+  {
+    "name": "iso 8601 date and time without timezone",
+    "mapping": "output = input.date()",
+    "input": {"input": "2014-05-20T11:22:34"},
+    "output": {"output": "Tue, 20 May 2014 11:22:34 +0000"}
+  },
+  {
+    "name": "iso date without timezone",
+    "mapping": "output = input.date()",
+    "input": {"input": "2014-05-20"},
+    "output": {"output": "Tue, 20 May 2014 00:00:00 +0000"}
+  },
+  {
+    "name": "iso 8601 datetime with time",
+    "mapping": "output = input.date()",
+    "input": {"input": "2014-05-20 11:22:34"} ,
+    "output": {	"output": "Tue, 20 May 2014 11:22:34 +0000"}
+  },
+  {
+    "name": "unsupported values - bool",
+    "mapping": "output = input.date()",
+    "input": {"input": false},
+    "output": {}
+  },
+  {
+    "name": "unsupported values - string",
+    "mapping": "output = input.date()",
+    "input": {"input": "abc"},
+    "output": {}
+  },
+  {
+    "name": "custom date format",
+    "mapping": "formattedOutput = formattedInput.date(\"yyyy.MM.dd G 'at' HH:mm:ss z\")",
+    "input": {"formattedInput": "2001.07.04 AD at 12:08:56 PDT"},
+    "output": {"formattedOutput": "Wed, 04 Jul 2001 12:08:56 -0700"}
+  },
+  {
+    "name": "milliseconds from a number",
+    "mapping": "millisOutput = millisInput.millis()",
+    "input": {"millisInput": 1413803342198} ,
+    "output": {"millisOutput" : "Mon, 20 Oct 2014 11:09:02 +0000"}
+  }
+]
