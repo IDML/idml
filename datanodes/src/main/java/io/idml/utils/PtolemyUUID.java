@@ -7,6 +7,8 @@ import java.util.UUID;
 /**
  * This class exists because all the fun parts of java.util.UUID are private and I can't copy paste the logic into scala
  * reliably.
+ *
+ * This code is from OpenJDK and this file, and this file only, is licensed under the GPL with linking exception
  */
 public class PtolemyUUID {
     public static UUID nameUUIDFromBytes5(byte[] name) {
