@@ -2,7 +2,7 @@
   {
     "name": "combining indexOf with get for late-bound field lookup",
 
-    "mapping": "@/com.datasift.ptolemy.functions/IndexOfWithGet.ini",
+    "mapping": "@/io.idml.functions/IndexOfWithGet.ini",
 
     "input": {
       "input_type": "vet data",

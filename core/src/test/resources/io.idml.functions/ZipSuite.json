@@ -1,7 +1,7 @@
 [
   {
     "name": "zip",
-    "mapping": "@/com.datasift.ptolemy.functions/ZipSuite.ini",
+    "mapping": "@/io.idml.functions/ZipSuite.ini",
     "input": {
       "input_type": "vet data",
       "names":   ["bob", "terry", "steve"],

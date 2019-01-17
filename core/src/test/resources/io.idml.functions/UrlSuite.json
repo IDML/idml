@@ -31,7 +31,7 @@
   },
   {
     "name": "url magic methods",
-    "mapping": "@/com.datasift.ptolemy.functions/UrlSuiteMagicMethods.ini",
+    "mapping": "@/io.idml.functions/UrlSuiteMagicMethods.ini",
     "input": {"x": "http://www.google.com/abc?q=apple"} ,
     "output": 	{
       "protocol": "http",

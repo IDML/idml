@@ -22,7 +22,7 @@
 
   {
     "name": "email magic methods - basic",
-    "mapping": "@/com.datasift.ptolemy.functions/EmailSuiteMagicMethods.ini",
+    "mapping": "@/io.idml.functions/EmailSuiteMagicMethods.ini",
     "input": {"input": "andi.miller@datasift.com"},
     "output": {
       "name": null, // FIXME: shouldn't this be 'missing'?
@@ -34,7 +34,7 @@
 
   {
     "name": "email magic methods - rfc 822",
-    "mapping": "@/com.datasift.ptolemy.functions/EmailSuiteMagicMethods.ini",
+    "mapping": "@/io.idml.functions/EmailSuiteMagicMethods.ini",
     "input": {"input": "Andi Miller <andi.miller@datasift.com>"},
     "output": {
       "name": "Andi Miller",
