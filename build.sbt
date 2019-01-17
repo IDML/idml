@@ -25,17 +25,20 @@ lazy val core = project
     buildInfoOptions += BuildInfoOption.BuildTime
   )
 
-lazy val geo = project.dependsOn(core)
+//lazy val geo = project.dependsOn(core)
 
 lazy val jsoup = project.dependsOn(core)
 
-lazy val utils = project.dependsOn(core).dependsOn(geo).dependsOn(jsoup)
+lazy val hashing = project.dependsOn(core)
 
-lazy val repl = project.dependsOn(core).dependsOn(geo).dependsOn(jsoup).dependsOn(hashing)
+lazy val utils = project.dependsOn(core).dependsOn(jsoup)
+
+lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing)
+
+lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils)
 
 lazy val tool = project
   .dependsOn(core)
-  .dependsOn(geo)
   .dependsOn(jsoup)
   .dependsOn(utils)
   .dependsOn(repl)
@@ -45,8 +48,4 @@ lazy val tool = project
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript))
   )
 
-lazy val geodb = project.dependsOn(core).dependsOn(geo)
-
-lazy val idmld = project.dependsOn(core).dependsOn(geo).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils)
-
-lazy val hashing = project.dependsOn(core)
+//lazy val geodb = project.dependsOn(core).dependsOn(geo)

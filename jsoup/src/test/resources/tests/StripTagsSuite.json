@@ -1,0 +1,105 @@
+[
+  {
+    "name": "stripTags is recognised as a function",
+    "mapping": "a = b.stripTags()"
+  },
+
+  {
+    "name": "stripTags will not affect text without tags",
+    "mapping": "a = b.stripTags()",
+    "input": {
+      "b": "abcdefg"
+    },
+    "output": {
+      "a": "abcdefg"
+    }
+  },
+
+  {
+    "name": "stripTags wants to treat <efg as an implicit <efg>",
+    "mapping": "a = b.stripTags()",
+    "input": {
+      "b": "ab>cd<efg"
+    },
+    "output": {
+      "a": "ab>cd"
+    }
+  },
+
+  {
+    "name": "stripTags will remove unclosed tags",
+    "mapping": "a = b.stripTags()",
+    "input": {
+      "b": "ab<cd>efg"
+    },
+    "output": {
+      "a": "abefg"
+    }
+  },
+
+  {
+    "name": "stripTags will remove single tags with a separating space",
+    "mapping": "a = b.stripTags()",
+    "input": {
+      "b": "ab<cd />efg"
+    },
+    "output": {
+      "a": "abefg"
+    }
+  },
+
+  {
+    "name": "stripTags will remove single tags without a separating space",
+    "mapping": "a = b.stripTags()",
+    "input": {
+      "b": "ab<cd/>efg"
+    },
+    "output": {
+      "a": "abefg"
+    }
+  },
+
+  {
+    "name": "stripTags will remove tags without content",
+    "mapping": "a = b.stripTags()",
+    "input": {
+      "b": "ab<cd></cd>efg"
+    },
+    "output": {
+      "a": "abefg"
+    }
+  },
+
+  {
+    "name": "stripTags will remove tags and preserve their content",
+    "mapping": "a = b.stripTags()",
+    "input": {
+      "b": "ab<cd>ef</cd>g"
+    },
+    "output": {
+      "a": "abefg"
+    }
+  },
+
+  {
+    "name": "stripTags will remove nested tags without content",
+    "mapping": "a = b.stripTags()",
+    "input": {
+      "b": "ab<cd><ef></ef></cd>g"
+    },
+    "output": {
+      "a": "abg"
+    }
+  },
+
+  {
+    "name": "stripTags will remove nested tags and preserve their content",
+    "mapping": "a = b.stripTags()",
+    "input": {
+      "b": "ab<cd>1<ef>2</ef>3</cd>g"
+    },
+    "output": {
+      "a": "ab123g"
+    }
+  }
+]
