@@ -1,0 +1,15 @@
+language: scala
+scala:
+ - 2.12.4
+script:
+ - sbt test
+ - sbt "project tool" "assembly"
+ - for f in tool/target/scala-2.12/idml-tool-assembly-*.jar; do cp "$f" "idml.jar"; done
+deploy:
+  provider: releases
+  api_key:
+    secure: "HEDSBlovbw6vl2B6ifXeCMmm7nZRU+NvDkyYDS8/QOydx5kZxa93TZm6svQwGa9LhuJw1c0SpSqlMbAcb5FxcfsOcuWEdI167r/Ykm4BtwXgV++cu82tCgzZPU32OeUCZR+IukQtTjzQoPEDu7UTe5x51jTO1Mbux4a6BvSTSp0zjbZggm+/o9CJRFXZWKsU9nATsfTlagbHStCK2y7HurpsVm/r6UUEsXID0kXyuWs8Bp0Mop/ZUPGI0vXAdIodDjw9F5pj24Giid0h7PRkoWM3RMfOEJPLBBmiIavYA5uOSSJHT9//Za/w+g7BPAmv3yfAAijEl1XiKV/I0zTZbaGUPfisbuEa8vCXv0I8uc/TqUtfMeoRsjqd+W1rLXfX6KlMH32+tsdPuHDafNZAfzz7Fr46CfbaD3q8C7SYV1+ToEeGYVJVTaUtx1SdP35811AawzAPFYpeWlE/K+Gu+JNHD7b1LWbB7KQLNPEqdUMkCygndZ3ku8OpVrOYZp2GNGYEL5UYwHywSBprsRf5s8ZtOd741zwHnSEzTrOd0AOD2c+OSykwGvHls7+DTHbBKpmdfA7OKEK/JYutWsy7eaeSU3/TijJY9m4DUE+p8d/SHbijz2oTysNr2cw87sM1yTlvRi5lvUGRM5VrliOiFB+ZkRRpu1u+qDmD8a3+JvQ="
+  file: "idml.jar"
+  skip_cleanup: true
+  on:
+    tags: true
