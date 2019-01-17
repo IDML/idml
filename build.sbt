@@ -3,7 +3,7 @@ import sbtassembly.AssemblyPlugin.defaultShellScript
 
 name := "idml-parent"
 
-version in Global := "1.1." + Properties.envOrElse("GO_PIPELINE_COUNTER", "0")
+version in Global := "1.0.0"
 
 organization in Global := "io.idml"
 
@@ -45,7 +45,12 @@ lazy val tool = project
   .dependsOn(idmld)
   .dependsOn(hashing)
   .settings(
-    assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript))
+    assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript)),
+    assemblyMergeStrategy in assembly := {
+      case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
+      case PathList("buildinfo/BuildInfo$.class") => MergeStrategy.first
+      case _ => MergeStrategy.first
+    }
   )
 
 //lazy val geodb = project.dependsOn(core).dependsOn(geo)
