@@ -27,7 +27,7 @@
   {
     "name": "nesting arrays inside arrays",
 
-    "mapping": "@/com.datasift.ptolemy.ast/ArraysSuiteNestedArrays.ini",
+    "mapping": "@/io.idml.ast/ArraysSuiteNestedArrays.ini",
 
     "input":     {
       "input_type": "vet data",
@@ -62,7 +62,7 @@
   {
     "name": "nesting objects inside arrays",
 
-    "mapping": "@/com.datasift.ptolemy.ast/ArraysSuiteNestedObjects.ini",
+    "mapping": "@/io.idml.ast/ArraysSuiteNestedObjects.ini",
 
     "input":     {
       "input_type": "vet data",
