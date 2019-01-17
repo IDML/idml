@@ -37,6 +37,8 @@ lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing)
 
 lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils)
 
+lazy val idmldoc = project.dependsOn(core).dependsOn(utils)
+
 lazy val tool = project
   .dependsOn(core)
   .dependsOn(jsoup)
