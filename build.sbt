@@ -1,9 +1,9 @@
+enablePlugins(GitVersioning)
+
 import scala.util.Properties
 import sbtassembly.AssemblyPlugin.defaultShellScript
 
 name := "idml-parent"
-
-version in Global := "1.0.0"
 
 organization in Global := "io.idml"
 
