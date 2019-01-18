@@ -9,6 +9,8 @@ organization := "io.idml"
 
 scalaVersion := "2.12.4"
 
+publishTo := sonatypePublishTo.value
+
 publishMavenStyle := true
 
 licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
