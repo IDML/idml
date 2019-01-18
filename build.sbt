@@ -37,6 +37,7 @@ lazy val core = project
   .dependsOn(datanodes)
   .dependsOn(lang)
   .enablePlugins(BuildInfoPlugin)
+  .settings(commonSettings)
   .settings(
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoPackage := "io.idml",
@@ -45,15 +46,15 @@ lazy val core = project
 
 //lazy val geo = project.dependsOn(core)
 
-lazy val jsoup = project.dependsOn(core)
+lazy val jsoup = project.dependsOn(core).settings(commonSettings)
 
-lazy val hashing = project.dependsOn(core)
+lazy val hashing = project.dependsOn(core).settings(commonSettings)
 
-lazy val utils = project.dependsOn(core).dependsOn(jsoup)
+lazy val utils = project.dependsOn(core).dependsOn(jsoup).settings(commonSettings)
 
-lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing)
+lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).settings(commonSettings)
 
-lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils)
+lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils).settings(commonSettings)
 
 lazy val tool = project
   .dependsOn(core)
@@ -62,6 +63,7 @@ lazy val tool = project
   .dependsOn(repl)
   .dependsOn(idmld)
   .dependsOn(hashing)
+  .settings(commonSettings)
   .settings(
     assembly/assemblyOption := (assembly/assemblyOption).value.copy(prependShellScript = Some(defaultShellScript)),
     assembly/assemblyMergeStrategy := {
