@@ -5,11 +5,16 @@ import sbtassembly.AssemblyPlugin.defaultShellScript
 
 name := "idml-parent"
 
-organization in Global := "io.idml"
+organization := "io.idml"
 
-scalaVersion in Global := "2.12.4"
+scalaVersion := "2.12.4"
 
-isSnapshot in Global := true
+publishMavenStyle := true
+
+licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
+
+import xerial.sbt.Sonatype._
+sonatypeProjectHosting := Some(GitHubHosting("idml", "idml", "andi@andimiller.net"))
 
 lazy val lang = project
 
@@ -45,8 +50,8 @@ lazy val tool = project
   .dependsOn(idmld)
   .dependsOn(hashing)
   .settings(
-    assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript)),
-    assemblyMergeStrategy in assembly := {
+    assembly/assemblyOption := (assembly/assemblyOption).value.copy(prependShellScript = Some(defaultShellScript)),
+    assembly/assemblyMergeStrategy := {
       case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
       case PathList("buildinfo/BuildInfo$.class") => MergeStrategy.first
       case _ => MergeStrategy.first
