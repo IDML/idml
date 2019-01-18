@@ -13,14 +13,25 @@ publishTo := sonatypePublishTo.value
 
 publishMavenStyle := true
 
+isSnapshot := false
+
+useGpg := true
+
 licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
 
 import xerial.sbt.Sonatype._
 sonatypeProjectHosting := Some(GitHubHosting("idml", "idml", "andi@andimiller.net"))
 
-lazy val lang = project
+lazy val commonSettings = Seq(
+  organization := "io.idml",
+  isSnapshot := false,
+  publishTo := sonatypePublishTo.value,
+  licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
+)
 
-lazy val datanodes = project
+lazy val lang = project.settings(commonSettings)
+
+lazy val datanodes = project.settings(commonSettings)
 
 lazy val core = project
   .dependsOn(datanodes)
