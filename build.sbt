@@ -20,13 +20,14 @@ useGpg := true
 licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
 
 import xerial.sbt.Sonatype._
-sonatypeProjectHosting := Some(GitHubHosting("idml", "idml", "andi@andimiller.net"))
 
 lazy val commonSettings = Seq(
   organization := "io.idml",
   isSnapshot := false,
   publishTo := sonatypePublishTo.value,
   licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
+  sonatypeProjectHosting := Some(GitHubHosting("idml", "idml", "opensource@meltwater.com")),
+  developers := List(Developer(id="andimiller", name="Andi Miller", email="andi@andimiller.net", url=url("http://andimiller.net"))),
 )
 
 lazy val lang = project.settings(commonSettings)
