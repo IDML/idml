@@ -17,6 +17,8 @@ isSnapshot := false
 
 useGpg := true
 
+publishArtifact := false
+
 licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
 
 import xerial.sbt.Sonatype._
@@ -24,6 +26,7 @@ import xerial.sbt.Sonatype._
 lazy val commonSettings = Seq(
   organization := "io.idml",
   isSnapshot := false,
+  publishArtifact := true,
   publishTo := sonatypePublishTo.value,
   licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
   sonatypeProjectHosting := Some(GitHubHosting("idml", "idml", "opensource@meltwater.com")),
