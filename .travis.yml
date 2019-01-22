@@ -15,7 +15,8 @@ deploy:
      tags: true
  - provider: script
    script:
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - echo "Starting docker publishing"
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - sbt "project tool" "docker:publish"
    on:
      tags: true
