@@ -2,6 +2,7 @@ language: scala
 scala:
  - 2.12.4
 script:
+ - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
  - sbt test
  - sbt "project tool" "assembly"
  - for f in tool/target/scala-2.12/idml-tool-assembly-*.jar; do cp "$f" "idml.jar"; done
@@ -14,9 +15,6 @@ deploy:
    on:
      tags: true
  - provider: script
-   script:
-    - echo "Starting docker publishing"
-    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-    - sbt "project tool" "docker:publish"
+   script: bash docker.sh
    on:
      tags: true
