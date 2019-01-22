@@ -1,4 +1,6 @@
 enablePlugins(GitVersioning)
+enablePlugins(JavaAppPackaging)
+enablePlugins(DockerPlugin)
 
 import scala.util.Properties
 import sbtassembly.AssemblyPlugin.defaultShellScript
@@ -31,6 +33,8 @@ lazy val commonSettings = Seq(
   licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
   sonatypeProjectHosting := Some(GitHubHosting("idml", "idml", "opensource@meltwater.com")),
   developers := List(Developer(id="andimiller", name="Andi Miller", email="andi@andimiller.net", url=url("http://andimiller.net"))),
+  version in Docker := version.value,
+  dockerUsername in Docker := Some("idml"),
 )
 
 lazy val lang = project.settings(commonSettings)
@@ -67,8 +71,11 @@ lazy val tool = project
   .dependsOn(repl)
   .dependsOn(idmld)
   .dependsOn(hashing)
+  .enablePlugins(DockerPlugin, JavaAppPackaging)
   .settings(commonSettings)
   .settings(
+    dockerExposedPorts := Seq(8081),
+    packageName in Docker := "idml",
     assembly/assemblyOption := (assembly/assemblyOption).value.copy(prependShellScript = Some(defaultShellScript)),
     assembly/assemblyMergeStrategy := {
       case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
