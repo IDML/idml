@@ -76,6 +76,7 @@ lazy val tool = project
   .settings(
     dockerExposedPorts := Seq(8081),
     packageName in Docker := "idml",
+    dockerUpdateLatest in Docker := true,
     assembly/assemblyOption := (assembly/assemblyOption).value.copy(prependShellScript = Some(defaultShellScript)),
     assembly/assemblyMergeStrategy := {
       case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
