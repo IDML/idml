@@ -6,16 +6,20 @@ import cats._
 import cats.effect.concurrent.Ref
 import cats.implicits._
 import io.idml.datanodes.PObject
+import io.idml.doc.Markdown.{Node, Code, Text}
 import io.idml.{Ptolemy, PtolemyConf, PtolemyJson, PtolemyObject}
-import org.commonmark.node.{AbstractVisitor, FencedCodeBlock}
-import org.commonmark.parser.Parser
 
 object Runners {
 
-  case class FencedBlock(label: String, content: String, extra: Option[FencedBlock] = None)
-
   trait Runner[F[_]] {
-    def run(block: FencedBlock): F[FencedBlock]
+    def run(block: Code): F[List[Code]]
+  }
+
+  def run[F[_]: Monad: Applicative: Effect](markdown: List[Node]): F[List[Node]] = idmlRunner[F].flatMap { r =>
+    markdown.traverse {
+      case c: Code => r.run(c).asInstanceOf[F[List[Node]]]
+      case n: Node => List(n).pure[F]
+    }.map(_.flatten)
   }
 
   def idmlRunner[F[_]: Monad: Applicative](implicit F: Effect[F]): F[Runner[F]] =
@@ -25,47 +29,32 @@ object Runners {
       code    <- Ref[F].of(ptolemy.fromString(""))
     } yield
       new Runner[F] {
-        override def run(block: FencedBlock): F[FencedBlock] = {
+        override def run(block: Code): F[List[Code]] = {
           block match {
-            case b @ FencedBlock(label, content, _) =>
+            case b @ Code(label, content) =>
               label.split(":").toList match {
                 case "idml" :: "input" :: modes =>
                   F.delay { PtolemyJson.parse(content) }.flatMap {
                     case o: PObject => input.set(o)
                     case _          => F.unit
-                  } *> F.pure(FencedBlock("json", content))
+                  } *> F.pure(List(Code("json", content)))
                 case "idml" :: "code" :: modes =>
                   F.delay { ptolemy.fromString(content) }.flatMap { m =>
                     code.set(m)
                   } *> {
                     modes match {
                       case m if m.contains("silent") =>
-                        F.pure(FencedBlock("idml", content))
+                        F.pure(List(Code("idml", content)))
                       case _ =>
                         (code.get, input.get).bisequence.map { case (c, i) => PtolemyJson.pretty(c.run(i)) }.map { output =>
-                          FencedBlock("idml", content, extra = Some(FencedBlock("json", output)))
+                          List(Code("idml", content), Code("json", output))
                         }
                     }
                   }
-                case _ => F.pure(b)
+                case _ => F.pure(List(b))
               }
           }
         }
       }
 
-  def runnerRunner[F[_]: Effect](r: Runner[F]) = new AbstractVisitor {
-    override def visit(fencedCodeBlock: FencedCodeBlock): Unit = {
-      val label   = fencedCodeBlock.getInfo
-      val content = fencedCodeBlock.getLiteral
-      val result  = Effect[F].toIO(r.run(FencedBlock(label, content))).unsafeRunSync()
-      fencedCodeBlock.setInfo(result.label)
-      fencedCodeBlock.setLiteral(result.content)
-      result.extra.foreach { e =>
-        val f = new FencedCodeBlock
-        f.setInfo(e.label)
-        f.setLiteral(e.content)
-        fencedCodeBlock.appendChild(f)
-      }
-    }
-  }
 }

@@ -4,9 +4,7 @@ import org.scalatest.{FlatSpec, MustMatchers}
 import cats.effect._
 import cats._
 import cats.implicits._
-import io.idml.doc.Runners
-import org.commonmark.parser.Parser
-import org.commonmark.renderer.Renderer
+import io.idml.doc.{Markdown, Runners}
 
 class IdmlDocSpec extends FlatSpec with MustMatchers {
 
@@ -25,16 +23,40 @@ class IdmlDocSpec extends FlatSpec with MustMatchers {
       |
       |```idml:code
       |result = a + b
+      |```""".stripMargin
+
+    val doc = Markdown.parse(input).get.value
+
+    val result = Markdown.render(Runners.run[IO](doc).unsafeRunSync())
+
+    println(result)
+
+
+    val expected = """# hello
+      |1. world
+      |this is some normal markdown in theory
+      |
+      |```python
+      |print 2 + 2
       |```
-    """.stripMargin
+      |
+      |```json
+      |{"a": 2, "b": 2}
+      |```
+      |
+      |```idml
+      |result = a + b
+      |```
+      |```json
+      |{
+      |  "result" : 4
+      |}
+      |```""".stripMargin
 
-    val doc = Parser.builder().build().parse(input)
-    Runners.idmlRunner[IO].map{ r =>
-      doc.accept(Runners.runnerRunner(r))
-    }
+    println("===")
+    println(expected)
 
-    Renderer
-
+    result must equal(expected)
   }
 
 }
