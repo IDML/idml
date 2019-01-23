@@ -6,20 +6,22 @@ import cats._
 import cats.effect.concurrent.Ref
 import cats.implicits._
 import io.idml.datanodes.PObject
-import io.idml.doc.Markdown.{Node, Code, Text}
+import io.idml.doc.Markdown.{Code, Node, Text}
 import io.idml.{Ptolemy, PtolemyConf, PtolemyJson, PtolemyObject}
 
 object Runners {
 
   trait Runner[F[_]] {
-    def run(block: Code): F[List[Code]]
+    def run(block: Code): F[List[Node]]
   }
 
   def run[F[_]: Monad: Applicative: Effect](markdown: List[Node]): F[List[Node]] = idmlRunner[F].flatMap { r =>
-    markdown.traverse {
-      case c: Code => r.run(c).asInstanceOf[F[List[Node]]]
-      case n: Node => List(n).pure[F]
-    }.map(_.flatten)
+    markdown
+      .traverse {
+        case c: Code => r.run(c)
+        case n: Node => List(n).pure[F]
+      }
+      .map(_.flatten)
   }
 
   def idmlRunner[F[_]: Monad: Applicative](implicit F: Effect[F]): F[Runner[F]] =
@@ -29,7 +31,7 @@ object Runners {
       code    <- Ref[F].of(ptolemy.fromString(""))
     } yield
       new Runner[F] {
-        override def run(block: Code): F[List[Code]] = {
+        override def run(block: Code): F[List[Node]] = {
           block match {
             case b @ Code(label, content) =>
               label.split(":").toList match {
@@ -47,7 +49,7 @@ object Runners {
                         F.pure(List(Code("idml", content)))
                       case _ =>
                         (code.get, input.get).bisequence.map { case (c, i) => PtolemyJson.pretty(c.run(i)) }.map { output =>
-                          List(Code("idml", content), Code("json", output))
+                          List(Code("idml", content), Text("\n"), Code("json", output))
                         }
                     }
                   }

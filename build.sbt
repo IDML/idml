@@ -49,9 +49,9 @@ lazy val tool = project
   .settings(
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript)),
     assemblyMergeStrategy in assembly := {
-      case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
+      case PathList("META-INF", "MANIFEST.MF")    => MergeStrategy.discard
       case PathList("buildinfo/BuildInfo$.class") => MergeStrategy.first
-      case _ => MergeStrategy.first
+      case _                                      => MergeStrategy.first
     }
   )
 
