@@ -64,6 +64,10 @@ lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).sett
 
 lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils).settings(commonSettings)
 
+lazy val idmldoc = project.dependsOn(core).dependsOn(utils)
+
+lazy val `idmldoc-plugin` = project.dependsOn(idmldoc)
+
 lazy val tool = project
   .dependsOn(core)
   .dependsOn(jsoup)
@@ -74,6 +78,7 @@ lazy val tool = project
   .enablePlugins(DockerPlugin, JavaAppPackaging)
   .settings(commonSettings)
   .settings(
+    assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript)),
     dockerExposedPorts := Seq(8081),
     packageName in Docker := "idml",
     dockerUpdateLatest in Docker := true,
@@ -81,7 +86,7 @@ lazy val tool = project
     assembly/assemblyMergeStrategy := {
       case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
       case PathList("buildinfo/BuildInfo$.class") => MergeStrategy.first
-      case _ => MergeStrategy.first
+      case _                                      => MergeStrategy.first
     }
   )
 
