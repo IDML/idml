@@ -88,6 +88,19 @@ class IdmlDocSpec extends WordSpec with MustMatchers {
         val result = Runners.run[IO](doc).attempt.unsafeRunSync()
         result.isLeft must be(true)
       }
+
+      "pass through code blocks with no type" in {
+        val input =
+          """# hello
+            |```
+            |code
+            |```
+            |blah
+          """.stripMargin
+
+        val doc = Markdown.parse(input).get.value
+        doc.size must equal(3)
+      }
     }
   }
 
