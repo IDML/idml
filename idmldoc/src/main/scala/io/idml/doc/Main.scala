@@ -28,6 +28,7 @@ object Main extends IOApp {
     for {
       contents <- fs2.io.file.readAll(in, 2048).through(fs2.text.utf8Decode[F]).compile.foldMonoid
       _        <- Effect[F].delay { Files.createDirectories(out.getParent) }
+      _        <- Effect[F].delay { println(s"Compiling $in into $out") }
       parsed   <- Effect[F].delay { Markdown.parse(contents).get.value }
       ran      <- Runners.run[F](parsed)
       output   <- Effect[F].delay { Markdown.render(ran) }

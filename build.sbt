@@ -39,6 +39,8 @@ lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dep
 
 lazy val idmldoc = project.dependsOn(core).dependsOn(utils)
 
+lazy val `idmldoc-plugin` = project.dependsOn(idmldoc)
+
 lazy val tool = project
   .dependsOn(core)
   .dependsOn(jsoup)
