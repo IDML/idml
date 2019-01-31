@@ -1,24 +1,51 @@
 enablePlugins(GitVersioning)
+enablePlugins(JavaAppPackaging)
+enablePlugins(DockerPlugin)
 
 import scala.util.Properties
 import sbtassembly.AssemblyPlugin.defaultShellScript
 
 name := "idml-parent"
 
-organization in Global := "io.idml"
+organization := "io.idml"
 
-scalaVersion in Global := "2.12.4"
+scalaVersion := "2.12.4"
 
-isSnapshot in Global := true
+publishTo := sonatypePublishTo.value
 
-lazy val lang = project
+publishMavenStyle := true
 
-lazy val datanodes = project
+isSnapshot := false
+
+useGpg := true
+
+publishArtifact := false
+
+licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
+
+import xerial.sbt.Sonatype._
+
+lazy val commonSettings = Seq(
+  organization := "io.idml",
+  isSnapshot := false,
+  publishArtifact := true,
+  publishTo := sonatypePublishTo.value,
+  licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
+  sonatypeProjectHosting := Some(GitHubHosting("idml", "idml", "opensource@meltwater.com")),
+  developers := List(Developer(id="andimiller", name="Andi Miller", email="andi@andimiller.net", url=url("http://andimiller.net"))),
+  version in Docker := version.value,
+  dockerUsername in Docker := Some("idml"),
+)
+
+lazy val lang = project.settings(commonSettings)
+
+lazy val datanodes = project.settings(commonSettings)
 
 lazy val core = project
   .dependsOn(datanodes)
   .dependsOn(lang)
   .enablePlugins(BuildInfoPlugin)
+  .settings(commonSettings)
   .settings(
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoPackage := "io.idml",
@@ -27,15 +54,15 @@ lazy val core = project
 
 //lazy val geo = project.dependsOn(core)
 
-lazy val jsoup = project.dependsOn(core)
+lazy val jsoup = project.dependsOn(core).settings(commonSettings)
 
-lazy val hashing = project.dependsOn(core)
+lazy val hashing = project.dependsOn(core).settings(commonSettings)
 
-lazy val utils = project.dependsOn(core).dependsOn(jsoup)
+lazy val utils = project.dependsOn(core).dependsOn(jsoup).settings(commonSettings)
 
-lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing)
+lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).settings(commonSettings)
 
-lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils)
+lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils).settings(commonSettings)
 
 lazy val idmldoc = project.dependsOn(core).dependsOn(utils)
 
@@ -48,10 +75,16 @@ lazy val tool = project
   .dependsOn(repl)
   .dependsOn(idmld)
   .dependsOn(hashing)
+  .enablePlugins(DockerPlugin, JavaAppPackaging)
+  .settings(commonSettings)
   .settings(
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript)),
-    assemblyMergeStrategy in assembly := {
-      case PathList("META-INF", "MANIFEST.MF")    => MergeStrategy.discard
+    dockerExposedPorts := Seq(8081),
+    packageName in Docker := "idml",
+    dockerUpdateLatest in Docker := true,
+    assembly/assemblyOption := (assembly/assemblyOption).value.copy(prependShellScript = Some(defaultShellScript)),
+    assembly/assemblyMergeStrategy := {
+      case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
       case PathList("buildinfo/BuildInfo$.class") => MergeStrategy.first
       case _                                      => MergeStrategy.first
     }
