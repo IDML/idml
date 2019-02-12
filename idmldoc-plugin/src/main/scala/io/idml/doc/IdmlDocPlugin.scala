@@ -19,13 +19,13 @@ object IdmlDocSbt extends AutoPlugin with MicrositeKeys {
 
   override val projectSettings = inConfig(Idml)(Defaults.configSettings) ++ Seq(
     idmlSourceDirectory := (sourceDirectory in Compile).value / "tut",
-    idmlTargetDirectory := crossTarget.value / "tut",
+    idmlTargetDirectory := resourceManaged.value / "main" / "jekyll",
     idml := {
       Main.processFiles[IO](idmlSourceDirectory.value.toPath, idmlTargetDirectory.value.toPath).unsafeRunSync()
     },
     makeIdml := {
       Def.sequential(microsite, idml, makeSite, micrositeConfig)
-    }.value
+    }.value,
   )
 
 }

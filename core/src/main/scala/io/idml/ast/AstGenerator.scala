@@ -302,7 +302,11 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
       .map(_.name)
       .toList
     val pipeline = visitPipeline(ctx.pipeline())
-    Assignment(destination, pipeline)
+    val positions = Positions(
+      start = Position(ctx.start.getLine, ctx.start.getCharPositionInLine),
+      end = Position(ctx.stop.getLine, ctx.stop.getCharPositionInLine)
+    )
+    Assignment(destination, pipeline, positions = Some(positions))
   }
 
   override def visitRootAssignment(ctx: RootAssignmentContext): Assignment = {

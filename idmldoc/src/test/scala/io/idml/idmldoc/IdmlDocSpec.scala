@@ -101,6 +101,35 @@ class IdmlDocSpec extends WordSpec with MustMatchers {
         val doc = Markdown.parse(input).get.value
         doc.size must equal(3)
       }
+
+      "inline code blocks that are marked to be inlined" in {
+        val input =
+          """# comment
+          |```idml:input
+          |{"a": 1, "b": 2}
+          |```
+          |into
+          |```idml:code:inline
+          |result = a + b
+          |```
+          |blah
+        """.stripMargin
+
+        val doc    = Markdown.parse(input).get.value
+        val result = Markdown.render(Runners.run[IO](doc).unsafeRunSync())
+        result must equal(
+          """# comment
+          |```json
+          |{"a": 1, "b": 2}
+          |```
+          |into
+          |```idml
+          |result = a + b # 3
+          |```
+          |blah
+        """.stripMargin
+        )
+      }
     }
   }
 

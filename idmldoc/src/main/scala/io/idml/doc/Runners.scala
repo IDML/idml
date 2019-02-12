@@ -7,7 +7,8 @@ import cats.effect.concurrent.Ref
 import cats.implicits._
 import io.idml.datanodes.PObject
 import io.idml.doc.Markdown.{Code, Node, Text}
-import io.idml.{Ptolemy, PtolemyConf, PtolemyJson, PtolemyObject}
+import io.idml._
+import io.idml.utils.Tracer.Annotator
 
 object Runners {
 
@@ -47,6 +48,16 @@ object Runners {
                     modes match {
                       case m if m.contains("silent") =>
                         F.pure(List(Code("idml", content)))
+                      case m if m.contains("inline") =>
+                        (code.get, input.get).tupled.flatMap {
+                          case (c, i) =>
+                            F.delay {
+                              val a   = new Annotator()
+                              val ctx = new PtolemyContext(i, PtolemyJson.newObject(), List[PtolemyListener](a))
+                              c.run(ctx)
+                              List(Code("idml", a.render(content)))
+                            }
+                        }
                       case _ =>
                         (code.get, input.get).bisequence.map { case (c, i) => PtolemyJson.pretty(c.run(i)) }.map { output =>
                           List(Code("idml", content), Text("\n"), Code("json", output))
