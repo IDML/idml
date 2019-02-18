@@ -16,8 +16,12 @@ import io.idml.jsoup.JsoupFunctionResolver
 import io.idml.server.Server
 import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters._
+import org.http4s.server.blaze.BlazeBuilder
+import io.idml.server.WebsocketServer
 
 import scala.util.{Failure, Success, Try}
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object IdmlTools {
 
@@ -34,8 +38,15 @@ object IdmlTools {
     name = "server",
     header = "IDML language server"
   ) {
-    Opts.unit.map { _ =>
-      Server.main(List.empty.toArray)
+    val bindAll = Opts.flag("bind-all", "Bind to all interfaces", short = "b").orFalse
+    bindAll.map { b =>
+      BlazeBuilder[IO]
+        .mountService(WebsocketServer.service)
+        .bindHttp(8081, if (b) "0.0.0.0" else "localhost")
+        .serve
+        .compile
+        .drain
+        .unsafeRunSync
     }
   }
 
