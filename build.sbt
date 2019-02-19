@@ -52,7 +52,7 @@ lazy val core = project
     buildInfoOptions += BuildInfoOption.BuildTime
   )
 
-//lazy val geo = project.dependsOn(core)
+lazy val geo = project.dependsOn(core)
 
 lazy val jsoup = project.dependsOn(core).settings(commonSettings)
 
@@ -75,6 +75,7 @@ lazy val tool = project
   .dependsOn(repl)
   .dependsOn(idmld)
   .dependsOn(hashing)
+  .dependsOn(geo)
   .enablePlugins(DockerPlugin, JavaAppPackaging)
   .settings(commonSettings)
   .settings(
@@ -86,7 +87,8 @@ lazy val tool = project
     assembly/assemblyMergeStrategy := {
       case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
       case PathList("buildinfo/BuildInfo$.class") => MergeStrategy.first
-      case _                                      => MergeStrategy.first
+      case PathList("META-INF", "services", "io.idml.functions.FunctionResolver") => MergeStrategy.concat
+      case _ => MergeStrategy.first
     }
   )
 

@@ -23,9 +23,7 @@ class Repl {
 
   val ptolemy = new Ptolemy(
     new PtolemyConf,
-    new StaticFunctionResolverService(
-      (StaticFunctionResolverService.defaults.asScala
-        ++ List(new JsoupFunctionResolver(), new HashingFunctionResolver())).asJava)
+    new FunctionResolverService()
   )
 
   val build        = BuildInfo
