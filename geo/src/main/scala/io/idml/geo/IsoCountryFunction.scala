@@ -12,7 +12,7 @@ object IsoCountryFunction {
   /** The ISO country name data of the form Map[country_code] = country_name */
   val Countries: PtolemyValue = PtolemyJson.parse(
     Resources
-      .toString(Resources.getResource("com/datasift/ptolemy/geo/Countries.json"), Charset.defaultCharset())
+      .toString(Resources.getResource("io/idml/geo/Countries.json"), Charset.defaultCharset())
       .ensuring(_ != null)
   )
   // scalastyle:on null

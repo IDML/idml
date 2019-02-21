@@ -1,0 +1,27 @@
+{
+  "mapping": "output = input.geo()",
+
+  "tests": [
+    {
+      "name": "arrays",
+      "input": {"input": [7.5, 1.0]},
+      "output": {"output": {"latitude": 7.5, "longitude": 1.0}}
+    },
+    {
+      "name": "objects",
+      "input": {"input": {"longitude": 7.5, "latitude": 2.0}},
+      "output":  {"output": {"longitude": 7.5, "latitude": 2.0}}
+    },
+    {
+      "name": "arrays - ints and strings",
+      "input": {"input": ["7.5", 1]},
+      "output": {"output": {"latitude": 7.5, "longitude": 1.0}}
+    },
+
+    {
+      "name": "objects - ints and strings",
+      "input": {"input": {"longitude": "7.5", "latitude": 2}},
+      "output": {"output": {"longitude": 7.5, "latitude": 2.0}}
+    }
+  ]
+}

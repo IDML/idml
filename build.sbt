@@ -52,7 +52,14 @@ lazy val core = project
     buildInfoOptions += BuildInfoOption.BuildTime
   )
 
-lazy val geo = project.dependsOn(core)
+lazy val geo = project.dependsOn(core).settings(
+  fork in Test := true,
+  envVars in Test := Map(
+    "IDML_GEO_DB_DRIVER" -> "org.sqlite.JDBC",
+    "IDML_GEO_CITY_JDBC_URL" -> "jdbc:sqlite::resource:cities.test.db",
+    "IDML_GEO_ADMIN1_JDBC_URL" -> "jdbc:sqlite::resource:admin1.test.db"
+  )
+)
 
 lazy val jsoup = project.dependsOn(core).settings(commonSettings)
 

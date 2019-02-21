@@ -1,0 +1,83 @@
+{
+  "mapping": "output = region(country, region)",
+  "tests": [
+    {
+      "name": "find a region",
+      "input": {
+        "country": "GB",
+        "region": "J7"
+      },
+      "output": {
+        "output": "North Yorkshire"
+      }
+    },
+
+    {
+      "name": "unknown country name",
+      "input": {
+        "country": "XX",
+        "region": "J7"
+      },
+      "output": {}
+    },
+
+    {
+      "name": "unknown region name",
+      "input": {
+        "country": "GB",
+        "region": "XX"
+      },
+      "output": {}
+    },
+
+    {
+      "name": "invalid country type",
+      "input": {
+        "country": true,
+        "region": "J7"
+      },
+      "output": {}
+    },
+
+    {
+      "name": "invalid region type",
+      "input": {
+        "country": "GB",
+        "region": true
+      },
+      "output": {}
+    },
+
+    {
+      "name": "invalid region and country",
+      "input": {
+        "country": true,
+        "region": true
+      },
+      "output": {}
+    },
+
+
+    {
+      "name": "missing country type",
+      "input": {
+        "region": "J7"
+      },
+      "output": {}
+    },
+
+    {
+      "name": "missing region type",
+      "input": {
+        "country": "GB"
+      },
+      "output": {}
+    },
+
+    {
+      "name": "missing country and region type",
+      "input": {},
+      "output": {}
+    }
+  ]
+}

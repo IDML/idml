@@ -29,14 +29,15 @@ class GeoFunctionResolver extends FunctionResolver {
 
 class GeoDatabaseFunctionResolver extends InnerGeoDatabaseFunctionResolver(
   driver = System.getenv("IDML_GEO_DB_DRIVER"),
-  url = System.getenv("IDML_GEO_DB_JDBC_URL"),
+  cityUrl = System.getenv("IDML_GEO_CITY_JDBC_URL"),
+  admin1Url = System.getenv("IDML_GEO_ADMIN1_JDBC_URL"),
   user = Option(System.getenv("IDML_GEO_DB_USER")).getOrElse(""),
   password = Option(System.getenv("IDML_GEO_DB_USER")).getOrElse("")
 )
 
-class InnerGeoDatabaseFunctionResolver(driver: String, url: String, user: String, password: String) extends FunctionResolver {
-  val cityFunction = new CityFunction(driver, url, user, password)
-  val admin1Function = new Admin1Function(driver, url, user, password)
+class InnerGeoDatabaseFunctionResolver(driver: String, cityUrl: String, admin1Url: String, user: String, password: String) extends FunctionResolver {
+  val cityFunction = Option(driver).map(_ => new CityFunction(driver, cityUrl, user, password))
+  val admin1Function = Option(driver).map(_ => new Admin1Function(driver, admin1Url, user, password))
 
   override def providedFunctions(): List[PtolemyFunctionMetadata] =
     List(
@@ -47,9 +48,9 @@ class InnerGeoDatabaseFunctionResolver(driver: String, url: String, user: String
   override def resolve(name: String, args: List[Argument]): Option[PtolemyFunction] = {
     (name, args) match {
       case ("city", (city: Pipeline) :: Nil) =>
-        Some(cityFunction.CityFunction(city))
+        cityFunction.map(_.CityFunction(city))
       case ("admin1", (admin1: Pipeline) :: Nil) =>
-        Some(Admin1Function(admin1))
+        admin1Function.map(_.Admin1Function(admin1))
       case _ => None
     }
   }
