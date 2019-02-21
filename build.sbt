@@ -52,7 +52,10 @@ lazy val core = project
     buildInfoOptions += BuildInfoOption.BuildTime
   )
 
-lazy val geo = project.dependsOn(core).settings(
+lazy val geo = project
+  .dependsOn(core)
+  .settings(commonSettings)
+  .settings(
   fork in Test := true,
   envVars in Test := Map(
     "IDML_GEO_DB_DRIVER" -> "org.sqlite.JDBC",
