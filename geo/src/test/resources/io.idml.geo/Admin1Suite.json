@@ -1,0 +1,31 @@
+{
+  "mapping": "output = admin1(admin1)",
+
+  "tests": [
+    {
+      "name": "find an admin1 name",
+      "input": {"admin1": 5128638},
+      "output": {"output": {"name" : "New York", "asciiname" : "New York", "id" : 5128638}}
+    },
+    {
+      "name": "fail nicely on unknown",
+      "input": {"admin1": "1234"},
+      "output": {}
+    },
+    {
+      "name": "invalid input type",
+      "input": {"admin1": true},
+      "output": {}
+    },
+    {
+      "name": "cope with unicode",
+      "input": {"admin1": 3626553},
+      "output": {"output": {"name": "Táchira", "asciiname": "Tachira", "id": 3626553}}
+    },
+    {
+      "name": "include historical adm1s",
+      "input": {"admin1": 2983751},
+      "output": {"output": {"name" : "Rhône-Alpes Region", "asciiname" : "Rhone-Alpes Region", "id" : 2983751}}
+    }
+  ]
+}

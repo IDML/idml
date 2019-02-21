@@ -52,7 +52,14 @@ lazy val core = project
     buildInfoOptions += BuildInfoOption.BuildTime
   )
 
-//lazy val geo = project.dependsOn(core)
+lazy val geo = project.dependsOn(core).settings(
+  fork in Test := true,
+  envVars in Test := Map(
+    "IDML_GEO_DB_DRIVER" -> "org.sqlite.JDBC",
+    "IDML_GEO_CITY_JDBC_URL" -> "jdbc:sqlite::resource:cities.test.db",
+    "IDML_GEO_ADMIN1_JDBC_URL" -> "jdbc:sqlite::resource:admin1.test.db"
+  )
+)
 
 lazy val jsoup = project.dependsOn(core).settings(commonSettings)
 
@@ -75,6 +82,7 @@ lazy val tool = project
   .dependsOn(repl)
   .dependsOn(idmld)
   .dependsOn(hashing)
+  .dependsOn(geo)
   .enablePlugins(DockerPlugin, JavaAppPackaging)
   .settings(commonSettings)
   .settings(
@@ -86,7 +94,8 @@ lazy val tool = project
     assembly/assemblyMergeStrategy := {
       case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
       case PathList("buildinfo/BuildInfo$.class") => MergeStrategy.first
-      case _                                      => MergeStrategy.first
+      case PathList("META-INF", "services", "io.idml.functions.FunctionResolver") => MergeStrategy.concat
+      case _ => MergeStrategy.first
     }
   )
 

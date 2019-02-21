@@ -1,0 +1,26 @@
+{
+  "mapping": "output = country(country)",
+
+  "tests": [
+    {
+      "name": "find a country name",
+      "input": {"country": "DE"},
+      "output": {"output": "Germany"}
+    },
+    {
+      "name": "unknown country name",
+      "input": {"country": "XX"},
+      "output": {}
+    },
+    {
+      "name": "invalid input type",
+      "input": {"country": true},
+      "output": {}
+    },
+    {
+      "name": "missing country name",
+      "input": {},
+      "output": {}
+    }
+  ]
+}
