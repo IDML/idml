@@ -48,19 +48,23 @@
     "input": {"a": [10]},
     "output": {"b": 10}
   },
-
   {
     "name": "last item - missing",
     "mapping": "b = a[-1]",
     "input": {"a": []},
     "output": {}
   },
-
+   {
+    "name": "last item - longer list",
+    "mapping": "b = a[-1]",
+    "input": {"a": [1,2,3]},
+    "output": {"b":  3}
+  },
   {
-    "name": "allow wrapping on all negative indexes",
+    "name": "not allow wrapping on all negative indexes",
     "mapping": "b = a[-10]",
     "input": {"a": [10, 11, 12, 13]},
-    "output": {"b": 12}
+    "output": {}
   },
 
   {

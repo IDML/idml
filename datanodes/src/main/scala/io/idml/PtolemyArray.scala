@@ -24,7 +24,7 @@ trait PtolemyArray extends PtolemyValue with CompositeValue {
   /** Wrap an index so we can support negatives but overflows should always return nothing */
   protected def wrapIndex(index: Int, size: Int): Int = {
     if (index < 0) {
-      math.abs(index % size.max(1))
+      size + index
     } else {
       index
     }
