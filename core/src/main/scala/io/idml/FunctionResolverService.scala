@@ -9,7 +9,7 @@ import io.idml.functions.FunctionResolver
 class FunctionResolverService {
 
   /** Function resolver */
-  protected val loader = ServiceLoader.load(classOf[FunctionResolver])
+  protected val loader = ServiceLoader.load(classOf[FunctionResolver], getClass.getClassLoader)
 
   /**
     * Create a new function given name and arguments
