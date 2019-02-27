@@ -10,6 +10,34 @@ class IdmlDocSpec extends WordSpec with MustMatchers {
 
   "IdmlDoc" when {
     "running" should {
+      "allow for silent json" in {
+        val input = """# hello
+        |1. world
+        |this is some normal markdown in theory
+        |```idml:input:silent
+        |{"a": 2, "b": 2}
+        |```
+        |```idml:code
+        |result = a + b
+        |```""".stripMargin
+
+        val doc      = Markdown.parse(input).get.value
+        val result   = Markdown.render(Runners.run[IO](doc).unsafeRunSync())
+        val expected = """# hello
+        |1. world
+        |this is some normal markdown in theory
+        |
+        |```idml
+        |result = a + b
+        |```
+        |```json
+        |{
+        |  "result" : 4
+        |}
+        |```""".stripMargin
+
+        result must equal(expected)
+      }
       "run the IDML" in {
         val input = """# hello
         |1. world

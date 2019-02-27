@@ -40,7 +40,9 @@ object Runners {
                   F.delay { PtolemyJson.parse(content) }.flatMap {
                     case o: PObject => input.set(o)
                     case _          => F.unit
-                  } *> F.pure(List(Code("json", content)))
+                  } *> F.pure(
+                    if (modes.contains("silent")) List.empty
+                    else List(Code("json", content)))
                 case "idml" :: "code" :: modes =>
                   F.delay { ptolemy.fromString(content) }.flatMap { m =>
                     code.set(m)
