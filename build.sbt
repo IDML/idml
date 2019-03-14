@@ -32,9 +32,9 @@ lazy val commonSettings = Seq(
   publishTo := sonatypePublishTo.value,
   licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
   sonatypeProjectHosting := Some(GitHubHosting("idml", "idml", "opensource@meltwater.com")),
-  developers := List(Developer(id="andimiller", name="Andi Miller", email="andi@andimiller.net", url=url("http://andimiller.net"))),
+  developers := List(Developer(id = "andimiller", name = "Andi Miller", email = "andi@andimiller.net", url = url("http://andimiller.net"))),
   version in Docker := version.value,
-  dockerUsername in Docker := Some("idml"),
+  dockerUsername in Docker := Some("idml")
 )
 
 lazy val lang = project.settings(commonSettings)
@@ -56,13 +56,13 @@ lazy val geo = project
   .dependsOn(core)
   .settings(commonSettings)
   .settings(
-  fork in Test := true,
-  envVars in Test := Map(
-    "IDML_GEO_DB_DRIVER" -> "org.sqlite.JDBC",
-    "IDML_GEO_CITY_JDBC_URL" -> "jdbc:sqlite::resource:cities.test.db",
-    "IDML_GEO_ADMIN1_JDBC_URL" -> "jdbc:sqlite::resource:admin1.test.db"
+    fork in Test := true,
+    envVars in Test := Map(
+      "IDML_GEO_DB_DRIVER"       -> "org.sqlite.JDBC",
+      "IDML_GEO_CITY_JDBC_URL"   -> "jdbc:sqlite::resource:cities.test.db",
+      "IDML_GEO_ADMIN1_JDBC_URL" -> "jdbc:sqlite::resource:admin1.test.db"
+    )
   )
-)
 
 lazy val jsoup = project.dependsOn(core).settings(commonSettings)
 
@@ -93,12 +93,12 @@ lazy val tool = project
     dockerExposedPorts := Seq(8081),
     packageName in Docker := "idml",
     dockerUpdateLatest in Docker := true,
-    assembly/assemblyOption := (assembly/assemblyOption).value.copy(prependShellScript = Some(defaultShellScript)),
-    assembly/assemblyMergeStrategy := {
-      case PathList("META-INF", "MANIFEST.MF") => MergeStrategy.discard
-      case PathList("buildinfo/BuildInfo$.class") => MergeStrategy.first
+    assembly / assemblyOption := (assembly / assemblyOption).value.copy(prependShellScript = Some(defaultShellScript)),
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", "MANIFEST.MF")                                    => MergeStrategy.discard
+      case PathList("buildinfo/BuildInfo$.class")                                 => MergeStrategy.first
       case PathList("META-INF", "services", "io.idml.functions.FunctionResolver") => MergeStrategy.concat
-      case _ => MergeStrategy.first
+      case _                                                                      => MergeStrategy.first
     }
   )
 

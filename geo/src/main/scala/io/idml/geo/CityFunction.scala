@@ -54,5 +54,3 @@ class CityFunction(driver: String, url: String, user: String, password: String) 
     override def name: String = "city"
   }
 }
-
-

@@ -7,6 +7,7 @@ import scala.annotation.tailrec
 
 case class Position(line: Int, character: Int)
 case class Positions(start: Position, end: Position)
+
 /** The assignment operator "=" */
 case class Assignment(dest: List[String], exps: Pipeline, positions: Option[Positions] = None) extends Rule {
 

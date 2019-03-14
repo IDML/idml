@@ -69,15 +69,13 @@ object IdmlTools {
           new PtolemyConf,
           List[PtolemyListener](new UnmappedFieldsFinder).asJava,
           new StaticFunctionResolverService(
-            (StaticFunctionResolverService.defaults.asScala ++ List(new JsoupFunctionResolver(),
-                                                                    new HashingFunctionResolver())).asJava)
+            (StaticFunctionResolverService.defaults.asScala ++ List(new JsoupFunctionResolver(), new HashingFunctionResolver())).asJava)
         )
       } else {
         new Ptolemy(
           new PtolemyConf,
           new StaticFunctionResolverService(
-            (StaticFunctionResolverService.defaults.asScala ++ List(new JsoupFunctionResolver(),
-                                                                    new HashingFunctionResolver())).asJava)
+            (StaticFunctionResolverService.defaults.asScala ++ List(new JsoupFunctionResolver(), new HashingFunctionResolver())).asJava)
         )
       }
       val (found, missing) = config.files.partition(_.exists())

@@ -53,5 +53,3 @@ class Admin1Function(driver: String, url: String, user: String, password: String
     override def name: String = "admin1"
   }
 }
-
-

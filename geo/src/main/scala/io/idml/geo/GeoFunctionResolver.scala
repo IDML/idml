@@ -27,22 +27,24 @@ class GeoFunctionResolver extends FunctionResolver {
   )
 }
 
-class GeoDatabaseFunctionResolver extends InnerGeoDatabaseFunctionResolver(
-  driver = System.getenv("IDML_GEO_DB_DRIVER"),
-  cityUrl = System.getenv("IDML_GEO_CITY_JDBC_URL"),
-  admin1Url = System.getenv("IDML_GEO_ADMIN1_JDBC_URL"),
-  user = Option(System.getenv("IDML_GEO_DB_USER")).getOrElse(""),
-  password = Option(System.getenv("IDML_GEO_DB_USER")).getOrElse("")
-)
+class GeoDatabaseFunctionResolver
+    extends InnerGeoDatabaseFunctionResolver(
+      driver = System.getenv("IDML_GEO_DB_DRIVER"),
+      cityUrl = System.getenv("IDML_GEO_CITY_JDBC_URL"),
+      admin1Url = System.getenv("IDML_GEO_ADMIN1_JDBC_URL"),
+      user = Option(System.getenv("IDML_GEO_DB_USER")).getOrElse(""),
+      password = Option(System.getenv("IDML_GEO_DB_USER")).getOrElse("")
+    )
 
-class InnerGeoDatabaseFunctionResolver(driver: String, cityUrl: String, admin1Url: String, user: String, password: String) extends FunctionResolver {
-  val cityFunction = Option(driver).map(_ => new CityFunction(driver, cityUrl, user, password))
+class InnerGeoDatabaseFunctionResolver(driver: String, cityUrl: String, admin1Url: String, user: String, password: String)
+    extends FunctionResolver {
+  val cityFunction   = Option(driver).map(_ => new CityFunction(driver, cityUrl, user, password))
   val admin1Function = Option(driver).map(_ => new Admin1Function(driver, admin1Url, user, password))
 
   override def providedFunctions(): List[PtolemyFunctionMetadata] =
     List(
-      PtolemyFunctionMetadata("city", List("city"       -> "city name to look up"), "look up a city"),
-      PtolemyFunctionMetadata("admin1", List("admin1"   -> "admin1 name to look up"), "look up an admin1 area")
+      PtolemyFunctionMetadata("city", List("city"     -> "city name to look up"), "look up a city"),
+      PtolemyFunctionMetadata("admin1", List("admin1" -> "admin1 name to look up"), "look up an admin1 area")
     )
 
   override def resolve(name: String, args: List[Argument]): Option[PtolemyFunction] = {
@@ -56,4 +58,3 @@ class InnerGeoDatabaseFunctionResolver(driver: String, cityUrl: String, admin1Ur
   }
 
 }
-

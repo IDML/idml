@@ -1,5 +1,3 @@
 package io.idml.geo
 
-class Admin1Spec {
-
-}
+class Admin1Spec {}

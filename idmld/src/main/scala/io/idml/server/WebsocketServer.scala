@@ -39,17 +39,15 @@ object WebsocketServer {
   case class Complete(in: List[Json], idml: String, position: Int)
   implicit def dec[F[_]: Sync, A](implicit decoder: Decoder[A]): EntityDecoder[F, A] = jsonOf
 
-  val functions = (StaticFunctionResolverService.defaults.asScala ++ List(new JsoupFunctionResolver,
-                                                                          new HashingFunctionResolver)).toList.flatMap { f =>
-    f.providedFunctions().filterNot(_.name.startsWith("$"))
-  }
+  val functions =
+    (StaticFunctionResolverService.defaults.asScala ++ List(new JsoupFunctionResolver, new HashingFunctionResolver)).toList.flatMap { f =>
+      f.providedFunctions().filterNot(_.name.startsWith("$"))
+    }
 
   val completionPtolemy = new Ptolemy(
     new PtolemyConf(),
     new StaticFunctionResolverService(
-      (StaticFunctionResolverService.defaults.asScala ++ List(new JsoupFunctionResolver,
-                                                              new HashingFunctionResolver,
-                                                              new AnalysisModule)).asJava
+      (StaticFunctionResolverService.defaults.asScala ++ List(new JsoupFunctionResolver, new HashingFunctionResolver, new AnalysisModule)).asJava
     )
   )
 
