@@ -78,12 +78,15 @@ lazy val idmldoc = project.dependsOn(core).dependsOn(utils).settings(commonSetti
 
 lazy val `idmldoc-plugin` = project.dependsOn(idmldoc).settings(commonSettings)
 
+lazy val idmltest = project.dependsOn(core).dependsOn(utils).settings(commonSettings)
+
 lazy val tool = project
   .dependsOn(core)
   .dependsOn(jsoup)
   .dependsOn(utils)
   .dependsOn(repl)
   .dependsOn(idmld)
+  .dependsOn(idmltest)
   .dependsOn(hashing)
   .dependsOn(geo)
   .enablePlugins(DockerPlugin, JavaAppPackaging)
