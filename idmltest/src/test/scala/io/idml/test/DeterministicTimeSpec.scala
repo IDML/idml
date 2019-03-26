@@ -18,9 +18,11 @@ class DeterministicTimeSpec extends WordSpec with MustMatchers {
     "override now with a specific value" in {
       val p = new Ptolemy(
         new PtolemyConf(),
-        new StaticFunctionResolverService((new DeterministicTime(1552653180) :: StaticFunctionResolverService.defaults.asScala.toList).asJava)
+        new StaticFunctionResolverService(
+          (new DeterministicTime(1552653180) :: StaticFunctionResolverService.defaults.asScala.toList).asJava)
       )
-      p.fromString("result = now()").run(PtolemyJson.newObject()) must equal(PObject("result" -> PDate(new DateTime(1552653180, DateTimeZone.UTC))))
+      p.fromString("result = now()").run(PtolemyJson.newObject()) must equal(
+        PObject("result" -> PDate(new DateTime(1552653180, DateTimeZone.UTC))))
     }
     "override microtime" in {
       val p = new Ptolemy(
@@ -32,9 +34,10 @@ class DeterministicTimeSpec extends WordSpec with MustMatchers {
     "override microtime with a specific value" in {
       val p = new Ptolemy(
         new PtolemyConf(),
-        new StaticFunctionResolverService((new DeterministicTime(1552653180) :: StaticFunctionResolverService.defaults.asScala.toList).asJava)
+        new StaticFunctionResolverService(
+          (new DeterministicTime(1552653180) :: StaticFunctionResolverService.defaults.asScala.toList).asJava)
       )
-      p.fromString("result = microtime()").run(PtolemyJson.newObject()) must equal(PObject("result" -> PtolemyValue(1552653180L*1000)))
+      p.fromString("result = microtime()").run(PtolemyJson.newObject()) must equal(PObject("result" -> PtolemyValue(1552653180L * 1000)))
     }
   }
 }

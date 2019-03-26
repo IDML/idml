@@ -23,7 +23,11 @@ object IdmlTool
           .of(
             IdmlTools.repl,
             IdmlTools.apply,
-            IdmlTools.server
+            IdmlTools.server,
+            io.idml.test.Main.execute.map { f =>
+              f.unsafeRunSync()
+              ()
+            }
           )
           .map(c => Opts.subcommand(c))
           .reduceK
