@@ -35,15 +35,19 @@ object Runner extends TestUtils[IO] with CirceEitherEncoders {
 
   case class State(folder: Path)
 
-  def load(test: Path) = readAll(test).flatMap(parseJ).flatMap(as[Test])
-  def resolve(path: Path, test: Test): IO[ResolvedTest] = test.resolve(
-    refToPath(path, _).flatMap(readAll),
-    refToPath(path, _).flatMap(readAll).flatMap(parseJ)
-  )
-  def updateResolve(path: Path, test: Test): IO[UpdateableResolvedTest] = test.updateResolve(
-    refToPath(path, _).flatMap(readAll),
-    refToPath(path, _).flatMap(readAll).flatMap(parseJ)
-  )
+  def load(test: Path): IO[Tests] = readAll(test).flatMap(parseJ).flatMap(as[Tests])
+  def resolve(path: Path, tests: Tests): IO[List[ResolvedTest]] =
+    tests.tests.traverse(
+      _.resolve(
+        refToPath(path, _).flatMap(readAll),
+        refToPath(path, _).flatMap(readAll).flatMap(parseJ)
+      ))
+  def updateResolve(path: Path, tests: Tests): IO[List[UpdateableResolvedTest]] =
+    tests.tests.traverse(
+      _.updateResolve(
+        refToPath(path, _).flatMap(readAll),
+        refToPath(path, _).flatMap(readAll).flatMap(parseJ)
+      ))
 
   def ptolemy: IO[Ptolemy] = IO {
     new Ptolemy(
@@ -60,53 +64,84 @@ object Runner extends TestUtils[IO] with CirceEitherEncoders {
       c <- parseJ(r)
     } yield c
 
-  def runTest(path: Path) =
+  def runTest(failedOnly: Boolean)(path: Path) =
     for {
       t <- load(path)
       result <- EitherT(resolve(path, t).attempt)
                  .semiflatMap { resolved =>
-                   run(resolved.code, resolved.input).tupleLeft(resolved)
+                   resolved.traverse(r => run(r.code, r.input).tupleLeft(r))
                  }
                  .map {
-                   case (resolved, output) =>
-                     Either.cond(resolved.output === output, Unit, JsonDiff.simpleDiff(output, resolved.output, true))
+                   _.map {
+                     case (resolved, output) =>
+                       Either.cond(resolved.output === output,
+                                   resolved.name,
+                                   (resolved.name, JsonDiff.simpleDiff(output, resolved.output, true)))
+                   }
                  }
                  .value
-      _ <- result.bitraverse({ e =>
-            red(s"${t.name} errored") *>
-              red(e)
-          }, {
-            _.bitraverse({ diff =>
-              red(s"${t.name} output differs") *>
-                red(diff)
-            }, { _ =>
-              green(s"${t.name} passed")
-            })
-          })
-    } yield Unit
+      _ <- result.bitraverse(
+            { e =>
+              red(s"$path errored when loading") *>
+                red(e)
+            }, {
+              _.traverse {
+                _.bitraverse({
+                  case (name, diff) =>
+                    red(s"$name output differs") *>
+                      red(diff)
+                }, { name =>
+                  IO.pure(failedOnly).ifM(green(s"${name} passed"), IO.unit)
+                })
+              }
+            }
+          )
+    } yield ()
 
-  def updateTest(path: Path) =
+//  _         <- blue(s"${test.name} updated")
+  def updateTest(failedOnly: Boolean)(path: Path) =
     for {
       test      <- load(path)
       updatable <- updateResolve(path, test)
-      result    <- run(updatable.code, updatable.input)
-      _         <- blue(s"${test.name} updated")
-      updated <- updatable.output.bitraverse(
-                  { r =>
-                    for {
-                      p           <- refToPath(path, r)
-                      oldcontents <- readAll(p)
-                      contents    = result.spaces2
-                      _           <- writeAll(p)(Stream.emit(contents))
-                    } yield (oldcontents, contents)
-                  }, { _ =>
-                    for {
-                      oldcontents <- readAll(path)
-                      contents    = test.copy(output = Right(result)).asJson.spaces2
-                      _           <- writeAll(path)(Stream.emit(contents))
-                    } yield (oldcontents, contents)
-                  }
-                )
-    } yield Unit
+      result    <- updatable.traverse(u => run(u.code, u.input).tupleLeft(u))
+      updated <- result.traverse {
+                  case (u, result) =>
+                    u.output
+                      .bitraverse(
+                        // we've got a referred output
+                        { r =>
+                          for {
+                            p           <- refToPath(path, r)
+                            oldcontents <- readAll(p)
+                            contents    = result.spaces2
+                            _ <- IO
+                                  .pure(contents === oldcontents)
+                                  .ifM(
+                                    IO.pure(failedOnly).ifM(IO.unit, green(s"${u.name} unchanged")),
+                                    blue(s"${u.name} updated") *> writeAll(p)(Stream.emit(contents))
+                                  )
+                          } yield u.original
+                        },
+                        // we've got an inline output
+                        { expected =>
+                          IO.pure(expected === result)
+                            .ifM(
+                              IO.pure(failedOnly).ifM(IO.unit, green(s"${u.name} unchanged")).as(Left(u.original)),
+                              blue(s"${u.name} updated inline").as(Right(u.original.copy(output = Right(result))))
+                            )
+                        }
+                      )
+                      .map(_.leftMap(_.asLeft[Test]).merge)
+                }
+      // if we had any right entries it means we've got to update this file
+      _ <- updated
+            .find(_.isRight)
+            .isDefined
+            .pure[IO]
+            .ifM(
+              blue(s"flushing upadte to $path") *> writeAll(path)(Stream.emit(Tests(updated.map(_.merge)).asJson.spaces2)),
+              failedOnly.pure[IO].ifM(IO.unit, green(s"$path unchanged, not flushing file"))
+            )
+    } yield ()
 
 }

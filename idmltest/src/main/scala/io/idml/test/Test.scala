@@ -1,7 +1,28 @@
 package io.idml.test
 
 import io.circe._
-import cats._, cats.implicits._, cats.data._, cats.effect._
+import cats._
+import cats.implicits._
+import cats.data._
+import cats.effect._
+
+final case class Tests(tests: List[Test])
+object Tests {
+  implicit def encoder(implicit t: Encoder[Test]): Encoder[Tests] =
+    (a: Tests) =>
+      a.tests match {
+        case ts @ Nil    => Encoder[List[Test]].apply(ts)
+        case head :: Nil => Encoder[Test].apply(head)
+        case ts          => Encoder[List[Test]].apply(ts)
+    }
+  implicit def decoder(implicit t: Decoder[Test]): Decoder[Tests] =
+    (c: HCursor) =>
+      c.focus match {
+        case Some(focus) if focus.isArray => Decoder[List[Test]].map(Tests.apply).apply(c)
+        case _                            => Decoder[Test].map(t => Tests(List(t))).apply(c)
+    }
+
+}
 
 final case class Ref(`$ref`: String)
 final case class Test(
@@ -32,6 +53,7 @@ final case class Test(
     ).mapN {
       case (c, i) =>
         UpdateableResolvedTest(
+          this,
           name,
           c,
           i,
@@ -49,6 +71,7 @@ final case class ResolvedTest(
 )
 
 final case class UpdateableResolvedTest(
+    original: Test,
     name: String,
     code: String,
     input: Json,

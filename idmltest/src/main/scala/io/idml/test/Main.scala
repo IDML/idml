@@ -12,12 +12,10 @@ object Main extends IOApp {
   val filter   = Opts.option[String]("filter", "filter to run specific tests, use re2 compatible regex or a prefix", "f").orNone
   val update   = Opts.flag("update", "update test snapshots", "u").orFalse
   val diff     = Opts.flag("json-diff", "output JSON diffs in stead", "j").orFalse
-  val failures = Opts.flag("failed-only", "suppress successful output", "x")
-  // flag to suppress successful output?
-
+  val failures = Opts.flag("failed-only", "suppress successful output", "x").orFalse
   // use re2 for the regex filtering
 
-  val command = Command("test", "run IDML tests")((arg, filter, update).tupled)
+  val command = Command("test", "run IDML tests")((arg, filter, update, failures).tupled)
 
   override def run(args: List[String]): IO[ExitCode] = execute.parse(args) match {
     case Left(h) =>
@@ -29,9 +27,9 @@ object Main extends IOApp {
   }
 
   val execute = command.map {
-    case (paths, filter, update) =>
+    case (paths, filter, update, failures) =>
       for {
-        compiled <- if (update) paths.traverse(Runner.updateTest) else paths.traverse(Runner.runTest)
+        compiled <- if (update) paths.traverse(Runner.updateTest(failures)) else paths.traverse(Runner.runTest(failures))
       } yield ExitCode.Success
   }
 }

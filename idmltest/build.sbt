@@ -6,6 +6,7 @@ libraryDependencies ++= Seq(
   "com.monovore"  %% "decline"       % "0.5.0",
   "io.circe"      %% "circe-generic" % "0.11.1",
   "io.circe"      %% "circe-parser"  % "0.11.1",
+  "io.circe"      %% "circe-literal"  % "0.11.1" % Test,
   "io.circe"      %% "circe-yaml"    % "0.9.0",
   "com.lihaoyi"   %% "fansi"         % "0.2.5",
   "org.gnieh"     %% "diffson-circe" % "3.1.1"
