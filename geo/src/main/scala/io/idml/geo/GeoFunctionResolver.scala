@@ -33,7 +33,7 @@ class GeoDatabaseFunctionResolver
       cityUrl = System.getenv("IDML_GEO_CITY_JDBC_URL"),
       admin1Url = System.getenv("IDML_GEO_ADMIN1_JDBC_URL"),
       user = Option(System.getenv("IDML_GEO_DB_USER")).getOrElse(""),
-      password = Option(System.getenv("IDML_GEO_DB_USER")).getOrElse("")
+      password = Option(System.getenv("IDML_GEO_DB_PASSWORD")).getOrElse("")
     )
 
 class InnerGeoDatabaseFunctionResolver(driver: String, cityUrl: String, admin1Url: String, user: String, password: String)
