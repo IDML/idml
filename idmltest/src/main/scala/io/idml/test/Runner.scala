@@ -35,8 +35,6 @@ class TestUtils[F[_]: Sync] {
 
 class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestUtils[IO] with CirceEitherEncoders {
 
-  case class State(folder: Path)
-
   def load(test: Path): IO[Tests] = readAll(test).flatMap(parseJ).flatMap(as[Tests])
   def resolve(path: Path, tests: Tests): IO[List[ResolvedTest]] =
     tests.tests.traverse(
@@ -160,5 +158,21 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestU
                  )
              }
     } yield List(exit.merge)
+
+  def report(results: List[TestState]): IO[Unit] = {
+    print("---") *>
+    print("Test Summary:") *>
+    results.groupBy(identity).mapValues(_.size).toList.map { case (s, count) =>
+      (count > 0).pure[IO].ifM(
+        s match {
+          case TestState.Error => red(s"$count tests errored")
+          case TestState.Failed => red(s"$count tests failed")
+          case TestState.Updated => blue(s"$count tests updated")
+          case TestState.Success => green(s"$count tests succeeded")
+        },
+        IO.unit
+      )
+    }.combineAll
+  }
 
 }
