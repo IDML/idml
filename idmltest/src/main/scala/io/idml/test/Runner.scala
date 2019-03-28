@@ -1,9 +1,10 @@
 package io.idml.test
 import java.io.File
+import java.net.URL
 import java.nio.file.{Path, Paths, StandardOpenOption}
 
 import cats._
-import cats.data.EitherT
+import cats.data.{EitherT, NonEmptyList}
 import cats.implicits._
 import cats.effect._
 import io.circe.parser.{parse => parseJson}
@@ -11,7 +12,7 @@ import io.circe.yaml.parser.{parse => parseYaml}
 import io.circe.{Decoder, Json}
 import io.circe.generic.auto._
 import io.circe.syntax._
-import io.idml.{Ptolemy, PtolemyConf, PtolemyJson, StaticFunctionResolverService}
+import io.idml.{FunctionResolverService, PluginFunctionResolverService, Ptolemy, PtolemyConf, PtolemyJson, StaticFunctionResolverService}
 import fs2._
 import gnieh.diffson.circe._
 
@@ -32,7 +33,7 @@ class TestUtils[F[_]: Sync] {
   def blue[T <: Any](t: T): F[Unit]  = Sync[F].delay { println(fansi.Color.Cyan(t.toString)) }
 }
 
-object Runner extends TestUtils[IO] with CirceEitherEncoders {
+class Runner(plugins: Option[NonEmptyList[URL]]) extends TestUtils[IO] with CirceEitherEncoders {
 
   case class State(folder: Path)
 
@@ -51,9 +52,16 @@ object Runner extends TestUtils[IO] with CirceEitherEncoders {
       ))
 
   def ptolemy: IO[Ptolemy] = IO {
+    val baseFunctionResolver =
+      new StaticFunctionResolverService((new DeterministicTime() :: StaticFunctionResolverService.defaults.asScala.toList).asJava)
+    val frs = plugins.fold[FunctionResolverService](
+      baseFunctionResolver
+    )(
+      urls => FunctionResolverService.orElse(baseFunctionResolver, new PluginFunctionResolverService(urls.toList.toArray)),
+    )
     new Ptolemy(
       new PtolemyConf(),
-      new StaticFunctionResolverService((new DeterministicTime() :: StaticFunctionResolverService.defaults.asScala.toList).asJava)
+      frs
     )
   }
 
@@ -65,7 +73,7 @@ object Runner extends TestUtils[IO] with CirceEitherEncoders {
       c <- parseJ(r)
     } yield c
 
-  def runTest(failedOnly: Boolean)(path: Path) =
+  def runTest(failedOnly: Boolean)(path: Path): IO[List[TestState]] =
     for {
       t <- load(path)
       result <- EitherT(resolve(path, t).attempt)
@@ -81,26 +89,27 @@ object Runner extends TestUtils[IO] with CirceEitherEncoders {
                    }
                  }
                  .value
-      _ <- result.bitraverse(
-            { e =>
-              red(s"$path errored when loading") *>
-                red(e)
-            }, {
-              _.traverse {
-                _.bitraverse({
-                  case (name, diff) =>
-                    red(s"$name output differs") *>
-                      red(diff)
-                }, { name =>
-                  IO.pure(failedOnly).ifM(IO.unit, green(s"${name} passed"))
-                })
-              }
-            }
-          )
-    } yield ()
+      outputs <- result.bitraverse(
+                  { e =>
+                    red(s"$path errored when loading") *>
+                      red(e).as(TestState.Error)
+                  }, {
+                    _.traverse {
+                      _.bitraverse(
+                        {
+                          case (name, diff) =>
+                            red(s"$name output differs") *>
+                              red(diff).as(TestState.Failed)
+                        }, { name =>
+                          IO.pure(failedOnly).ifM(IO.unit, green(s"${name} passed")).as(TestState.Success)
+                        }
+                      )
+                    }
+                  }
+                )
+    } yield outputs.leftMap(List(_)).map(_.map(_.merge)).merge
 
-//  _         <- blue(s"${test.name} updated")
-  def updateTest(failedOnly: Boolean)(path: Path) =
+  def updateTest(failedOnly: Boolean)(path: Path): IO[List[TestState]] =
     for {
       test      <- load(path)
       updatable <- updateResolve(path, test)
@@ -135,13 +144,14 @@ object Runner extends TestUtils[IO] with CirceEitherEncoders {
                       .map(_.leftMap(_.asLeft[Test]).merge)
                 }
       // if we had any right entries it means we've got to update this file
-      _ <- updated
+      exit <- updated
             .exists(_.isRight)
             .pure[IO]
             .ifM(
-              blue(s"flushing update to $path") *> writeAll(path)(Stream.emit(Tests(updated.map(_.merge)).asJson.spaces2)),
-              failedOnly.pure[IO].ifM(IO.unit, green(s"$path unchanged, not flushing file"))
+              blue(s"flushing update to $path") *> writeAll(path)(Stream.emit(Tests(updated.map(_.merge)).asJson.spaces2))
+                .as(TestState.Updated),
+              failedOnly.pure[IO].ifM(IO.unit, green(s"$path unchanged, not flushing file")).as(TestState.Success)
             )
-    } yield ()
+    } yield List(exit)
 
 }

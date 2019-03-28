@@ -5,6 +5,9 @@ import java.util.ServiceLoader
 import io.idml.ast.{Argument, Pipeline, PtolemyFunction}
 import io.idml.functions.FunctionResolver
 
+import scala.util.Try
+import cats._, cats.implicits._
+
 /** A factory for functions that utilizes the Java ServiceLoader pattern */
 class FunctionResolverService {
 
@@ -30,5 +33,14 @@ class FunctionResolverService {
       result = resolvers.next().resolve(name, args)
     }
     result.getOrElse(throw new UnknownFunctionException(s"Unsupported function '$name' with ${args.size} params"))
+  }
+}
+
+object FunctionResolverService {
+  def orElse(a: FunctionResolverService, b: FunctionResolverService): FunctionResolverService = new FunctionResolverService {
+    override def resolve(name: String, args: List[Argument]): PtolemyFunction =
+      Try { a.resolve(name, args) }.toEither.leftMap { e1 =>
+        b.resolve(name, args)
+      }.merge
   }
 }
