@@ -1,6 +1,6 @@
 package io.idml.test
 import java.io.File
-import java.nio.file.{Path, Paths}
+import java.nio.file.{Path, Paths, StandardOpenOption}
 
 import cats._
 import cats.data.EitherT
@@ -19,16 +19,17 @@ import scala.util.Try
 import scala.collection.JavaConverters._
 
 class TestUtils[F[_]: Sync] {
-  def readAll(p: Path): F[String]                      = fs2.io.file.readAll[F](p, 2048).through(fs2.text.utf8Decode[F]).compile.foldMonoid
-  def parseJ(s: String): F[Json]                       = Sync[F].fromEither(parseJson(s))
-  def parseY(s: String): F[Json]                       = Sync[F].fromEither(parseYaml(s))
-  def as[T: Decoder](j: Json): F[T]                    = Sync[F].fromEither(j.as[T])
-  def refToPath(parent: Path, r: Ref): F[Path]         = Sync[F].fromTry(Try { Paths.get(r.`$ref`) })
-  def writeAll(p: Path)(s: Stream[F, String]): F[Unit] = s.through(fs2.text.utf8Encode[F]).to(fs2.io.file.writeAll(p)).compile.drain
-  def print(a: Any): F[Unit]                           = Sync[F].delay { println(a) }
-  def red[T <: Any](t: T): F[Unit]                     = Sync[F].delay { println(fansi.Color.Red(t.toString)) }
-  def green[T <: Any](t: T): F[Unit]                   = Sync[F].delay { println(fansi.Color.Green(t.toString)) }
-  def blue[T <: Any](t: T): F[Unit]                    = Sync[F].delay { println(fansi.Color.Cyan(t.toString)) }
+  def readAll(p: Path): F[String]              = fs2.io.file.readAll[F](p, 2048).through(fs2.text.utf8Decode[F]).compile.foldMonoid
+  def parseJ(s: String): F[Json]               = Sync[F].fromEither(parseJson(s))
+  def parseY(s: String): F[Json]               = Sync[F].fromEither(parseYaml(s))
+  def as[T: Decoder](j: Json): F[T]            = Sync[F].fromEither(j.as[T])
+  def refToPath(parent: Path, r: Ref): F[Path] = Sync[F].fromTry(Try { Paths.get(r.`$ref`) })
+  def writeAll(p: Path)(s: Stream[F, String]): F[Unit] =
+    s.through(fs2.text.utf8Encode[F]).to(fs2.io.file.writeAll(p, List(StandardOpenOption.TRUNCATE_EXISTING))).compile.drain
+  def print(a: Any): F[Unit]         = Sync[F].delay { println(a) }
+  def red[T <: Any](t: T): F[Unit]   = Sync[F].delay { println(fansi.Color.Red(t.toString)) }
+  def green[T <: Any](t: T): F[Unit] = Sync[F].delay { println(fansi.Color.Green(t.toString)) }
+  def blue[T <: Any](t: T): F[Unit]  = Sync[F].delay { println(fansi.Color.Cyan(t.toString)) }
 }
 
 object Runner extends TestUtils[IO] with CirceEitherEncoders {
@@ -91,7 +92,7 @@ object Runner extends TestUtils[IO] with CirceEitherEncoders {
                     red(s"$name output differs") *>
                       red(diff)
                 }, { name =>
-                  IO.pure(failedOnly).ifM(green(s"${name} passed"), IO.unit)
+                  IO.pure(failedOnly).ifM(IO.unit, green(s"${name} passed"))
                 })
               }
             }
@@ -135,11 +136,10 @@ object Runner extends TestUtils[IO] with CirceEitherEncoders {
                 }
       // if we had any right entries it means we've got to update this file
       _ <- updated
-            .find(_.isRight)
-            .isDefined
+            .exists(_.isRight)
             .pure[IO]
             .ifM(
-              blue(s"flushing upadte to $path") *> writeAll(path)(Stream.emit(Tests(updated.map(_.merge)).asJson.spaces2)),
+              blue(s"flushing update to $path") *> writeAll(path)(Stream.emit(Tests(updated.map(_.merge)).asJson.spaces2)),
               failedOnly.pure[IO].ifM(IO.unit, green(s"$path unchanged, not flushing file"))
             )
     } yield ()
