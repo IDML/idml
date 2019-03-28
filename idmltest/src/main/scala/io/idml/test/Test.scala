@@ -48,8 +48,12 @@ final case class Test(
   }
   def updateResolve[F[_]: Sync](load: Ref => F[String], parse: Ref => F[Json]): F[UpdateableResolvedTest] = {
     (
-      code.swap.traverse(load).map(_.merge),
-      input.swap.traverse(parse).map(_.merge),
+      code.swap.traverse( r =>
+        load(r).attempt.map(_.leftMap(e => new Throwable(s"Unable to load reference to ${r.`$ref`}: ${e.getMessage}"))).rethrow
+      ).map(_.merge),
+      input.swap.traverse( r =>
+        parse(r).attempt.map(_.leftMap(e => new Throwable(s"Unable to load reference to ${r.`$ref`}: ${e.getMessage}"))).rethrow
+      ).map(_.merge),
     ).mapN {
       case (c, i) =>
         UpdateableResolvedTest(
