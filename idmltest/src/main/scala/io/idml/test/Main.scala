@@ -43,6 +43,6 @@ object Main extends IOApp {
       val runner = new Runner(plugins)
       for {
         results <- if (update) paths.traverse(runner.updateTest(failures)) else paths.traverse(runner.runTest(failures))
-      } yield TestState.toExitCode(results.toList.flatten)
+      } yield TestState.toExitCode(results.toList.flatten.combineAll)
   }
 }

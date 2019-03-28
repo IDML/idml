@@ -34,6 +34,10 @@ class FunctionResolverService {
     }
     result.getOrElse(throw new UnknownFunctionException(s"Unsupported function '$name' with ${args.size} params"))
   }
+
+  def orElse(other: FunctionResolverService): FunctionResolverService = {
+    FunctionResolverService.orElse(this, other)
+  }
 }
 
 object FunctionResolverService {

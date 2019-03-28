@@ -112,9 +112,14 @@ class Runner(plugins: Option[NonEmptyList[URL]]) extends TestUtils[IO] with Circ
   def updateTest(failedOnly: Boolean)(path: Path): IO[List[TestState]] =
     for {
       test      <- load(path)
-      updatable <- updateResolve(path, test)
-      result    <- updatable.traverse(u => run(u.code, u.input).tupleLeft(u))
-      updated <- result.traverse {
+      updatable <- updateResolve(path, test).attempt
+      result <- updatable.bitraverse(
+                 e =>
+                   red(s"$path errored when loading") *>
+                     red(e).as(TestState.Error),
+                 _.traverse(u => run(u.code, u.input).tupleLeft(u))
+               )
+      updated <- result.traverse(_.traverse {
                   case (u, result) =>
                     u.output
                       .bitraverse(
@@ -142,16 +147,17 @@ class Runner(plugins: Option[NonEmptyList[URL]]) extends TestUtils[IO] with Circ
                         }
                       )
                       .map(_.leftMap(_.asLeft[Test]).merge)
-                }
+                })
       // if we had any right entries it means we've got to update this file
-      exit <- updated
-            .exists(_.isRight)
-            .pure[IO]
-            .ifM(
-              blue(s"flushing update to $path") *> writeAll(path)(Stream.emit(Tests(updated.map(_.merge)).asJson.spaces2))
-                .as(TestState.Updated),
-              failedOnly.pure[IO].ifM(IO.unit, green(s"$path unchanged, not flushing file")).as(TestState.Success)
-            )
-    } yield List(exit)
+      exit <- updated.traverse { u =>
+               u.exists(_.isRight)
+                 .pure[IO]
+                 .ifM(
+                   blue(s"flushing update to $path") *> writeAll(path)(Stream.emit(Tests(u.map(_.merge)).asJson.spaces2))
+                     .as(TestState.Updated),
+                   failedOnly.pure[IO].ifM(IO.unit, green(s"$path unchanged, not flushing file")).as(TestState.Success)
+                 )
+             }
+    } yield List(exit.merge)
 
 }
