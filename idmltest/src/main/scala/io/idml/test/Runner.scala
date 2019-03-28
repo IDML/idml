@@ -33,7 +33,7 @@ class TestUtils[F[_]: Sync] {
   def blue[T <: Any](t: T): F[Unit]  = Sync[F].delay { println(fansi.Color.Cyan(t.toString)) }
 }
 
-class Runner(plugins: Option[NonEmptyList[URL]]) extends TestUtils[IO] with CirceEitherEncoders {
+class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestUtils[IO] with CirceEitherEncoders {
 
   case class State(folder: Path)
 
@@ -61,7 +61,8 @@ class Runner(plugins: Option[NonEmptyList[URL]]) extends TestUtils[IO] with Circ
     )
     new Ptolemy(
       new PtolemyConf(),
-      frs
+      if (dynamic) frs.orElse(new FunctionResolverService())
+      else frs
     )
   }
 

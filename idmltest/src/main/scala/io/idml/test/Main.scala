@@ -24,10 +24,11 @@ object Main extends IOApp {
   val update   = Opts.flag("update", "update test snapshots", "u").orFalse
   val diff     = Opts.flag("json-diff", "output JSON diffs in stead", "j").orFalse
   val failures = Opts.flag("failed-only", "suppress successful output", "x").orFalse
-  val plugins  = Opts.options[URL]("plugin-folder", "folder with IDML plugin jars", "p").orNone
+  val dynamic  = Opts.flag("resolve-plugins", "just resolve plugins from the normal classpath", "p").orFalse
+  val plugins  = Opts.options[URL]("plugin-folder", "folder with IDML plugin jars", "pf").orNone
   // use re2 for the regex filtering
 
-  val command = Command("test", "run IDML tests")((arg, filter, update, failures, plugins).tupled)
+  val command = Command("test", "run IDML tests")((arg, filter, update, failures, dynamic, plugins).tupled)
 
   override def run(args: List[String]): IO[ExitCode] = execute.parse(args) match {
     case Left(h) =>
@@ -39,8 +40,8 @@ object Main extends IOApp {
   }
 
   val execute = command.map {
-    case (paths, filter, update, failures, plugins) =>
-      val runner = new Runner(plugins)
+    case (paths, filter, update, failures, dynamic, plugins) =>
+      val runner = new Runner(dynamic, plugins)
       for {
         results <- if (update) paths.traverse(runner.updateTest(failures)) else paths.traverse(runner.runTest(failures))
       } yield TestState.toExitCode(results.toList.flatten.combineAll)
