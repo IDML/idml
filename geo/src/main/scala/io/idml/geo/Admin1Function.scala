@@ -29,7 +29,7 @@ class Admin1Function(driver: String, url: String, user: String, password: String
   }
 
   def find(id: Long): ConnectionIO[Option[Admin1]] =
-    sql"select * from admin1 where id = $id".query[Admin1].option
+    sql"select * from Admin1 where id = $id".query[Admin1].option
 
   def get(id: Long): Option[PtolemyValue] =
     find(id)

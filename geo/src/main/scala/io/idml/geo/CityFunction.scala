@@ -29,7 +29,7 @@ class CityFunction(driver: String, url: String, user: String, password: String) 
   }
 
   def find(id: Long): ConnectionIO[Option[City]] =
-    sql"select * from cities where id = $id".query[City].option
+    sql"select * from Cities where id = $id".query[City].option
 
   def get(id: Long): Option[PtolemyValue] =
     find(id)
