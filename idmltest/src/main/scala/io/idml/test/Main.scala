@@ -44,9 +44,9 @@ object Main extends IOApp {
     case (paths, filter, update, failures, dynamic, plugins, noReport) =>
       val runner = new Runner(dynamic, plugins)
       for {
-        results <- if (update) paths.traverse(runner.updateTest(failures)) else paths.traverse(runner.runTest(failures))
+        results  <- if (update) paths.traverse(runner.updateTest(failures)) else paths.traverse(runner.runTest(failures))
         results2 = results.toList.flatten
-        _ <- noReport.pure[IO].ifM(IO.unit, runner.report(results2))
+        _        <- noReport.pure[IO].ifM(IO.unit, runner.report(results2))
       } yield TestState.toExitCode(results2.combineAll)
   }
 }

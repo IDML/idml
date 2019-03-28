@@ -161,18 +161,26 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestU
 
   def report(results: List[TestState]): IO[Unit] = {
     print("---") *>
-    print("Test Summary:") *>
-    results.groupBy(identity).mapValues(_.size).toList.map { case (s, count) =>
-      (count > 0).pure[IO].ifM(
-        s match {
-          case TestState.Error => red(s"$count tests errored")
-          case TestState.Failed => red(s"$count tests failed")
-          case TestState.Updated => blue(s"$count tests updated")
-          case TestState.Success => green(s"$count tests succeeded")
-        },
-        IO.unit
-      )
-    }.combineAll
+      print("Test Summary:") *>
+      results
+        .groupBy(identity)
+        .mapValues(_.size)
+        .toList
+        .map {
+          case (s, count) =>
+            (count > 0)
+              .pure[IO]
+              .ifM(
+                s match {
+                  case TestState.Error   => red(s"$count tests errored")
+                  case TestState.Failed  => red(s"$count tests failed")
+                  case TestState.Updated => blue(s"$count tests updated")
+                  case TestState.Success => green(s"$count tests succeeded")
+                },
+                IO.unit
+              )
+        }
+        .combineAll
   }
 
 }
