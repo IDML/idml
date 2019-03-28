@@ -31,11 +31,13 @@ final case class Test(
     input: Either[Ref, Json],
     output: Either[Ref, Json],
 ) {
+  def reportErrorWithRef[F[_]: Sync, T](r: Ref, f: F[T]): F[T] =
+    f.attempt.map(_.leftMap(e => new Throwable(s"Unable to load reference to ${r.`$ref`}: ${e.getMessage}", e))).rethrow
   def resolve[F[_]: Sync](load: Ref => F[String], parse: Ref => F[Json]): F[ResolvedTest] = {
     (
-      code.swap.traverse(load).map(_.merge),
-      input.swap.traverse(parse).map(_.merge),
-      output.swap.traverse(parse).map(_.merge)
+      code.swap.traverse(r => reportErrorWithRef(r, load(r))).map(_.merge),
+      input.swap.traverse(r => reportErrorWithRef(r, parse(r))).map(_.merge),
+      output.swap.traverse(r => reportErrorWithRef(r, parse(r))).map(_.merge)
     ).mapN {
       case (c, i, o) =>
         ResolvedTest(
@@ -48,12 +50,8 @@ final case class Test(
   }
   def updateResolve[F[_]: Sync](load: Ref => F[String], parse: Ref => F[Json]): F[UpdateableResolvedTest] = {
     (
-      code.swap.traverse( r =>
-        load(r).attempt.map(_.leftMap(e => new Throwable(s"Unable to load reference to ${r.`$ref`}: ${e.getMessage}"))).rethrow
-      ).map(_.merge),
-      input.swap.traverse( r =>
-        parse(r).attempt.map(_.leftMap(e => new Throwable(s"Unable to load reference to ${r.`$ref`}: ${e.getMessage}"))).rethrow
-      ).map(_.merge),
+      code.swap.traverse(r => reportErrorWithRef(r, load(r))).map(_.merge),
+      input.swap.traverse(r => reportErrorWithRef(r, parse(r))).map(_.merge),
     ).mapN {
       case (c, i) =>
         UpdateableResolvedTest(
