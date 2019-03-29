@@ -1,0 +1,11 @@
+{
+  "name": "basic test with a ref",
+  "code": "r = a + b",
+  "input": {
+    "a": 2,
+    "b": 1
+  },
+  "output": {
+    "$ref": "outputs/output.json"
+  }
+}

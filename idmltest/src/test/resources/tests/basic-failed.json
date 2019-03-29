@@ -1,0 +1,11 @@
+{
+  "name": "basic test",
+  "code": "r = a + b",
+  "input": {
+    "a": 2,
+    "b": 1
+  },
+  "output": {
+    "r": 4
+  }
+}

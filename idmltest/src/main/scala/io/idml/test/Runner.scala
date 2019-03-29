@@ -30,9 +30,9 @@ class TestUtils[F[_]: Sync] {
   def writeAll(p: Path)(s: Stream[F, String]): F[Unit] =
     s.through(fs2.text.utf8Encode[F]).to(fs2.io.file.writeAll(p, List(StandardOpenOption.TRUNCATE_EXISTING))).compile.drain
   def print(a: Any): F[Unit]         = Sync[F].delay { println(a) }
-  def red[T <: Any](t: T): F[Unit]   = Sync[F].delay { println(fansi.Color.Red(t.toString)) }
-  def green[T <: Any](t: T): F[Unit] = Sync[F].delay { println(fansi.Color.Green(t.toString)) }
-  def blue[T <: Any](t: T): F[Unit]  = Sync[F].delay { println(fansi.Color.Cyan(t.toString)) }
+  def red[T <: Any](t: T): F[Unit]   = print(fansi.Color.Red(t.toString))
+  def green[T <: Any](t: T): F[Unit] = print(fansi.Color.Green(t.toString))
+  def blue[T <: Any](t: T): F[Unit]  = print(fansi.Color.Cyan(t.toString))
 }
 
 class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestUtils[IO] with CirceEitherEncoders {
@@ -161,6 +161,8 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestU
              }
     } yield List(exit.merge)
 
+  def pluralize(s: String)(count: Int): String = if (count == 1) s else s"${s}s"
+
   def report(results: List[TestState]): IO[Unit] = {
     print("---") *>
       print("Test Summary:") *>
@@ -174,10 +176,10 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestU
               .pure[IO]
               .ifM(
                 s match {
-                  case TestState.Error   => red(s"$count tests errored")
-                  case TestState.Failed  => red(s"$count tests failed")
-                  case TestState.Updated => blue(s"$count tests updated")
-                  case TestState.Success => green(s"$count tests succeeded")
+                  case TestState.Error   => red(s"$count ${pluralize("test")(count)} errored")
+                  case TestState.Failed  => red(s"$count ${pluralize("test")(count)} failed")
+                  case TestState.Updated => blue(s"$count ${pluralize("test")(count)} updated")
+                  case TestState.Success => green(s"$count ${pluralize("test")(count)} succeeded")
                 },
                 IO.unit
               )

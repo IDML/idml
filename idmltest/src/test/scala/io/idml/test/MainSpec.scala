@@ -6,6 +6,4 @@ import io.circe.literal.JsonStringContext
 import io.circe.syntax._
 import org.scalatest.{MustMatchers, WordSpec}
 
-class MainSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
-
-}
+class MainSpec extends WordSpec with MustMatchers with CirceEitherEncoders {}
