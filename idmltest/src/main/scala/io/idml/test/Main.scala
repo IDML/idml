@@ -31,7 +31,7 @@ object Main extends IOApp {
 
   val command = Command("test", "run IDML tests")((arg, filter, update, failures, dynamic, plugins, noReport).tupled)
 
-  override def run(args: List[String]): IO[ExitCode] = execute.parse(args) match {
+  override def run(args: List[String]): IO[ExitCode] = execute().parse(args) match {
     case Left(h) =>
       IO {
         println(h)
@@ -40,9 +40,9 @@ object Main extends IOApp {
     case Right(r) => r
   }
 
-  val execute = command.map {
+  def execute(injectedRunner: Option[Runner] = None) = command.map {
     case (paths, filter, update, failures, dynamic, plugins, noReport) =>
-      val runner = new Runner(dynamic, plugins)
+      val runner = injectedRunner.getOrElse(new Runner(dynamic, plugins))
       for {
         results  <- if (update) paths.traverse(runner.updateTest(failures)) else paths.traverse(runner.runTest(failures))
         results2 = results.toList.flatten

@@ -24,7 +24,7 @@ object IdmlTool
             IdmlTools.repl,
             IdmlTools.apply,
             IdmlTools.server,
-            io.idml.test.Main.execute.map { f =>
+            io.idml.test.Main.execute().map { f =>
               f.unsafeRunSync()
               ()
             }
