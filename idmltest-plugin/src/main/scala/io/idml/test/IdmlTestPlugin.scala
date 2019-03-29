@@ -8,6 +8,7 @@ import cats.effect._
 import cats._
 import cats.implicits._
 import scala.collection.JavaConverters._
+import scala.util.control.NoStackTrace
 
 object IdmlTestPlugin extends AutoPlugin {
   object autoImport {
@@ -18,12 +19,7 @@ object IdmlTestPlugin extends AutoPlugin {
 
   override val trigger = allRequirements
 
-  class TestRunFailed(s: String) extends Exception {
-    // This intentionally has no stack trace
-    override def fillInStackTrace(): Throwable = this
-    override def getMessage: String            = s
-    override def getLocalizedMessage: String   = s
-  }
+  class TestRunFailed(s: String) extends Throwable with NoStackTrace
 
   override val projectSettings = Seq(
     idmlTestDirectory := (sourceDirectory in sbt.Test).value / "idml",
