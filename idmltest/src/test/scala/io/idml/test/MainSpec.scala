@@ -21,12 +21,33 @@ class MainSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
       val r    = new TestRunner
       val test = Paths.get(getClass.getResource("/tests/basic.json").getFile)
       Main.execute(Some(r)).parse(List(test.toAbsolutePath.toString)).right.get.unsafeRunSync() must equal(ExitCode.Success)
-      r.printed must equal(
+      r.printed.toList must equal(
         List(
           fansi.Color.Green("basic test passed").toString(),
           "---",
           "Test Summary:",
           fansi.Color.Green("1 test succeeded").toString()
+        )
+      )
+    }
+    "run a real test which fails and translate it's exit code" in {
+      val r    = new TestRunner
+      val test = Paths.get(getClass.getResource("/tests/basic-failed.json").getFile)
+      Main.execute(Some(r)).parse(List(test.toAbsolutePath.toString)).right.get.unsafeRunSync() must equal(ExitCode.Error)
+      r.printed.toList must equal(
+        List(
+          fansi.Color.Red("basic test output differs").toString(),
+          fansi.Color.Red("""[
+  {
+    "op" : "replace",
+    "path" : "/r",
+    "value" : 4,
+    "old" : 3
+  }
+]""").toString(),
+          "---",
+          "Test Summary:",
+          fansi.Color.Red("1 test failed").toString()
         )
       )
     }
