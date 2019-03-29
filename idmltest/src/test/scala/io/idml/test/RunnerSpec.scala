@@ -87,4 +87,16 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
         fansi.Color.Cyan("1 test updated").toString(),
       ))
   }
+  "be able to tell when a test doesn't need updating" in {
+    val test  = Paths.get(getClass.getResource("/tests/basic.json").getFile)
+    val r     = new TestRunner
+    val state = r.updateTest(false)(test).unsafeRunSync()
+    state must equal(List(TestState.Success))
+    r.printed.toList must equal(
+      List(
+        fansi.Color.Green("basic test unchanged").toString(),
+        fansi.Color.Green("basic.json unchanged, not flushing file").toString()
+      )
+    )
+  }
 }

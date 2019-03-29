@@ -154,9 +154,9 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestU
                u.exists(_.isRight)
                  .pure[IO]
                  .ifM(
-                   blue(s"flushing update to $path") *> writeAll(path)(Stream.emit(Tests(u.map(_.merge)).asJson.spaces2))
+                   blue(s"flushing update to ${path.getFileName}") *> writeAll(path)(Stream.emit(Tests(u.map(_.merge)).asJson.spaces2))
                      .as(TestState.Updated),
-                   failedOnly.pure[IO].ifM(IO.unit, green(s"$path unchanged, not flushing file")).as(TestState.Success)
+                   failedOnly.pure[IO].ifM(IO.unit, green(s"${path.getFileName} unchanged, not flushing file")).as(TestState.Success)
                  )
              }
     } yield List(exit.merge)
