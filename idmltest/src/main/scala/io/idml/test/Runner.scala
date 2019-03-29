@@ -20,11 +20,13 @@ import scala.util.Try
 import scala.collection.JavaConverters._
 
 class TestUtils[F[_]: Sync] {
-  def readAll(p: Path): F[String]              = fs2.io.file.readAll[F](p, 2048).through(fs2.text.utf8Decode[F]).compile.foldMonoid
-  def parseJ(s: String): F[Json]               = Sync[F].fromEither(parseJson(s))
-  def parseY(s: String): F[Json]               = Sync[F].fromEither(parseYaml(s))
-  def as[T: Decoder](j: Json): F[T]            = Sync[F].fromEither(j.as[T])
-  def refToPath(parent: Path, r: Ref): F[Path] = Sync[F].fromTry(Try { Paths.get(r.`$ref`) })
+  def readAll(p: Path): F[String]   = fs2.io.file.readAll[F](p, 2048).through(fs2.text.utf8Decode[F]).compile.foldMonoid
+  def parseJ(s: String): F[Json]    = Sync[F].fromEither(parseJson(s))
+  def parseY(s: String): F[Json]    = Sync[F].fromEither(parseYaml(s))
+  def as[T: Decoder](j: Json): F[T] = Sync[F].fromEither(j.as[T])
+  def refToPath(parent: Path, r: Ref): F[Path] = Sync[F].fromTry(
+    Try { parent.resolve(r.`$ref`) }
+  )
   def writeAll(p: Path)(s: Stream[F, String]): F[Unit] =
     s.through(fs2.text.utf8Encode[F]).to(fs2.io.file.writeAll(p, List(StandardOpenOption.TRUNCATE_EXISTING))).compile.drain
   def print(a: Any): F[Unit]         = Sync[F].delay { println(a) }
