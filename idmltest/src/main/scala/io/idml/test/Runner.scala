@@ -130,36 +130,36 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestU
                             p           <- refToPath(path, r)
                             oldcontents <- readAll(p)
                             contents    = result.spaces2
-                            _ <- IO
-                                  .pure(contents === oldcontents)
-                                  .ifM(
-                                    IO.pure(failedOnly).ifM(IO.unit, green(s"${u.name} unchanged")),
-                                    blue(s"${u.name} updated") *> writeAll(p)(Stream.emit(contents))
-                                  )
-                          } yield u.original
+                            status <- IO
+                                       .pure(contents === oldcontents)
+                                       .ifM(
+                                         IO.pure(failedOnly).ifM(IO.unit, green(s"${u.name} unchanged")).as(TestState.Success),
+                                         blue(s"${u.name} updated") *> writeAll(p)(Stream.emit(contents)).as(TestState.Updated)
+                                       )
+                          } yield (status, u.original)
                         },
                         // we've got an inline output
                         { expected =>
                           IO.pure(expected === result)
                             .ifM(
-                              IO.pure(failedOnly).ifM(IO.unit, green(s"${u.name} unchanged")).as(Left(u.original)),
-                              blue(s"${u.name} updated inline").as(Right(u.original.copy(output = Right(result))))
+                              IO.pure(failedOnly).ifM(IO.unit, green(s"${u.name} unchanged")).as(Left((TestState.Success, u.original))),
+                              blue(s"${u.name} updated inline").as(Right((TestState.Updated, u.original.copy(output = Right(result)))))
                             )
                         }
                       )
-                      .map(_.leftMap(_.asLeft[Test]).merge)
+                      .map(_.leftMap(_.asLeft[(TestState, Test)]).merge)
                 })
       // if we had any right entries it means we've got to update this file
       exit <- updated.traverse { u =>
                u.exists(_.isRight)
                  .pure[IO]
                  .ifM(
-                   blue(s"flushing update to ${path.getFileName}") *> writeAll(path)(Stream.emit(Tests(u.map(_.merge)).asJson.spaces2))
+                   blue(s"flushing update to ${path.getFileName}") *> writeAll(path)(Stream.emit(Tests(u.map(_.merge._2)).asJson.spaces2))
                      .as(TestState.Updated),
                    failedOnly.pure[IO].ifM(IO.unit, green(s"${path.getFileName} unchanged, not flushing file")).as(TestState.Success)
                  )
              }
-    } yield List(exit.merge)
+    } yield List(exit.merge) ++ updated.toOption.toList.flatten.map(_.bimap(_._1, _._1).merge)
 
   def pluralize(s: String)(count: Int): String = if (count == 1) s else s"${s}s"
 

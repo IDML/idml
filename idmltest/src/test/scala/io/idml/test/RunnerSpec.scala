@@ -1,6 +1,6 @@
 package io.idml.test
 
-import java.nio.file.Paths
+import java.nio.file.{Files, Paths}
 
 import cats.effect.IO
 import io.circe.Json
@@ -91,12 +91,72 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
     val test  = Paths.get(getClass.getResource("/tests/basic.json").getFile)
     val r     = new TestRunner
     val state = r.updateTest(false)(test).unsafeRunSync()
-    state must equal(List(TestState.Success))
+    state must equal(List(TestState.Success, TestState.Success))
     r.printed.toList must equal(
       List(
         fansi.Color.Green("basic test unchanged").toString(),
         fansi.Color.Green("basic.json unchanged, not flushing file").toString()
       )
     )
+  }
+  "be able to update a file that needs updating" in {
+    val test     = Files.createTempFile("idml-test", ".json")
+    val r        = new TestRunner
+    val testJson = json"""
+      {
+        "name" : "example test",
+        "code" : "r = a + b",
+        "input" : {
+           "a" : 2,
+           "b" : 2
+        },
+        "output" : {
+        }
+      }"""
+    r.writeAll(test)(fs2.Stream.emit(testJson.spaces2)).unsafeRunSync()
+    val state = r.updateTest(false)(test).unsafeRunSync()
+    Files.delete(test)
+    state must equal(List(TestState.Updated, TestState.Updated))
+    r.printed.toList must equal(
+      List(
+        fansi.Color.Cyan("example test updated inline").toString(),
+        fansi.Color.Cyan(s"flushing update to ${test.getFileName}").toString()
+      )
+    )
+  }
+  "be able to update a referred file that needs updating" in {
+    val r = new TestRunner
+
+    {
+      for {
+        test   <- IO { Files.createTempFile("idml-test", ".json") }
+        output <- IO { Files.createTempFile("idml-test", ".json") }
+        ref    = "$ref"
+        testJson = Json.obj(
+          "name" -> Json.fromString("example test"),
+          "code" -> Json.fromString("r = a + b"),
+          "input" -> Json.obj(
+            "a" -> Json.fromInt(2),
+            "b" -> Json.fromInt(2)
+          ),
+          "output" -> Json.obj(
+            "$ref" -> Json.fromString(output.getFileName.toString)
+          )
+        )
+        _     <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
+        _     <- r.writeAll(output)(fs2.Stream.emit("{}"))
+        state <- r.updateTest(false)(test)
+        _     <- IO { Files.delete(test) }
+        _     <- IO { Files.delete(output) }
+      } yield {
+        state must equal(List(TestState.Success, TestState.Updated))
+        r.printed.toList must equal(
+          List(
+            fansi.Color.Cyan("example test updated").toString(),
+            fansi.Color.Green(s"${test.getFileName} unchanged, not flushing file").toString()
+          )
+        )
+      }
+    }.unsafeRunSync()
   }
 }
