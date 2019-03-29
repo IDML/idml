@@ -143,11 +143,12 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
             "$ref" -> Json.fromString(output.getFileName.toString)
           )
         )
-        _     <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
-        _     <- r.writeAll(output)(fs2.Stream.emit("{}"))
-        state <- r.updateTest(false)(test)
-        _     <- IO { Files.delete(test) }
-        _     <- IO { Files.delete(output) }
+        _       <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
+        _       <- r.writeAll(output)(fs2.Stream.emit("{}"))
+        state   <- r.updateTest(false)(test)
+        _       <- IO { Files.delete(test) }
+        updated <- r.readAll(output).flatMap(r.parseJ)
+        _       <- IO { Files.delete(output) }
       } yield {
         state must equal(List(TestState.Success, TestState.Updated))
         r.printed.toList must equal(
@@ -156,6 +157,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
             fansi.Color.Green(s"${test.getFileName} unchanged, not flushing file").toString()
           )
         )
+        updated must equal(Json.obj("r" -> Json.fromInt(4)))
       }
     }.unsafeRunSync()
   }
