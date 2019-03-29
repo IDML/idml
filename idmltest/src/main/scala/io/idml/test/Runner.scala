@@ -7,6 +7,7 @@ import cats._
 import cats.data.{EitherT, NonEmptyList}
 import cats.implicits._
 import cats.effect._
+import com.google.re2j.Pattern
 import io.circe.parser.{parse => parseJson}
 import io.circe.yaml.parser.{parse => parseYaml}
 import io.circe.{Decoder, Json}
@@ -74,12 +75,14 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestU
       c <- parseJ(r)
     } yield c
 
-  def runTest(failedOnly: Boolean)(path: Path): IO[List[TestState]] =
+  def patternToFilter(filter: Option[Pattern]): String => Boolean = (s: String) => filter.map(_.matches(s)).getOrElse(true)
+
+  def runTest(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path): IO[List[TestState]] =
     for {
       t <- load(path)
       result <- EitherT(resolve(path, t).attempt)
                  .semiflatMap { resolved =>
-                   resolved.traverse(r => run(r.code, r.input).tupleLeft(r))
+                   resolved.filter(patternToFilter(filter).compose(_.name)).traverse(r => run(r.code, r.input).tupleLeft(r))
                  }
                  .map {
                    _.map {
@@ -110,7 +113,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestU
                 )
     } yield outputs.leftMap(List(_)).map(_.map(_.merge)).merge
 
-  def updateTest(failedOnly: Boolean)(path: Path): IO[List[TestState]] =
+  def updateTest(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path): IO[List[TestState]] =
     for {
       test      <- load(path)
       updatable <- updateResolve(path, test).attempt
@@ -120,7 +123,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestU
                      red(e).as(TestState.Error),
                  _.traverse(u => run(u.code, u.input).tupleLeft(u))
                )
-      updated <- result.traverse(_.traverse {
+      updated <- result.traverse(_.filter(patternToFilter(filter).compose(_._1.name)).traverse {
                   case (u, result) =>
                     u.output
                       .bitraverse(

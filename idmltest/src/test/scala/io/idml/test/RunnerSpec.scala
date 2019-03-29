@@ -3,6 +3,7 @@ package io.idml.test
 import java.nio.file.{Files, Paths}
 
 import cats.effect.IO
+import com.google.re2j.Pattern
 import io.circe.Json
 import io.circe.generic.auto._
 import io.circe.literal.JsonStringContext
@@ -160,5 +161,26 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
         updated must equal(Json.obj("r" -> Json.fromInt(4)))
       }
     }.unsafeRunSync()
+  }
+  "be able to filter tests in run" in {
+    val test  = Paths.get(getClass.getResource("/tests/two-tests.json").getFile)
+    val r     = new TestRunner
+    val state = r.runTest(false, Some(Pattern.compile(".*aaa")))(test).unsafeRunSync()
+    state must equal(List(TestState.Success))
+    r.printed.toList must equal(
+      List(fansi.Color.Green("basic test aaa passed").toString())
+    )
+  }
+  "be able to filter tests in update" in {
+    val test  = Paths.get(getClass.getResource("/tests/two-tests.json").getFile)
+    val r     = new TestRunner
+    val state = r.updateTest(false, Some(Pattern.compile(".*aaa")))(test).unsafeRunSync()
+    state must equal(List(TestState.Success, TestState.Success))
+    r.printed.toList must equal(
+      List(
+        fansi.Color.Green("basic test aaa unchanged").toString(),
+        fansi.Color.Green(s"${test.getFileName} unchanged, not flushing file").toString()
+      )
+    )
   }
 }
