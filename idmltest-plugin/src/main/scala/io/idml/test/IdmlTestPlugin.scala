@@ -19,7 +19,7 @@ object IdmlTestPlugin extends AutoPlugin {
 
   override val trigger = allRequirements
 
-  class TestRunFailed(s: String) extends Throwable with NoStackTrace
+  class TestRunFailed(s: String) extends Throwable(s) with NoStackTrace
 
   override val projectSettings = Seq(
     idmlTestDirectory := (sourceDirectory in sbt.Test).value / "idml",
@@ -33,9 +33,10 @@ object IdmlTestPlugin extends AutoPlugin {
         results  <- tests.traverse(runner.runTest(false))
         results2 = results.flatten
         _        <- runner.report(results2)
+        combined = results2.combineAll
       } yield {
-        TestState.toExitCode(results2.combineAll) match {
-          case ExitCode.Error   => throw new TestRunFailed(s"Test run failed, aggregate state is ${results2.combineAll}")
+        TestState.toExitCode(combined) match {
+          case ExitCode.Error   => throw new TestRunFailed(s"Test run failed, aggregate state is ${combined}")
           case ExitCode.Success => ()
         }
       }
