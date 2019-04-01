@@ -13,6 +13,7 @@ import io.circe.yaml.parser.{parse => parseYaml}
 import io.circe.{Decoder, Json}
 import io.circe.generic.auto._
 import io.circe.syntax._
+import io.circe.Printer.spaces2
 import io.idml.{FunctionResolverService, PluginFunctionResolverService, Ptolemy, PtolemyConf, PtolemyJson, StaticFunctionResolverService}
 import fs2._
 import gnieh.diffson.circe._
@@ -53,9 +54,9 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
         refToPath(path, _).flatMap(readAll).flatMap(parseJ)
       ))
 
-  def ptolemy: IO[Ptolemy] = IO {
+  def ptolemy(time: Option[Long]): IO[Ptolemy] = IO {
     val baseFunctionResolver =
-      new StaticFunctionResolverService((new DeterministicTime() :: StaticFunctionResolverService.defaults.asScala.toList).asJava)
+      new StaticFunctionResolverService((new DeterministicTime(time.getOrElse(0L)) :: StaticFunctionResolverService.defaults.asScala.toList).asJava)
     val frs = plugins.fold[FunctionResolverService](
       baseFunctionResolver
     )(
@@ -68,9 +69,9 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
     )
   }
 
-  def run(code: String, input: Json): IO[Json] =
+  def run(time: Option[Long], code: String, input: Json): IO[Json] =
     for {
-      p <- ptolemy
+      p <- ptolemy(time.map(_ * 1000))
       m <- IO { p.fromString(code) }
       r <- IO { PtolemyJson.compact(m.run(PtolemyJson.parse(input.toString()))) }
       c <- parseJ(r)
@@ -83,7 +84,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
       t <- load(path)
       result <- EitherT(resolve(path, t).attempt)
                  .semiflatMap { resolved =>
-                   resolved.filter(patternToFilter(filter).compose(_.name)).traverse(r => run(r.code, r.input).tupleLeft(r))
+                   resolved.filter(patternToFilter(filter).compose(_.name)).traverse(r => run(r.time, r.code, r.input).tupleLeft(r))
                  }
                  .map {
                    _.map {
@@ -120,6 +121,8 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                 )
     } yield outputs.leftMap(List(_)).map(_.map(_.merge)).merge
 
+  val spaces2butDropNulls = spaces2.copy(dropNullValues = true)
+
   def updateTest(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path): IO[List[TestState]] =
     for {
       test      <- load(path)
@@ -128,7 +131,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                  e =>
                    red(s"$path errored when loading") *>
                      red(e).as(TestState.Error),
-                 _.traverse(u => run(u.code, u.input).tupleLeft(u))
+                 _.traverse(u => run(u.time, u.code, u.input).tupleLeft(u))
                )
       updated <- result.traverse(_.filter(patternToFilter(filter).compose(_._1.name)).traverse {
                   case (u, result) =>
@@ -139,7 +142,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                           for {
                             p           <- refToPath(path, r)
                             oldcontents <- readAll(p)
-                            contents    = result.spaces2
+                            contents    = spaces2butDropNulls.pretty(result)
                             status <- IO
                                        .pure(contents === oldcontents)
                                        .ifM(
@@ -164,7 +167,8 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                u.exists(_.isRight)
                  .pure[IO]
                  .ifM(
-                   blue(s"flushing update to ${path.getFileName}") *> writeAll(path)(Stream.emit(Tests(u.map(_.merge._2)).asJson.spaces2))
+                   blue(s"flushing update to ${path.getFileName}")
+                     *> writeAll(path)(Stream.emit(spaces2butDropNulls.pretty(Tests(u.map(_.merge._2)).asJson)))
                      .as(TestState.Updated),
                    failedOnly.pure[IO].ifM(IO.unit, green(s"${path.getFileName} unchanged, not flushing file")).as(TestState.Success)
                  )

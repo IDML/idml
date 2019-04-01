@@ -30,6 +30,7 @@ final case class Test(
     code: Either[Ref, String],
     input: Either[Ref, Json],
     output: Either[Ref, Json],
+    time: Option[Long]
 ) {
   def reportErrorWithRef[F[_]: Sync, T](r: Ref, f: F[T]): F[T] =
     f.attempt.map(_.leftMap(e => new Throwable(s"Unable to load reference to ${r.`$ref`}: ${e.getMessage}", e))).rethrow
@@ -45,6 +46,7 @@ final case class Test(
           c,
           i,
           o,
+          time
         )
     }
   }
@@ -60,6 +62,7 @@ final case class Test(
           c,
           i,
           output,
+          time
         )
     }
   }
@@ -70,6 +73,7 @@ final case class ResolvedTest(
     code: String,
     input: Json,
     output: Json,
+    time: Option[Long],
 )
 
 final case class UpdateableResolvedTest(
@@ -78,4 +82,5 @@ final case class UpdateableResolvedTest(
     code: String,
     input: Json,
     output: Either[Ref, Json],
+    time: Option[Long],
 )

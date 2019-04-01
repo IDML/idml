@@ -24,6 +24,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
     "be able to run IDML" in {
       val r = new TestRunner
       r.run(
+          None,
           "r = a + b",
           json"""
                {
@@ -35,6 +36,18 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
         .unsafeRunSync() must equal(Json.obj("r" -> Json.fromInt(3)))
     }
   }
+  "be able to run IDML with an injected time" in {
+    val r = new TestRunner
+    r.run(
+        Some(1554117846L),
+        "r = now()",
+        json"""
+               {
+               }
+        """
+      )
+      .unsafeRunSync() must equal(Json.obj("r" -> Json.fromString("Mon, 01 Apr 2019 11:24:06 +0000")))
+  }
   "be able to run a test" in {
     val test  = Paths.get(getClass.getResource("/tests/basic.json").getFile)
     val r     = new TestRunner
@@ -42,6 +55,15 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
     state must equal(List(TestState.Success))
     r.printed.toList must equal(
       List(fansi.Color.Green("basic test passed").toString())
+    )
+  }
+  "be able to run a test with an injected time" in {
+    val test  = Paths.get(getClass.getResource("/tests/inject-now.json").getFile)
+    val r     = new TestRunner
+    val state = r.runTest(false)(test).unsafeRunSync()
+    state must equal(List(TestState.Success))
+    r.printed.toList must equal(
+      List(fansi.Color.Green("injected now test passed").toString())
     )
   }
   "be able to run a test with a ref" in {
@@ -58,7 +80,6 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
     val r     = new TestRunner
     val state = r.runTest(false)(test).unsafeRunSync()
     state must equal(List(TestState.Failed))
-
   }
   "be able to run a test which has an invalid reference" in {
     val test  = Paths.get(getClass.getResource("/tests/basic-invalid-ref.json").getFile)
@@ -180,6 +201,18 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
       List(
         fansi.Color.Green("basic test aaa unchanged").toString(),
         fansi.Color.Green(s"${test.getFileName} unchanged, not flushing file").toString()
+      )
+    )
+  }
+  "be able to tell when a test with an injected time doesn't need updating" in {
+    val test  = Paths.get(getClass.getResource("/tests/inject-now.json").getFile)
+    val r     = new TestRunner
+    val state = r.updateTest(false)(test).unsafeRunSync()
+    state must equal(List(TestState.Success, TestState.Success))
+    r.printed.toList must equal(
+      List(
+        fansi.Color.Green("injected now test unchanged").toString(),
+        fansi.Color.Green("inject-now.json unchanged, not flushing file").toString()
       )
     )
   }

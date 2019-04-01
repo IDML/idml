@@ -16,7 +16,8 @@ class TestsSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
            "b" : 2
         },
         "output" : {
-        }
+        },
+        "time" : null
       }"""
 
   val test = Test(
@@ -28,7 +29,8 @@ class TestsSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
         "b" -> Json.fromInt(2)
       )
     ),
-    Right(Json.obj())
+    Right(Json.obj()),
+    None,
   )
 
   "the Tests encoder and decoder" should {
