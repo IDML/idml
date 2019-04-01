@@ -31,7 +31,7 @@ class TestUtils[F[_]: Sync] {
     Try { parent.toAbsolutePath.getParent.resolve(r.`$ref`) }
   )
   def writeAll(p: Path)(s: Stream[F, String]): F[Unit] =
-    s.through(fs2.text.utf8Encode[F]).to(fs2.io.file.writeAll(p, List(StandardOpenOption.TRUNCATE_EXISTING))).compile.drain
+    s.through(fs2.text.utf8Encode[F]).to(fs2.io.file.writeAll(p, List(StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE))).compile.drain
   def print(a: Any): F[Unit]         = Sync[F].delay { println(a) }
   def red[T <: Any](t: T): F[Unit]   = print(fansi.Color.Red(t.toString))
   def green[T <: Any](t: T): F[Unit] = print(fansi.Color.Green(t.toString))
@@ -141,7 +141,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                         { r =>
                           for {
                             p           <- refToPath(path, r)
-                            oldcontents <- readAll(p)
+                            oldcontents <- readAll(p).attempt.map(_.leftMap(_ => "").merge)
                             contents    = spaces2butDropNulls.pretty(result)
                             status <- IO
                                        .pure(contents === oldcontents)

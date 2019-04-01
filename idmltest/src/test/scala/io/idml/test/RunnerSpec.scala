@@ -183,6 +183,41 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
       }
     }.unsafeRunSync()
   }
+   "be able to create a referred file that needs creating" in {
+    val r = new TestRunner
+
+    {
+      for {
+        test   <- IO { Files.createTempFile("idml-test", ".json")}
+        output   = Paths.get(test.getParent.toString, "create-me.json")
+        testJson = Json.obj(
+          "name" -> Json.fromString("creation test"),
+          "code" -> Json.fromString("r = a + b"),
+          "input" -> Json.obj(
+            "a" -> Json.fromInt(2),
+            "b" -> Json.fromInt(2)
+          ),
+          "output" -> Json.obj(
+            "$ref" -> Json.fromString(output.toAbsolutePath.toString)
+          )
+        )
+        _       <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
+        state   <- r.updateTest(false)(test)
+        _       <- IO { Files.delete(test) }
+        //updated <- r.readAll(output).flatMap(r.parseJ)
+        _       <- IO { Files.delete(output) }
+      } yield {
+        state must equal(List(TestState.Success, TestState.Updated))
+        r.printed.toList must equal(
+          List(
+            fansi.Color.Cyan("creation test updated").toString(),
+            fansi.Color.Green(s"${test.getFileName} unchanged, not flushing file").toString()
+          )
+        )
+        //updated must equal(Json.obj("r" -> Json.fromInt(4)))
+      }
+    }.unsafeRunSync()
+  }
   "be able to filter tests in run" in {
     val test  = Paths.get(getClass.getResource("/tests/two-tests.json").getFile)
     val r     = new TestRunner
