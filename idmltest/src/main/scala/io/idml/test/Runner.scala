@@ -16,6 +16,7 @@ import io.circe.syntax._
 import io.idml.{FunctionResolverService, PluginFunctionResolverService, Ptolemy, PtolemyConf, PtolemyJson, StaticFunctionResolverService}
 import fs2._
 import gnieh.diffson.circe._
+import diffable.TestDiff
 
 import scala.util.Try
 import scala.collection.JavaConverters._
@@ -36,7 +37,7 @@ class TestUtils[F[_]: Sync] {
   def blue[T <: Any](t: T): F[Unit]  = print(fansi.Color.Cyan(t.toString))
 }
 
-class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestUtils[IO] with CirceEitherEncoders {
+class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolean) extends TestUtils[IO] with CirceEitherEncoders {
 
   def load(test: Path): IO[Tests] = readAll(test).flatMap(parseJ).flatMap(as[Tests])
   def resolve(path: Path, tests: Tests): IO[List[ResolvedTest]] =
@@ -87,9 +88,15 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestU
                  .map {
                    _.map {
                      case (resolved, output) =>
-                       Either.cond(resolved.output === output,
-                                   resolved.name,
-                                   (resolved.name, JsonDiff.simpleDiff(output, resolved.output, true)))
+                       Either.cond(
+                         resolved.output === output,
+                         resolved.name,
+                         (resolved.name,
+                          if (jdiff)
+                            JsonDiff.simpleDiff(output, resolved.output, true).toString()
+                          else
+                            TestDiff.generateDiff(output, resolved.output))
+                       )
                    }
                  }
                  .value
@@ -103,7 +110,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestU
                         {
                           case (name, diff) =>
                             red(s"$name output differs") *>
-                              red(diff).as(TestState.Failed)
+                              print(diff).as(TestState.Failed)
                         }, { name =>
                           IO.pure(failedOnly).ifM(IO.unit, green(s"${name} passed")).as(TestState.Success)
                         }

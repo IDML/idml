@@ -12,7 +12,7 @@ import org.scalatest.{MustMatchers, WordSpec}
 import scala.collection.mutable
 
 class MainSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
-  class TestRunner extends Runner(false, None) {
+  class TestRunner extends Runner(false, None, true) {
     val printed                          = mutable.Buffer.empty[String]
     override def print(a: Any): IO[Unit] = IO { printed.append(a.toString) }
   }
@@ -37,14 +37,14 @@ class MainSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
       r.printed.toList must equal(
         List(
           fansi.Color.Red("basic test output differs").toString(),
-          fansi.Color.Red("""[
+          """[
   {
     "op" : "replace",
     "path" : "/r",
     "value" : 4,
     "old" : 3
   }
-]""").toString(),
+]""",
           "---",
           "Test Summary:",
           fansi.Color.Red("1 test failed").toString()

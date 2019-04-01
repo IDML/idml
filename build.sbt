@@ -34,7 +34,8 @@ lazy val commonSettings = Seq(
   sonatypeProjectHosting := Some(GitHubHosting("idml", "idml", "opensource@meltwater.com")),
   developers := List(Developer(id = "andimiller", name = "Andi Miller", email = "andi@andimiller.net", url = url("http://andimiller.net"))),
   version in Docker := version.value,
-  dockerUsername in Docker := Some("idml")
+  dockerUsername in Docker := Some("idml"),
+  scalacOptions += "-Ypartial-unification"
 )
 
 lazy val lang = project.settings(commonSettings)

@@ -15,7 +15,7 @@ import scala.collection.mutable
 
 class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
 
-  class TestRunner extends Runner(false, None) {
+  class TestRunner extends Runner(false, None, true) {
     val printed                          = mutable.Buffer.empty[String]
     override def print(a: Any): IO[Unit] = IO { printed.append(a.toString) }
   }

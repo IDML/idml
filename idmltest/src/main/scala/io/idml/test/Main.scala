@@ -30,13 +30,13 @@ object Main extends IOApp {
   val arg      = Opts.arguments[Path]("test.json")
   val filter   = Opts.option[Pattern]("filter", "filter to run specific tests, use re2 compatible regex or a prefix", "f").orNone
   val update   = Opts.flag("update", "update test snapshots", "u").orFalse
-  val diff     = Opts.flag("json-diff", "output JSON diffs in stead", "j").orFalse
+  val diff     = Opts.flag("json-diff", "output JSON diffs instead", "j").orFalse
   val failures = Opts.flag("failed-only", "suppress successful output", "x").orFalse
   val dynamic  = Opts.flag("dynamic-plugins", "resolve plugins from the normal classpath", "d").orFalse
   val plugins  = Opts.options[URL]("plugin-folder", "folder with IDML plugin jars", "pf").orNone
   val noReport = Opts.flag("no-report", "disable the test reporter at the end of a run", "nr").orFalse
 
-  val command = Command("test", "run IDML tests")((arg, filter, update, failures, dynamic, plugins, noReport).tupled)
+  val command = Command("test", "run IDML tests")((arg, filter, update, failures, dynamic, plugins, noReport, diff).tupled)
 
   override def run(args: List[String]): IO[ExitCode] = execute().parse(args) match {
     case Left(h) =>
@@ -48,8 +48,8 @@ object Main extends IOApp {
   }
 
   def execute(injectedRunner: Option[Runner] = None): Command[IO[ExitCode]] = command.map {
-    case (paths, filter, update, failures, dynamic, plugins, noReport) =>
-      val runner = injectedRunner.getOrElse(new Runner(dynamic, plugins))
+    case (paths, filter, update, failures, dynamic, plugins, noReport, jdiff) =>
+      val runner = injectedRunner.getOrElse(new Runner(dynamic, plugins, jdiff))
       for {
         results  <- if (update) paths.traverse(runner.updateTest(failures, filter)) else paths.traverse(runner.runTest(failures, filter))
         results2 = results.toList.flatten
