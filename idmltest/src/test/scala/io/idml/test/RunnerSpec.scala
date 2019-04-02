@@ -57,6 +57,18 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
       List(fansi.Color.Green("basic test passed").toString())
     )
   }
+  "be able to run a multitest" in {
+    val test  = Paths.get(getClass.getResource("/tests/basic-multitest.json").getFile)
+    val r     = new TestRunner
+    val state = r.runTest(false)(test).unsafeRunSync()
+    state must equal(List(TestState.Success, TestState.Success))
+    r.printed.toList must equal(
+      List(
+        fansi.Color.Green("basic multitest #1 passed").toString(),
+        fansi.Color.Green("basic multitest #2 passed").toString()
+      )
+    )
+  }
   "be able to run a test with an injected time" in {
     val test  = Paths.get(getClass.getResource("/tests/inject-now.json").getFile)
     val r     = new TestRunner

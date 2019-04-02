@@ -42,8 +42,8 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
     extends RunnerUtils(dynamic, plugins)
     with CirceEitherEncoders {
 
-  def load(test: Path): IO[Either[Tests[Json], Tests[List[Json]]]] =
-    readAll(test).flatMap(parseJ).flatMap(as[Either[Tests[Json], Tests[List[Json]]]])
+  def load(test: Path): IO[Either[Tests[List[Json]], Tests[Json]]] =
+    readAll(test).flatMap(parseJ).flatMap(as[Either[Tests[List[Json]], Tests[Json]]])
   def resolve[T: Decoder](path: Path, tests: Tests[T]): IO[List[ResolvedTest[T]]] =
     tests.tests.traverse(
       _.resolve(
@@ -62,7 +62,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
   def runTest(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path): IO[List[TestState]] =
     for {
       t <- load(path)
-      r <- t.bitraverse(runTests[Json](failedOnly, filter)(path), runTests[List[Json]](failedOnly, filter)(path))
+      r <- t.bitraverse(runTests[List[Json]](failedOnly, filter)(path), runTests[Json](failedOnly, filter)(path))
     } yield r.merge
 
   def runTests[T: Encoder: Decoder: Eq: PtolemyUtils](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(
@@ -96,24 +96,26 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                       red(e).as(TestState.error)
                   }, {
                     _.traverse {
-                      _.bitraverse(
+                      _.traverse(
+                        _.bitraverse(
                         {
                           case DifferentOutput(name, diff) =>
                             red(s"$name output differs") *>
                               print(diff).as(TestState.failed)
                         }, { name =>
-                          IO.pure(failedOnly).ifM(IO.unit, name.traverse(n => green(s"$n passed"))).as(TestState.success)
+                          IO.pure(failedOnly).ifM(IO.unit, green(s"$name passed")).as(TestState.success)
                         }
+                        )
                       )
                     }
                   }
                 )
-    } yield outputs.leftMap(List(_)).map(_.map(_.merge)).merge
+    } yield outputs.leftMap(List(_)).map(_.flatten.map(_.merge)).merge
 
   def updateTest(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path): IO[List[TestState]] =
     for {
       test <- load(path)
-      r    <- test.bitraverse(updateTests[Json](failedOnly, filter)(path), updateTests[List[Json]](failedOnly, filter)(path))
+      r    <- test.bitraverse(updateTests[List[Json]](failedOnly, filter)(path), updateTests[Json](failedOnly, filter)(path))
     } yield r.merge
 
   def updateTests[T: Encoder: Decoder: Eq](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(test: Tests[T])(

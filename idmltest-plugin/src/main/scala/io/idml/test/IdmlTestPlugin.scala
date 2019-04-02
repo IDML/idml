@@ -25,7 +25,7 @@ object IdmlTestPlugin extends AutoPlugin {
     idmlTestDirectory := (sourceDirectory in sbt.Test).value / "idml",
     (sbt.Test / test) := ((sbt.Test / test) dependsOn idmlTest).value,
     idmlTest := {
-      val runner = new Runner(true, None)
+      val runner = new Runner(true, None, false)
       val folder = idmlTestDirectory.value.toPath
       println(s"Executing IDML tests in $folder")
       val tests = Files.walk(folder).iterator().asScala.filter(_.getParent == folder).filter(_.toString.endsWith(".json")).toList

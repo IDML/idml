@@ -71,7 +71,7 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
     def run: (Option[Long], String, T) => IO[T]
     def toString(t: T): String
     def validate(t: ResolvedTest[T]): Either[Throwable, ResolvedTest[T]]
-    def inspectOutput(resolved: ResolvedTest[T], output: T, diff: (Json, Json) => String): Either[DifferentOutput, List[String]]
+    def inspectOutput(resolved: ResolvedTest[T], output: T, diff: (Json, Json) => String): List[Either[DifferentOutput, String]]
   }
   object PtolemyUtils {
     def apply[T: PtolemyUtils]: PtolemyUtils[T] = implicitly
@@ -82,12 +82,12 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
     override def validate(t: ResolvedTest[Json]) = Right(t)
     override def inspectOutput(resolved: ResolvedTest[Json],
                                output: Json,
-                               diff: (Json, Json) => String): Either[DifferentOutput, List[String]] =
-      Either.cond(
+                               diff: (Json, Json) => String): List[Either[DifferentOutput, String]] =
+      List(Either.cond(
         resolved.output === output,
-        List(resolved.name),
+        resolved.name,
         DifferentOutput(resolved.name, diff(output, resolved.output))
-      )
+      ))
 
   }
   implicit val multiPtolemyRun = new PtolemyUtils[List[Json]] {
@@ -100,15 +100,15 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
     )
     override def inspectOutput(resolved: ResolvedTest[List[Json]],
                                output: List[Json],
-                               diff: (Json, Json) => String): Either[DifferentOutput, List[String]] = {
-      resolved.output.zip(output).traverse {
-        case (expected, actual) =>
+                               diff: (Json, Json) => String): List[Either[DifferentOutput, String]] = {
+      (1 to resolved.output.length).zip(resolved.output.zip(output)).map {
+        case (index, (expected, actual)) =>
           Either.cond(
             expected.asJson === actual,
-            resolved.name,
-            DifferentOutput(resolved.name, diff(actual, expected))
+            resolved.name + s" #$index",
+            DifferentOutput(resolved.name + s" #$index", diff(actual, expected))
           )
       }
-    }
+    }.toList
   }
 }
