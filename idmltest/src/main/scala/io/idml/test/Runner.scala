@@ -1,7 +1,6 @@
 package io.idml.test
-import java.io.File
 import java.net.URL
-import java.nio.file.{Path, Paths, StandardOpenOption}
+import java.nio.file.{Path, StandardOpenOption}
 
 import cats._
 import cats.data.{EitherT, NonEmptyList}
@@ -10,26 +9,15 @@ import cats.effect._
 import com.google.re2j.Pattern
 import io.circe.parser.{parse => parseJson}
 import io.circe.yaml.parser.{parse => parseYaml}
-import io.circe.{Decoder, Encoder, Json, JsonObject}
+import io.circe.{Decoder, Encoder, Json}
 import io.circe.generic.auto._
 import io.circe.syntax._
-import io.circe.Printer.spaces2
-import io.idml.{
-  FunctionResolverService,
-  PluginFunctionResolverService,
-  Ptolemy,
-  PtolemyConf,
-  PtolemyJson,
-  PtolemyMapping,
-  StaticFunctionResolverService
-}
 import fs2._
 import gnieh.diffson.circe._
 import diffable.TestDiff
 import Test._
 
 import scala.util.Try
-import scala.collection.JavaConverters._
 
 class TestUtils[F[_]: Sync] {
   def readAll(p: Path): F[String]   = fs2.io.file.readAll[F](p, 2048).through(fs2.text.utf8Decode[F]).compile.foldMonoid
@@ -74,80 +62,31 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
   def runTest(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path): IO[List[TestState]] =
     for {
       t <- load(path)
-      r <- t.bitraverse(runTestSingle(failedOnly, filter)(path), runTestMulti(failedOnly, filter)(path))
+      r <- t.bitraverse(runTests[Json](failedOnly, filter)(path), runTests[List[Json]](failedOnly, filter)(path))
     } yield r.merge
 
-  def runTestSingle(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(t: Tests[Json]): IO[List[TestState]] =
-    for {
-      result <- EitherT(resolve(path, t).attempt)
-                 .semiflatMap { resolved =>
-                   resolved.filter(patternToFilter(filter).compose(_.name)).traverse(r => runSingle(r.time, r.code, r.input).tupleLeft(r))
-                 }
-                 .map {
-                   _.map {
-                     case (resolved, output) =>
-                       Either.cond(
-                         resolved.output.asJson === output,
-                         resolved.name,
-                         (resolved.name,
-                          if (jdiff)
-                            JsonDiff.simpleDiff(output, resolved.output, true).toString()
-                          else
-                            TestDiff.generateDiff(output, resolved.output.asJson))
-                       )
-                   }
-                 }
-                 .value
-      outputs <- result.bitraverse(
-                  { e =>
-                    red(s"$path errored when loading") *>
-                      red(e).as(TestState.error)
-                  }, {
-                    _.traverse {
-                      _.bitraverse(
-                        {
-                          case (name, diff) =>
-                            red(s"$name output differs") *>
-                              print(diff).as(TestState.failed)
-                        }, { name =>
-                          IO.pure(failedOnly).ifM(IO.unit, green(s"${name} passed")).as(TestState.success)
-                        }
-                      )
-                    }
-                  }
-                )
-    } yield outputs.leftMap(List(_)).map(_.map(_.merge)).merge
-
-  def runTestMulti(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(t: Tests[List[Json]]): IO[List[TestState]] =
+  def runTests[T: Encoder: Decoder: Eq: PtolemyUtils](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(
+      t: Tests[T]): IO[List[TestState]] =
     for {
       result <- EitherT(resolve(path, t).attempt)
                  .flatMap { resolved =>
                    resolved.traverse { t =>
-                     EitherT.cond[IO](
-                       t.input.size == t.output.size,
-                       t,
-                       new Throwable(s"${t.name} must have the same number of inputs and outputs")
-                     )
+                     EitherT.fromEither[IO](PtolemyUtils[T].validate(t))
                    }
                  }
                  .semiflatMap { resolved =>
-                   resolved.filter(patternToFilter(filter).compose(_.name)).traverse(r => runMulti(r.time, r.code, r.input).tupleLeft(r))
+                   resolved
+                     .filter(patternToFilter(filter).compose(_.name))
+                     .traverse(r => PtolemyUtils[T].run(r.time, r.code, r.input).tupleLeft(r))
                  }
                  .map {
                    _.map {
                      case (resolved, output) =>
-                       resolved.output.zip(output).traverse {
-                         case (expected, actual) =>
-                           Either.cond(
-                             expected.asJson === actual,
-                             resolved.name,
-                             (resolved.name,
-                              if (jdiff)
-                                JsonDiff.simpleDiff(actual, resolved.output, true).toString()
-                              else
-                                TestDiff.generateDiff(actual, resolved.output.asJson))
-                           )
-                       }
+                       PtolemyUtils[T].inspectOutput(resolved, output, if (jdiff) { (j1: Json, j2: Json) =>
+                         JsonDiff.simpleDiff(j1, j2, true).toString()
+                       } else { (j1: Json, j2: Json) =>
+                         TestDiff.generateDiff(j1, j2)
+                       })
                    }
                  }
                  .value
@@ -159,11 +98,11 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                     _.traverse {
                       _.bitraverse(
                         {
-                          case (name, diff) =>
+                          case DifferentOutput(name, diff) =>
                             red(s"$name output differs") *>
                               print(diff).as(TestState.failed)
                         }, { name =>
-                          IO.pure(failedOnly).ifM(IO.unit, green(s"${name} passed")).as(TestState.success)
+                          IO.pure(failedOnly).ifM(IO.unit, name.traverse(n => green(s"$n passed"))).as(TestState.success)
                         }
                       )
                     }

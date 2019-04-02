@@ -1,17 +1,12 @@
 package io.idml.test
 
-import java.io.File
 import java.net.URL
-import java.nio.file.{Path, Paths, StandardOpenOption}
 
 import cats._
 import cats.data.{EitherT, NonEmptyList}
 import cats.implicits._
 import cats.effect._
-import com.google.re2j.Pattern
-import io.circe.parser.{parse => parseJson}
-import io.circe.yaml.parser.{parse => parseYaml}
-import io.circe.{Decoder, Encoder, Json, JsonObject}
+import io.circe.Json
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.Printer.spaces2
@@ -25,11 +20,8 @@ import io.idml.{
   StaticFunctionResolverService
 }
 import fs2._
-import gnieh.diffson.circe._
-import diffable.TestDiff
 import Test._
 
-import scala.util.Try
 import scala.collection.JavaConverters._
 
 class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestUtils[IO] {
@@ -73,16 +65,50 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
 
   val spaces2butDropNulls = spaces2.copy(dropNullValues = true)
 
+  case class DifferentOutput(name: String, diff: String)
+
   trait PtolemyUtils[T] {
     def run: (Option[Long], String, T) => IO[T]
     def toString(t: T): String
+    def validate(t: ResolvedTest[T]): Either[Throwable, ResolvedTest[T]]
+    def inspectOutput(resolved: ResolvedTest[T], output: T, diff: (Json, Json) => String): Either[DifferentOutput, List[String]]
+  }
+  object PtolemyUtils {
+    def apply[T: PtolemyUtils]: PtolemyUtils[T] = implicitly
   }
   implicit val singlePtolemyRun = new PtolemyUtils[Json] {
-    override def run               = runSingle
-    override def toString(t: Json) = spaces2butDropNulls.pretty(t)
+    override def run                             = runSingle
+    override def toString(t: Json)               = spaces2butDropNulls.pretty(t)
+    override def validate(t: ResolvedTest[Json]) = Right(t)
+    override def inspectOutput(resolved: ResolvedTest[Json],
+                               output: Json,
+                               diff: (Json, Json) => String): Either[DifferentOutput, List[String]] =
+      Either.cond(
+        resolved.output === output,
+        List(resolved.name),
+        DifferentOutput(resolved.name, diff(output, resolved.output))
+      )
+
   }
   implicit val multiPtolemyRun = new PtolemyUtils[List[Json]] {
     override def run                     = runMulti
     override def toString(t: List[Json]) = spaces2butDropNulls.pretty(Json.arr(t: _*))
+    override def validate(t: ResolvedTest[List[Json]]) = Either.cond(
+      t.input.size == t.output.size,
+      t,
+      new Throwable(s"${t.name} must have the same number of inputs and outputs")
+    )
+    override def inspectOutput(resolved: ResolvedTest[List[Json]],
+                               output: List[Json],
+                               diff: (Json, Json) => String): Either[DifferentOutput, List[String]] = {
+      resolved.output.zip(output).traverse {
+        case (expected, actual) =>
+          Either.cond(
+            expected.asJson === actual,
+            resolved.name,
+            DifferentOutput(resolved.name, diff(actual, expected))
+          )
+      }
+    }
   }
 }
