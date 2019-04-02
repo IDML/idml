@@ -24,6 +24,8 @@ import Test._
 
 import scala.collection.JavaConverters._
 
+class UnbalancedMultiTest(s: String) extends Throwable(s)
+
 class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestUtils[IO] {
 
   def ptolemy(time: Option[Long]): IO[Ptolemy] = IO {
@@ -96,7 +98,7 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
     override def validate(t: ResolvedTest[List[Json]]) = Either.cond(
       t.input.size == t.output.size,
       t,
-      new Throwable(s"${t.name} must have the same number of inputs and outputs")
+      new UnbalancedMultiTest(s"${t.name} must have the same number of inputs and outputs")
     )
     override def inspectOutput(resolved: ResolvedTest[List[Json]],
                                output: List[Json],

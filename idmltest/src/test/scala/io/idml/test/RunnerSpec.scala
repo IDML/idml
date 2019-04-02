@@ -195,13 +195,13 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
       }
     }.unsafeRunSync()
   }
-   "be able to create a referred file that needs creating" in {
+  "be able to create a referred file that needs creating" in {
     val r = new TestRunner
 
     {
       for {
-        test   <- IO { Files.createTempFile("idml-test", ".json")}
-        output   = Paths.get(test.getParent.toString, "create-me.json")
+        test   <- IO { Files.createTempFile("idml-test", ".json") }
+        output = Paths.get(test.getParent.toString, "create-me.json")
         testJson = Json.obj(
           "name" -> Json.fromString("creation test"),
           "code" -> Json.fromString("r = a + b"),
@@ -216,7 +216,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
         _       <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
         state   <- r.updateTest(false)(test)
         _       <- IO { Files.delete(test) }
-        //updated <- r.readAll(output).flatMap(r.parseJ)
+        updated <- r.readAll(output).flatMap(r.parseJ)
         _       <- IO { Files.delete(output) }
       } yield {
         state must equal(List(TestState.Success, TestState.Updated))
@@ -226,7 +226,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
             fansi.Color.Green(s"${test.getFileName} unchanged, not flushing file").toString()
           )
         )
-        //updated must equal(Json.obj("r" -> Json.fromInt(4)))
+        updated must equal(Json.obj("r" -> Json.fromInt(4)))
       }
     }.unsafeRunSync()
   }
@@ -262,5 +262,89 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
         fansi.Color.Green("inject-now.json unchanged, not flushing file").toString()
       )
     )
+  }
+  "be able to fail validation of a multitest with mismatched arrays" in {
+    val test  = Paths.get(getClass.getResource("/tests/bad-multitest.json").getFile)
+    val r     = new TestRunner
+    val state = r.runTest(false)(test).unsafeRunSync()
+    state must equal(List(TestState.Error))
+    r.printed.toList must equal(
+      List(
+        fansi.Color.Red("bad-multitest.json errored when loading").toString(),
+        fansi.Color.Red("io.idml.test.UnbalancedMultiTest: bad multitest must have the same number of inputs and outputs").toString()
+      )
+    )
+  }
+  "be able to update an inline multitest" in {
+    val r = new TestRunner
+
+    {
+      for {
+        test <- IO { Files.createTempFile("idml-test", ".json") }
+        testJson = Json.obj(
+          "name" -> Json.fromString("multitest update test"),
+          "code" -> Json.fromString("r = a + b"),
+          "input" -> Json.arr(
+            Json.obj(
+              "a" -> Json.fromInt(2),
+              "b" -> Json.fromInt(2)
+            )
+          ),
+          "output" -> Json.arr()
+        )
+        _       <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
+        state   <- r.updateTest(false)(test)
+        updated <- r.readAll(test).flatMap(r.parseJ)
+        _       <- IO { Files.delete(test) }
+      } yield {
+        state must equal(List(TestState.Updated, TestState.Updated))
+        r.printed.toList must equal(
+          List(
+            fansi.Color.Cyan("multitest update test updated inline").toString(),
+            fansi.Color.Cyan(s"flushing update to ${test.getFileName}").toString()
+          )
+        )
+        updated.hcursor.downField("output").focus must equal(Some(Json.arr(Json.obj("r" -> Json.fromInt(4)))))
+      }
+    }.unsafeRunSync()
+  }
+  "be able to update a referred file that needs updating in a multitest" in {
+    val r = new TestRunner
+
+    {
+      for {
+        test   <- IO { Files.createTempFile("idml-test", ".json") }
+        output <- IO { Files.createTempFile("idml-test", ".json") }
+        ref    = "$ref"
+        testJson = Json.obj(
+          "name" -> Json.fromString("example multitest"),
+          "code" -> Json.fromString("r = a + b"),
+          "input" -> Json.arr(
+            Json.obj(
+              "a" -> Json.fromInt(2),
+              "b" -> Json.fromInt(2)
+            )
+          ),
+          "output" -> Json.obj(
+            "$ref" -> Json.fromString(output.getFileName.toString)
+          )
+        )
+        _       <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
+        _       <- r.writeAll(output)(fs2.Stream.emit("[]"))
+        state   <- r.updateTest(false)(test)
+        _       <- IO { Files.delete(test) }
+        updated <- r.readAll(output).flatMap(r.parseJ)
+        _       <- IO { Files.delete(output) }
+      } yield {
+        state must equal(List(TestState.Success, TestState.Updated))
+        r.printed.toList must equal(
+          List(
+            fansi.Color.Cyan("example multitest updated").toString(),
+            fansi.Color.Green(s"${test.getFileName} unchanged, not flushing file").toString()
+          )
+        )
+        updated must equal(Json.arr(Json.obj("r" -> Json.fromInt(4))))
+      }
+    }.unsafeRunSync()
   }
 }

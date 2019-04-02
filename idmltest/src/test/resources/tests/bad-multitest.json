@@ -1,0 +1,14 @@
+{
+  "name": "bad multitest",
+  "code": "r = a + b",
+  "input": [{
+    "a": 2,
+    "b": 1
+  },{
+    "a": 2,
+    "b": 2
+  }],
+  "output": [{
+    "r": 3
+  }]
+}

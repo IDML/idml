@@ -92,7 +92,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                  .value
       outputs <- result.bitraverse(
                   { e =>
-                    red(s"$path errored when loading") *>
+                    red(s"${path.getFileName} errored when loading") *>
                       red(e).as(TestState.error)
                   }, {
                     _.traverse {
