@@ -50,7 +50,9 @@ class TestUtils[F[_]: Sync] {
   def blue[T <: Any](t: T): F[Unit]  = print(fansi.Color.Cyan(t.toString))
 }
 
-class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolean) extends RunnerUtils(dynamic, plugins) with CirceEitherEncoders {
+class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolean)
+    extends RunnerUtils(dynamic, plugins)
+    with CirceEitherEncoders {
 
   def load(test: Path): IO[Either[Tests[Json], Tests[List[Json]]]] =
     readAll(test).flatMap(parseJ).flatMap(as[Either[Tests[Json], Tests[List[Json]]]])
@@ -99,16 +101,16 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
       outputs <- result.bitraverse(
                   { e =>
                     red(s"$path errored when loading") *>
-                      red(e).as(TestState.Error)
+                      red(e).as(TestState.error)
                   }, {
                     _.traverse {
                       _.bitraverse(
                         {
                           case (name, diff) =>
                             red(s"$name output differs") *>
-                              print(diff).as(TestState.Failed)
+                              print(diff).as(TestState.failed)
                         }, { name =>
-                          IO.pure(failedOnly).ifM(IO.unit, green(s"${name} passed")).as(TestState.Success)
+                          IO.pure(failedOnly).ifM(IO.unit, green(s"${name} passed")).as(TestState.success)
                         }
                       )
                     }
@@ -152,23 +154,22 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
       outputs <- result.bitraverse(
                   { e =>
                     red(s"$path errored when loading") *>
-                      red(e).as(TestState.Error)
+                      red(e).as(TestState.error)
                   }, {
                     _.traverse {
                       _.bitraverse(
                         {
                           case (name, diff) =>
                             red(s"$name output differs") *>
-                              print(diff).as(TestState.Failed)
+                              print(diff).as(TestState.failed)
                         }, { name =>
-                          IO.pure(failedOnly).ifM(IO.unit, green(s"${name} passed")).as(TestState.Success)
+                          IO.pure(failedOnly).ifM(IO.unit, green(s"${name} passed")).as(TestState.success)
                         }
                       )
                     }
                   }
                 )
     } yield outputs.leftMap(List(_)).map(_.map(_.merge)).merge
-
 
   def updateTest(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path): IO[List[TestState]] =
     for {
@@ -183,7 +184,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
       result <- updatable.bitraverse(
                  e =>
                    red(s"$path errored when loading") *>
-                     red(e).as(TestState.Error),
+                     red(e).as(TestState.error),
                  _.traverse(u => runner.run(u.time, u.code, u.input).tupleLeft(u))
                )
       updated <- result.traverse(_.filter(patternToFilter(filter).compose(_._1.name)).traverse {
@@ -199,8 +200,8 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                             status <- IO
                                        .pure(contents === oldcontents)
                                        .ifM(
-                                         IO.pure(failedOnly).ifM(IO.unit, green(s"${u.name} unchanged")).as(TestState.Success),
-                                         blue(s"${u.name} updated") *> writeAll(p)(Stream.emit(contents)).as(TestState.Updated)
+                                         IO.pure(failedOnly).ifM(IO.unit, green(s"${u.name} unchanged")).as(TestState.success),
+                                         blue(s"${u.name} updated") *> writeAll(p)(Stream.emit(contents)).as(TestState.updated)
                                        )
                           } yield (status, u.original.get)
                         },
@@ -210,9 +211,9 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                             .ifM(
                               IO.pure(failedOnly)
                                 .ifM(IO.unit, green(s"${u.name} unchanged"))
-                                .as((TestState.Success.asInstanceOf[TestState], u.original.get)
+                                .as((TestState.success, u.original.get)
                                   .asLeft[(TestState, ParsedTest[T])]),
-                              blue(s"${u.name} updated inline").as((TestState.Updated, u.original.get.copy(output = Right(result)))
+                              blue(s"${u.name} updated inline").as((TestState.updated, u.original.get.copy(output = Right(result)))
                                 .asInstanceOf[(TestState, ParsedTest[T])]
                                 .asRight[(TestState, ParsedTest[T])])
                             )
@@ -227,8 +228,8 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                  .ifM(
                    blue(s"flushing update to ${path.getFileName}")
                      *> writeAll(path)(Stream.emit(spaces2butDropNulls.pretty(Tests(u.map(_.merge._2)).asJson)))
-                       .as(TestState.Updated),
-                   failedOnly.pure[IO].ifM(IO.unit, green(s"${path.getFileName} unchanged, not flushing file")).as(TestState.Success)
+                       .as(TestState.updated),
+                   failedOnly.pure[IO].ifM(IO.unit, green(s"${path.getFileName} unchanged, not flushing file")).as(TestState.success)
                  )
              }
     } yield List(exit.merge) ++ updated.toOption.toList.flatten.map(_.bimap(_._1, _._1).merge)

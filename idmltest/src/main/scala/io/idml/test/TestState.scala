@@ -23,4 +23,8 @@ object TestState {
   case object Failed  extends TestState
   case object Success extends TestState
   case object Updated extends TestState
+  def error: TestState   = Error
+  def failed: TestState  = Failed
+  def success: TestState = Success
+  def updated: TestState = Updated
 }
