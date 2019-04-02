@@ -23,7 +23,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "Runner" should {
     "be able to run IDML" in {
       val r = new TestRunner
-      r.run(
+      r.runSingle(
           None,
           "r = a + b",
           json"""
@@ -38,7 +38,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   }
   "be able to run IDML with an injected time" in {
     val r = new TestRunner
-    r.run(
+    r.runSingle(
         Some(1554117846L),
         "r = now()",
         json"""

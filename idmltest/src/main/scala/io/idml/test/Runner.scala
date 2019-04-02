@@ -10,14 +10,23 @@ import cats.effect._
 import com.google.re2j.Pattern
 import io.circe.parser.{parse => parseJson}
 import io.circe.yaml.parser.{parse => parseYaml}
-import io.circe.{Decoder, Json}
+import io.circe.{Decoder, Encoder, Json, JsonObject}
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.Printer.spaces2
-import io.idml.{FunctionResolverService, PluginFunctionResolverService, Ptolemy, PtolemyConf, PtolemyJson, StaticFunctionResolverService}
+import io.idml.{
+  FunctionResolverService,
+  PluginFunctionResolverService,
+  Ptolemy,
+  PtolemyConf,
+  PtolemyJson,
+  PtolemyMapping,
+  StaticFunctionResolverService
+}
 import fs2._
 import gnieh.diffson.circe._
 import diffable.TestDiff
+import Test._
 
 import scala.util.Try
 import scala.collection.JavaConverters._
@@ -31,72 +40,58 @@ class TestUtils[F[_]: Sync] {
     Try { parent.toAbsolutePath.getParent.resolve(r.`$ref`) }
   )
   def writeAll(p: Path)(s: Stream[F, String]): F[Unit] =
-    s.through(fs2.text.utf8Encode[F]).to(fs2.io.file.writeAll(p, List(StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE))).compile.drain
+    s.through(fs2.text.utf8Encode[F])
+      .to(fs2.io.file.writeAll(p, List(StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)))
+      .compile
+      .drain
   def print(a: Any): F[Unit]         = Sync[F].delay { println(a) }
   def red[T <: Any](t: T): F[Unit]   = print(fansi.Color.Red(t.toString))
   def green[T <: Any](t: T): F[Unit] = print(fansi.Color.Green(t.toString))
   def blue[T <: Any](t: T): F[Unit]  = print(fansi.Color.Cyan(t.toString))
 }
 
-class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolean) extends TestUtils[IO] with CirceEitherEncoders {
+class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolean) extends RunnerUtils(dynamic, plugins) with CirceEitherEncoders {
 
-  def load(test: Path): IO[Tests] = readAll(test).flatMap(parseJ).flatMap(as[Tests])
-  def resolve(path: Path, tests: Tests): IO[List[ResolvedTest]] =
+  def load(test: Path): IO[Either[Tests[Json], Tests[List[Json]]]] =
+    readAll(test).flatMap(parseJ).flatMap(as[Either[Tests[Json], Tests[List[Json]]]])
+  def resolve[T: Decoder](path: Path, tests: Tests[T]): IO[List[ResolvedTest[T]]] =
     tests.tests.traverse(
       _.resolve(
         refToPath(path, _).flatMap(readAll),
-        refToPath(path, _).flatMap(readAll).flatMap(parseJ)
+        parseJ
       ))
-  def updateResolve(path: Path, tests: Tests): IO[List[UpdateableResolvedTest]] =
+  def updateResolve[T: Decoder](path: Path, tests: Tests[T]): IO[List[UpdatableTest[T]]] =
     tests.tests.traverse(
       _.updateResolve(
         refToPath(path, _).flatMap(readAll),
-        refToPath(path, _).flatMap(readAll).flatMap(parseJ)
+        parseJ
       ))
-
-  def ptolemy(time: Option[Long]): IO[Ptolemy] = IO {
-    val baseFunctionResolver =
-      new StaticFunctionResolverService((new DeterministicTime(time.getOrElse(0L)) :: StaticFunctionResolverService.defaults.asScala.toList).asJava)
-    val frs = plugins.fold[FunctionResolverService](
-      baseFunctionResolver
-    )(
-      urls => FunctionResolverService.orElse(baseFunctionResolver, new PluginFunctionResolverService(urls.toList.toArray)),
-    )
-    new Ptolemy(
-      new PtolemyConf(),
-      if (dynamic) frs.orElse(new FunctionResolverService())
-      else frs
-    )
-  }
-
-  def run(time: Option[Long], code: String, input: Json): IO[Json] =
-    for {
-      p <- ptolemy(time.map(_ * 1000))
-      m <- IO { p.fromString(code) }
-      r <- IO { PtolemyJson.compact(m.run(PtolemyJson.parse(input.toString()))) }
-      c <- parseJ(r)
-    } yield c
 
   def patternToFilter(filter: Option[Pattern]): String => Boolean = (s: String) => filter.map(_.matches(s)).getOrElse(true)
 
   def runTest(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path): IO[List[TestState]] =
     for {
       t <- load(path)
+      r <- t.bitraverse(runTestSingle(failedOnly, filter)(path), runTestMulti(failedOnly, filter)(path))
+    } yield r.merge
+
+  def runTestSingle(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(t: Tests[Json]): IO[List[TestState]] =
+    for {
       result <- EitherT(resolve(path, t).attempt)
                  .semiflatMap { resolved =>
-                   resolved.filter(patternToFilter(filter).compose(_.name)).traverse(r => run(r.time, r.code, r.input).tupleLeft(r))
+                   resolved.filter(patternToFilter(filter).compose(_.name)).traverse(r => runSingle(r.time, r.code, r.input).tupleLeft(r))
                  }
                  .map {
                    _.map {
                      case (resolved, output) =>
                        Either.cond(
-                         resolved.output === output,
+                         resolved.output.asJson === output,
                          resolved.name,
                          (resolved.name,
                           if (jdiff)
                             JsonDiff.simpleDiff(output, resolved.output, true).toString()
                           else
-                            TestDiff.generateDiff(output, resolved.output))
+                            TestDiff.generateDiff(output, resolved.output.asJson))
                        )
                    }
                  }
@@ -121,17 +116,75 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                 )
     } yield outputs.leftMap(List(_)).map(_.map(_.merge)).merge
 
-  val spaces2butDropNulls = spaces2.copy(dropNullValues = true)
+  def runTestMulti(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(t: Tests[List[Json]]): IO[List[TestState]] =
+    for {
+      result <- EitherT(resolve(path, t).attempt)
+                 .flatMap { resolved =>
+                   resolved.traverse { t =>
+                     EitherT.cond[IO](
+                       t.input.size == t.output.size,
+                       t,
+                       new Throwable(s"${t.name} must have the same number of inputs and outputs")
+                     )
+                   }
+                 }
+                 .semiflatMap { resolved =>
+                   resolved.filter(patternToFilter(filter).compose(_.name)).traverse(r => runMulti(r.time, r.code, r.input).tupleLeft(r))
+                 }
+                 .map {
+                   _.map {
+                     case (resolved, output) =>
+                       resolved.output.zip(output).traverse {
+                         case (expected, actual) =>
+                           Either.cond(
+                             expected.asJson === actual,
+                             resolved.name,
+                             (resolved.name,
+                              if (jdiff)
+                                JsonDiff.simpleDiff(actual, resolved.output, true).toString()
+                              else
+                                TestDiff.generateDiff(actual, resolved.output.asJson))
+                           )
+                       }
+                   }
+                 }
+                 .value
+      outputs <- result.bitraverse(
+                  { e =>
+                    red(s"$path errored when loading") *>
+                      red(e).as(TestState.Error)
+                  }, {
+                    _.traverse {
+                      _.bitraverse(
+                        {
+                          case (name, diff) =>
+                            red(s"$name output differs") *>
+                              print(diff).as(TestState.Failed)
+                        }, { name =>
+                          IO.pure(failedOnly).ifM(IO.unit, green(s"${name} passed")).as(TestState.Success)
+                        }
+                      )
+                    }
+                  }
+                )
+    } yield outputs.leftMap(List(_)).map(_.map(_.merge)).merge
+
 
   def updateTest(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path): IO[List[TestState]] =
     for {
-      test      <- load(path)
+      test <- load(path)
+      r    <- test.bitraverse(updateTests[Json](failedOnly, filter)(path), updateTests[List[Json]](failedOnly, filter)(path))
+    } yield r.merge
+
+  def updateTests[T: Encoder: Decoder: Eq](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(test: Tests[T])(
+      implicit runner: PtolemyUtils[T]): IO[List[TestState]] =
+    for {
       updatable <- updateResolve(path, test).attempt
       result <- updatable.bitraverse(
                  e =>
                    red(s"$path errored when loading") *>
                      red(e).as(TestState.Error),
-                 _.traverse(u => run(u.time, u.code, u.input).tupleLeft(u))
+                 _.traverse(u => runner.run(u.time, u.code, u.input).tupleLeft(u))
                )
       updated <- result.traverse(_.filter(patternToFilter(filter).compose(_._1.name)).traverse {
                   case (u, result) =>
@@ -142,25 +195,30 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                           for {
                             p           <- refToPath(path, r)
                             oldcontents <- readAll(p).attempt.map(_.leftMap(_ => "").merge)
-                            contents    = spaces2butDropNulls.pretty(result)
+                            contents    = runner.toString(result)
                             status <- IO
                                        .pure(contents === oldcontents)
                                        .ifM(
                                          IO.pure(failedOnly).ifM(IO.unit, green(s"${u.name} unchanged")).as(TestState.Success),
                                          blue(s"${u.name} updated") *> writeAll(p)(Stream.emit(contents)).as(TestState.Updated)
                                        )
-                          } yield (status, u.original)
+                          } yield (status, u.original.get)
                         },
                         // we've got an inline output
                         { expected =>
                           IO.pure(expected === result)
                             .ifM(
-                              IO.pure(failedOnly).ifM(IO.unit, green(s"${u.name} unchanged")).as(Left((TestState.Success, u.original))),
-                              blue(s"${u.name} updated inline").as(Right((TestState.Updated, u.original.copy(output = Right(result)))))
+                              IO.pure(failedOnly)
+                                .ifM(IO.unit, green(s"${u.name} unchanged"))
+                                .as((TestState.Success.asInstanceOf[TestState], u.original.get)
+                                  .asLeft[(TestState, ParsedTest[T])]),
+                              blue(s"${u.name} updated inline").as((TestState.Updated, u.original.get.copy(output = Right(result)))
+                                .asInstanceOf[(TestState, ParsedTest[T])]
+                                .asRight[(TestState, ParsedTest[T])])
                             )
                         }
                       )
-                      .map(_.leftMap(_.asLeft[(TestState, Test)]).merge)
+                      .map(_.leftMap(_.asLeft[(TestState, ParsedTest[T])]).merge)
                 })
       // if we had any right entries it means we've got to update this file
       exit <- updated.traverse { u =>
@@ -169,7 +227,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                  .ifM(
                    blue(s"flushing update to ${path.getFileName}")
                      *> writeAll(path)(Stream.emit(spaces2butDropNulls.pretty(Tests(u.map(_.merge._2)).asJson)))
-                     .as(TestState.Updated),
+                       .as(TestState.Updated),
                    failedOnly.pure[IO].ifM(IO.unit, green(s"${path.getFileName} unchanged, not flushing file")).as(TestState.Success)
                  )
              }

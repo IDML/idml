@@ -35,7 +35,8 @@ lazy val commonSettings = Seq(
   developers := List(Developer(id = "andimiller", name = "Andi Miller", email = "andi@andimiller.net", url = url("http://andimiller.net"))),
   version in Docker := version.value,
   dockerUsername in Docker := Some("idml"),
-  scalacOptions += "-Ypartial-unification"
+  scalacOptions += "-Ypartial-unification",
+  addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9")
 )
 
 lazy val lang = project.settings(commonSettings)

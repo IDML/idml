@@ -17,10 +17,11 @@ class TestsSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
         },
         "output" : {
         },
-        "time" : null
+        "time" : null,
+        "original" : null
       }"""
 
-  val test = Test(
+  val test = Test[Either[Ref, ?], Either[Ref, ?], Json](
     "example test",
     Right("r = a + b"),
     Right(
@@ -35,7 +36,7 @@ class TestsSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
 
   "the Tests encoder and decoder" should {
     "decode single tests" in {
-      testJson.as[Tests] must equal(
+      testJson.as[Tests[Json]] must equal(
         Right(
           Tests(
             List(
@@ -46,7 +47,7 @@ class TestsSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
       )
     }
     "decode arrays of tests" in {
-      Json.arr(testJson, testJson).as[Tests] must equal(
+      Json.arr(testJson, testJson).as[Tests[Json]] must equal(
         Right(
           Tests(
             List(
