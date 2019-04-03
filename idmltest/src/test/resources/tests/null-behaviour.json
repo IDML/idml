@@ -1,0 +1,9 @@
+{
+  "name": "null behaviour",
+  "code": "a = a\nb = b",
+  "input": {
+    "b": null
+  },
+  "output": {
+  }
+}

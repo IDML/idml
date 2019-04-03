@@ -6,7 +6,7 @@ import cats._
 import cats.data.{EitherT, NonEmptyList}
 import cats.implicits._
 import cats.effect._
-import io.circe.Json
+import io.circe._
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.Printer.spaces2
@@ -55,17 +55,28 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
     run({ (m: PtolemyMapping, j: Json) =>
       IO {
         PtolemyJson.compact(m.run(PtolemyJson.parse(j.toString)))
-      }.flatMap(parseJ)
+      }.flatMap(parseJ).map(_.foldWith(notNulls))
     })
 
   def runMulti(implicit timer: Timer[IO]): (Option[Long], String, List[Json]) => IO[List[Json]] =
     run({ (m: PtolemyMapping, js: List[Json]) =>
       js.parTraverse { j =>
-        IO { PtolemyJson.compact(m.run(PtolemyJson.parse(j.toString))) }.flatMap(parseJ)
+        IO { PtolemyJson.compact(m.run(PtolemyJson.parse(j.toString))) }.flatMap(parseJ).map(_.foldWith(notNulls))
       }
     })
 
   val spaces2butDropNulls = spaces2.copy(dropNullValues = true)
+
+  val notNulls = new Json.Folder[Json] {
+    override def onObject(value: JsonObject): Json = {
+      Json.obj(value.toIterable.filterNot(_._2.isNull).toVector: _*)
+    }
+    override def onNull: Json                       = Json.Null
+    override def onBoolean(value: Boolean): Json    = Json.fromBoolean(value)
+    override def onNumber(value: JsonNumber): Json  = Json.fromJsonNumber(value)
+    override def onString(value: String): Json      = Json.fromString(value)
+    override def onArray(value: Vector[Json]): Json = Json.arr(value: _*)
+  }
 
   case class DifferentOutput(name: String, diff: String)
 
