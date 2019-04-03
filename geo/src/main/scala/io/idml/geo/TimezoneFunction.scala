@@ -8,21 +8,21 @@ import doobie.implicits._
 import io.idml._
 import io.idml.ast.Pipeline
 import io.idml.datanodes.{PInt, PObject, PString}
-import io.idml.functions.PtolemyFunction1
+import io.idml.functions.PtolemyFunction0
 import net.iakovlev.timeshape.TimeZoneEngine
 
-class TimezoneFunction {
-  val engine: TimeZoneEngine = TimeZoneEngine.initialize()
+object TimezoneFunction {
+  lazy val engine: TimeZoneEngine = TimeZoneEngine.initialize()
 
   def query(g: Geo): Option[String] = {
     engine.query(g.lat, g.long).map[Option[String]](r => Some(r.toString)).orElse(None)
   }
 
-  case class TimezoneFunction(arg: Pipeline) extends PtolemyFunction1 {
-    override protected def apply(cursor: PtolemyValue, country: PtolemyValue): PtolemyValue = {
-      country match {
-        case g: Geo =>  query(g).map(PString).getOrElse(MissingField)
-        case _       => InvalidParameters
+  case object TimezoneFunction extends PtolemyFunction0 {
+    override protected def apply(cursor: PtolemyValue): PtolemyValue = {
+      cursor match {
+        case g: Geo => query(g).map(PString).getOrElse(MissingField)
+        case _      => InvalidParameters
       }
     }
 
