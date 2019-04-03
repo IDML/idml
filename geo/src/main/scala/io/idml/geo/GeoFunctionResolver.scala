@@ -14,6 +14,8 @@ class GeoFunctionResolver extends FunctionResolver {
         Some(IsoCountryFunction(country))
       case ("region", (country: Pipeline) :: (region: Pipeline) :: Nil) =>
         Some(IsoRegionFunction(country, region))
+      case ("timezone", Nil) =>
+        Some(TimezoneFunction.TimezoneFunction)
       case _ => None
     }
   }
@@ -24,6 +26,7 @@ class GeoFunctionResolver extends FunctionResolver {
     PtolemyFunctionMetadata("region", List("region"   -> "region name to look up"), "look up a region"),
     PtolemyFunctionMetadata("city", List("city"       -> "city name to look up"), "look up a city"),
     PtolemyFunctionMetadata("admin1", List("admin1"   -> "admin1 name to look up"), "look up an admin1 area"),
+    PtolemyFunctionMetadata("timezone", List.empty, "turn this geo into a timezone, eg. Europe/London")
   )
 }
 
