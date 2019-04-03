@@ -59,14 +59,16 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
 
   def patternToFilter(filter: Option[Pattern]): String => Boolean = (s: String) => filter.map(_.matches(s)).getOrElse(true)
 
-  def runTest(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path): IO[List[TestState]] =
+  def runTest(failedOnly: Boolean, filter: Option[Pattern] = None)(timer: Timer[IO])(path: Path): IO[List[TestState]] = {
+    implicit val it: Timer[IO] = timer
     for {
       t <- load(path)
       r <- t.bitraverse(runTests[List[Json]](failedOnly, filter)(path), runTests[Json](failedOnly, filter)(path))
     } yield r.merge
+  }
 
-  def runTests[T: Encoder: Decoder: Eq: PtolemyUtils](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(
-      t: Tests[T]): IO[List[TestState]] =
+  def runTests[T: Encoder: Decoder: Eq: PtolemyUtils](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(t: Tests[T])(
+      implicit timer: Timer[IO]): IO[List[TestState]] =
     for {
       result <- EitherT(resolve(path, t).attempt)
                  .flatMap { resolved =>
@@ -77,7 +79,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                  .semiflatMap { resolved =>
                    resolved
                      .filter(patternToFilter(filter).compose(_.name))
-                     .traverse(r => PtolemyUtils[T].run(r.time, r.code, r.input).tupleLeft(r))
+                     .parTraverse(r => PtolemyUtils[T].run(implicitly)(r.time, r.code, r.input).tupleLeft(r))
                  }
                  .map {
                    _.map {
@@ -98,13 +100,13 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                     _.traverse {
                       _.traverse(
                         _.bitraverse(
-                        {
-                          case DifferentOutput(name, diff) =>
-                            red(s"$name output differs") *>
-                              print(diff).as(TestState.failed)
-                        }, { name =>
-                          IO.pure(failedOnly).ifM(IO.unit, green(s"$name passed")).as(TestState.success)
-                        }
+                          {
+                            case DifferentOutput(name, diff) =>
+                              red(s"$name output differs") *>
+                                print(diff).as(TestState.failed)
+                          }, { name =>
+                            IO.pure(failedOnly).ifM(IO.unit, green(s"$name passed")).as(TestState.success)
+                          }
                         )
                       )
                     }
@@ -112,21 +114,23 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                 )
     } yield outputs.leftMap(List(_)).map(_.flatten.map(_.merge)).merge
 
-  def updateTest(failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path): IO[List[TestState]] =
+  def updateTest(failedOnly: Boolean, filter: Option[Pattern] = None)(timer: Timer[IO])(path: Path): IO[List[TestState]] = {
+    implicit val t: Timer[IO] = timer
     for {
       test <- load(path)
       r    <- test.bitraverse(updateTests[List[Json]](failedOnly, filter)(path), updateTests[Json](failedOnly, filter)(path))
     } yield r.merge
+  }
 
-  def updateTests[T: Encoder: Decoder: Eq](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(test: Tests[T])(
-      implicit runner: PtolemyUtils[T]): IO[List[TestState]] =
+  def updateTests[T: Encoder: Decoder: Eq](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(
+      test: Tests[T])(implicit runner: PtolemyUtils[T], timer: Timer[IO]): IO[List[TestState]] =
     for {
       updatable <- updateResolve(path, test).attempt
       result <- updatable.bitraverse(
                  e =>
                    red(s"$path errored when loading") *>
                      red(e).as(TestState.error),
-                 _.traverse(u => runner.run(u.time, u.code, u.input).tupleLeft(u))
+                 _.parTraverse(u => runner.run(implicitly)(u.time, u.code, u.input).tupleLeft(u))
                )
       updated <- result.traverse(_.filter(patternToFilter(filter).compose(_._1.name)).traverse {
                   case (u, result) =>

@@ -1,6 +1,7 @@
 package io.idml.test
 import java.net.URL
 import java.nio.file.Path
+import java.util.concurrent.Executors
 
 import cats._
 import cats.data._
@@ -9,6 +10,7 @@ import cats.effect._
 import com.google.re2j.Pattern
 import com.monovore.decline._
 
+import scala.concurrent.ExecutionContext
 import scala.util.Try
 
 object Main extends IOApp {
@@ -35,8 +37,9 @@ object Main extends IOApp {
   val dynamic  = Opts.flag("dynamic-plugins", "resolve plugins from the normal classpath", "d").orFalse
   val plugins  = Opts.options[URL]("plugin-folder", "folder with IDML plugin jars", "pf").orNone
   val noReport = Opts.flag("no-report", "disable the test reporter at the end of a run", "nr").orFalse
+  val threads  = Opts.option[Int]("threads", "number of threads to use", "t").orNone
 
-  val command = Command("test", "run IDML tests")((arg, filter, update, failures, dynamic, plugins, noReport, diff).tupled)
+  val command = Command("test", "run IDML tests")((arg, filter, update, failures, dynamic, plugins, noReport, diff, threads).tupled)
 
   override def run(args: List[String]): IO[ExitCode] = execute().parse(args) match {
     case Left(h) =>
@@ -48,12 +51,22 @@ object Main extends IOApp {
   }
 
   def execute(injectedRunner: Option[Runner] = None): Command[IO[ExitCode]] = command.map {
-    case (paths, filter, update, failures, dynamic, plugins, noReport, jdiff) =>
-      val runner = injectedRunner.getOrElse(new Runner(dynamic, plugins, jdiff))
-      for {
-        results  <- if (update) paths.traverse(runner.updateTest(failures, filter)) else paths.traverse(runner.runTest(failures, filter))
-        results2 = results.toList.flatten
-        _        <- noReport.pure[IO].ifM(IO.unit, runner.report(results2))
-      } yield TestState.toExitCode(results2.combineAll)
+    case (paths, filter, update, failures, dynamic, plugins, noReport, jdiff, threads) =>
+      val timer: Resource[IO, Timer[IO]] = threads
+        .map(n =>
+          Resource.make(IO { Executors.newFixedThreadPool(n) })(p => IO { p.shutdown() }).map { p =>
+            IO.timer(ExecutionContext.fromExecutor(p))
+        })
+        .getOrElse(Resource.liftF(IO { IO.timer(ExecutionContext.global) }))
+      timer.use { t =>
+        implicit val it: Timer[IO] = t
+        val runner                 = injectedRunner.getOrElse(new Runner(dynamic, plugins, jdiff))
+        for {
+          results <- if (update) paths.traverse(runner.updateTest(failures, filter)(t))
+                    else paths.traverse(runner.runTest(failures, filter)(t))
+          results2 = results.toList.flatten
+          _        <- noReport.pure[IO].ifM(IO.unit, runner.report(results2))
+        } yield TestState.toExitCode(results2.combineAll)
+      }
   }
 }
