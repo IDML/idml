@@ -67,15 +67,15 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
 
   val spaces2butDropNulls = spaces2.copy(dropNullValues = true)
 
-  val notNulls = new Json.Folder[Json] {
+  val notNulls: Json.Folder[Json] = new Json.Folder[Json] {
     override def onObject(value: JsonObject): Json = {
-      Json.obj(value.toIterable.filterNot(_._2.isNull).toVector: _*)
+      Json.obj(value.toIterable.filterNot(_._2.isNull).map(kv => (kv._1, kv._2.foldWith(notNulls))).toVector: _*)
     }
     override def onNull: Json                       = Json.Null
     override def onBoolean(value: Boolean): Json    = Json.fromBoolean(value)
     override def onNumber(value: JsonNumber): Json  = Json.fromJsonNumber(value)
     override def onString(value: String): Json      = Json.fromString(value)
-    override def onArray(value: Vector[Json]): Json = Json.arr(value: _*)
+    override def onArray(value: Vector[Json]): Json = Json.arr(value.map(_.foldWith(notNulls)): _*)
   }
 
   case class DifferentOutput(name: String, diff: String)
