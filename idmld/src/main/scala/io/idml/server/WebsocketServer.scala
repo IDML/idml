@@ -51,72 +51,74 @@ object WebsocketServer {
     )
   )
 
-  def service(implicit ec: ExecutionContext) = HttpService[IO] {
-    case GET -> Root / "functions" / partial =>
-      Ok(functions.filter(_.name.startsWith(partial)).asJson)
-    case req @ POST -> Root / "completion" =>
-      req
-        .as[Complete]
-        .map { c =>
-          c.in.flatMap { doc =>
-            AutoComplete.complete(completionPtolemy)(PtolemyJson.parse(doc.noSpaces).asInstanceOf[PtolemyObject], c.idml, c.position)
-          }.asJson
+  def service(fr: FunctionResolverService)(implicit ec: ExecutionContext) = {
+    val ptolemy = new Ptolemy(new PtolemyConf(), fr)
+    HttpService[IO] {
+      case GET -> Root / "functions" / partial =>
+        Ok(functions.filter(_.name.startsWith(partial)).asJson)
+      case req @ POST -> Root / "completion" =>
+        req
+          .as[Complete]
+          .map { c =>
+            c.in.flatMap { doc =>
+              AutoComplete.complete(completionPtolemy)(PtolemyJson.parse(doc.noSpaces).asInstanceOf[PtolemyObject], c.idml, c.position)
+            }.asJson
+          }
+          .flatMap(Ok(_))
+
+      case req @ GET -> Root =>
+        val queue = async.unboundedQueue[IO, WebSocketFrame]
+        val echoReply: Pipe[IO, WebSocketFrame, WebSocketFrame] = _.collect {
+          case Text(msg, _) => Text("You sent the server: " + msg)
+          case _            => Text("Something new")
         }
-        .flatMap(Ok(_))
-
-    case req @ GET -> Root =>
-      val ptolemy = new Ptolemy(new PtolemyConf())
-      val queue   = async.unboundedQueue[IO, WebSocketFrame]
-      val echoReply: Pipe[IO, WebSocketFrame, WebSocketFrame] = _.collect {
-        case Text(msg, _) => Text("You sent the server: " + msg)
-        case _            => Text("Something new")
-      }
-      val main: Pipe[IO, WebSocketFrame, Response] = _.flatMap {
-        _ match {
-          case Text(msg, _) =>
-            Stream.eval(
-              IO {
-                parse(msg)
-                  .map(_.as[Request])
-                  .leftMap { e =>
-                    List(e.message)
-                  }
-                  .map { r =>
-                    r.toTry.toEither.leftMap(e => List(e.getMessage))
-                  }
-                  .flatMap(identity)
-                  .flatMap { x =>
-                    Try {
-                      log.info(x.toString)
-                      val chain = ptolemy.fromString(x.idml)
-                      val jsons = x.in.map(i => PtolemyJson.parse(i.toString))
-                      val p     = x.path.getOrElse("root")
-                      val path  = ptolemy.fromString(s"result = $p")
-                      jsons
-                        .map { j =>
-                          parse(PtolemyJson.compact(path.run(chain.run(j)))).toTry
-                        }
-                        .sequence
-                        .toEither
-                    }.toEither
-                      .leftMap(e => List(e.getMessage))
-                      .flatMap(_.toTry.toEither.leftMap(e => List(e.getMessage)))
-                  }
-                  .map(result => Response(Some(result), None))
-                  .leftMap(e => Response(None, Some(e)))
-                  .merge
-              }
-            )
-          case _ => Stream.emit(Response(None, Some(List("Please send your request as Text")))).covary[IO]
+        val main: Pipe[IO, WebSocketFrame, Response] = _.flatMap {
+          _ match {
+            case Text(msg, _) =>
+              Stream.eval(
+                IO {
+                  parse(msg)
+                    .map(_.as[Request])
+                    .leftMap { e =>
+                      List(e.message)
+                    }
+                    .map { r =>
+                      r.toTry.toEither.leftMap(e => List(e.getMessage))
+                    }
+                    .flatMap(identity)
+                    .flatMap { x =>
+                      Try {
+                        log.info(x.toString)
+                        val chain = ptolemy.fromString(x.idml)
+                        val jsons = x.in.map(i => PtolemyJson.parse(i.toString))
+                        val p     = x.path.getOrElse("root")
+                        val path  = ptolemy.fromString(s"result = $p")
+                        jsons
+                          .map { j =>
+                            parse(PtolemyJson.compact(path.run(chain.run(j)))).toTry
+                          }
+                          .sequence
+                          .toEither
+                      }.toEither
+                        .leftMap(e => List(e.getMessage))
+                        .flatMap(_.toTry.toEither.leftMap(e => List(e.getMessage)))
+                    }
+                    .map(result => Response(Some(result), None))
+                    .leftMap(e => Response(None, Some(e)))
+                    .merge
+                }
+              )
+            case _ => Stream.emit(Response(None, Some(List("Please send your request as Text")))).covary[IO]
+          }
         }
-      }
 
-      queue.flatMap { q =>
-        val d = q.dequeue.through(main.andThen(_.map(resp => Text(resp.asJson.toString()))))
-        val e = q.enqueue
-        WebSocketBuilder[IO].build(d, e)
-      }
+        queue.flatMap { q =>
+          val d = q.dequeue.through(main.andThen(_.map(resp => Text(resp.asJson.toString()))))
+          val e = q.enqueue
+          WebSocketBuilder[IO].build(d, e)
+        }
 
+    }
   }
 
 }

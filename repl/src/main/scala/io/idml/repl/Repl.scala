@@ -21,11 +21,6 @@ import scala.collection.JavaConverters._
   */
 class Repl {
 
-  val ptolemy = new Ptolemy(
-    new PtolemyConf,
-    new FunctionResolverService()
-  )
-
   val build        = BuildInfo
   val IDML_VERSION = build.version
   val BUILD_DATE   = build.builtAtString
@@ -36,8 +31,15 @@ class Repl {
   var mode: String         = "json"
   var doc: Option[PObject] = None
 
-  def run(args: Array[String]) {
+  def run(args: Array[String]) = runInner(args)
+
+  def runInner(args: Array[String], fr: Option[FunctionResolverService] = None) {
     addShutdownHook()
+
+    val ptolemy = new Ptolemy(
+      new PtolemyConf,
+      fr.getOrElse(new FunctionResolverService())
+    )
 
     out.println("""
         |idml %s (%s)
@@ -61,14 +63,14 @@ class Repl {
             case "load" =>
               input = loadFile(input.substring(".load".length).trim)
               if (input.length > 0) {
-                processInput(input)
+                processInput(ptolemy)(input)
               }
             case _ =>
               out.println("Error: Unknown command [" + tokens(0) + "]")
               ""
           }
         } else {
-          processInput(input)
+          processInput(ptolemy)(input)
         }
         out.println()
       }
@@ -121,11 +123,11 @@ class Repl {
                 """.stripMargin)
   }
 
-  def processInput(input: String) {
+  def processInput(ptolemy: Ptolemy)(input: String) {
     mode match {
       case "json"   => processJson(input)
-      case "idml"   => processIdml(input)
-      case "schema" => processSchema(input)
+      case "idml"   => processIdml(ptolemy)(input)
+      case "schema" => processSchema(ptolemy)(input)
       case _        => out.println("Error: Unknown mode [" + mode + "]")
     }
   }
@@ -142,7 +144,7 @@ class Repl {
     }
   }
 
-  def processIdml(input: String) {
+  def processIdml(ptolemy: Ptolemy)(input: String) {
     try {
       val mapping = ptolemy.fromString(input)
       val output  = mapping.run(doc.get)
@@ -153,7 +155,7 @@ class Repl {
     }
   }
 
-  def processSchema(input: String) {
+  def processSchema(ptolemy: Ptolemy)(input: String) {
     try {
       var mapping: String = ""
       doc.get.fields.keySet.foreach {
