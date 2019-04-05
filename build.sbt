@@ -34,7 +34,9 @@ lazy val commonSettings = Seq(
   sonatypeProjectHosting := Some(GitHubHosting("idml", "idml", "opensource@meltwater.com")),
   developers := List(Developer(id = "andimiller", name = "Andi Miller", email = "andi@andimiller.net", url = url("http://andimiller.net"))),
   version in Docker := version.value,
-  dockerUsername in Docker := Some("idml")
+  dockerUsername in Docker := Some("idml"),
+  scalacOptions += "-Ypartial-unification",
+  addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9")
 )
 
 lazy val lang = project.settings(commonSettings)
@@ -78,12 +80,17 @@ lazy val idmldoc = project.dependsOn(core).dependsOn(utils).settings(commonSetti
 
 lazy val `idmldoc-plugin` = project.dependsOn(idmldoc).settings(commonSettings)
 
+lazy val idmltest = project.dependsOn(core).dependsOn(utils).settings(commonSettings)
+
+lazy val `idmltest-plugin` = project.dependsOn(idmltest).dependsOn(hashing).dependsOn(geo).dependsOn(jsoup).settings(commonSettings)
+
 lazy val tool = project
   .dependsOn(core)
   .dependsOn(jsoup)
   .dependsOn(utils)
   .dependsOn(repl)
   .dependsOn(idmld)
+  .dependsOn(idmltest)
   .dependsOn(hashing)
   .dependsOn(geo)
   .enablePlugins(DockerPlugin, JavaAppPackaging)

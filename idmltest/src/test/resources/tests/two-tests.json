@@ -1,0 +1,24 @@
+[
+  {
+    "name": "basic test aaa",
+    "code": "r = a + b",
+    "input": {
+      "a": 2,
+      "b": 1
+    },
+    "output": {
+      "r": 3
+    }
+  },
+  {
+    "name": "basic test bbb",
+    "code": "r = a + b",
+    "input": {
+      "a": 2,
+      "b": 1
+    },
+    "output": {
+      "r": 3
+    }
+  }
+]

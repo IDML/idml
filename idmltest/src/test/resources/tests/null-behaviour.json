@@ -1,0 +1,15 @@
+{
+  "name": "null behaviour",
+  "code": "a = a\nb = b\nfoo.bar.baz.blargh = b",
+  "input": {
+    "b": null
+  },
+  "output": {
+    "foo": {
+      "bar": {
+        "baz": {
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name" : "example test",
+  "code" : "r = a + b",
+  "input" : {
+    "a" : 2,
+    "b" : 2
+  },
+  "output" : {
+    "$ref" : "create-me.json"
+  }
+}
