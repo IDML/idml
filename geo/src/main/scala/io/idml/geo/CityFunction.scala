@@ -40,7 +40,7 @@ class CityFunction(driver: String, url: String, user: String, password: String) 
       .attempt
       .unsafeRunSync()
       .leftMap { e =>
-        log.warn("admin1 couldn't be called", e)
+        log.warn("city couldn't be called", e)
         None
       }
       .merge
