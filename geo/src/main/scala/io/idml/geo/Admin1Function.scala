@@ -7,8 +7,11 @@ import io.idml.functions.PtolemyFunction1
 import cats._, cats.implicits._, cats.syntax._, cats.effect._
 import doobie.implicits._, doobie._
 import doobie.hikari._, doobie.hikari.implicits._
+import org.slf4j.LoggerFactory
 
 class Admin1Function(driver: String, url: String, user: String, password: String) {
+  val log = LoggerFactory.getLogger(getClass)
+
   lazy val xa = HikariTransactor
     .newHikariTransactor[IO](
       driver,
@@ -36,8 +39,8 @@ class Admin1Function(driver: String, url: String, user: String, password: String
       .transact(xa)
       .attempt
       .unsafeRunSync()
-      .leftMap { _ =>
-        // could log the error here
+      .leftMap { e =>
+        log.warn("admin1 couldn't be called", e)
         None
       }
       .merge
