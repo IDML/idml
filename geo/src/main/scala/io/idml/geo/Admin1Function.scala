@@ -9,17 +9,24 @@ import doobie.implicits._, doobie._
 import doobie.hikari._, doobie.hikari.implicits._
 import org.slf4j.LoggerFactory
 
+import scala.concurrent.ExecutionContext.global
+
 class Admin1Function(driver: String, url: String, user: String, password: String) {
-  val log = LoggerFactory.getLogger(getClass)
+  val log         = LoggerFactory.getLogger(getClass)
+  implicit val cs = IO.contextShift(global)
 
   lazy val xa = HikariTransactor
     .newHikariTransactor[IO](
       driver,
       url,
       user,
-      password
+      password,
+      global,
+      global
     )
+    .allocated
     .unsafeRunSync()
+    ._1
 
   case class Admin1(id: Long, name: String, asciiname: String) {
     def toPValue: PtolemyValue = {
