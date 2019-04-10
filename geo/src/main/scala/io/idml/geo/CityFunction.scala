@@ -9,24 +9,17 @@ import doobie.implicits._, doobie._
 import doobie.hikari._, doobie.hikari.implicits._
 import org.slf4j.LoggerFactory
 
-import scala.concurrent.ExecutionContext.global
-
 class CityFunction(driver: String, url: String, user: String, password: String) {
-  val log         = LoggerFactory.getLogger(getClass)
-  implicit val cs = IO.contextShift(global)
+  val log = LoggerFactory.getLogger(getClass)
 
   lazy val xa = HikariTransactor
     .newHikariTransactor[IO](
       driver,
       url,
       user,
-      password,
-      global,
-      global
+      password
     )
-    .allocated
     .unsafeRunSync()
-    ._1
 
   case class City(id: Long, name: String, asciiname: String) {
     def toPValue: PtolemyValue = {
