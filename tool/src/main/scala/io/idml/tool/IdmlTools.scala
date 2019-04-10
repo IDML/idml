@@ -48,26 +48,29 @@ object IdmlTools {
     header = "IDML REPL"
   ) {
     functionResolver.map { fr =>
-      new Repl().runInner(List().toArray, Some(fr))
+      IO {
+        new Repl().runInner(List().toArray, Some(fr))
+        ExitCode.Success
+      }
     }
   }
 
-  val server = Command(
-    name = "server",
-    header = "IDML language server"
-  ) {
-    val bindAll = Opts.flag("bind-all", "Bind to all interfaces", short = "b").orFalse
-    (bindAll, functionResolver).mapN {
-      case (b, fr) =>
-        BlazeBuilder[IO]
-          .mountService(WebsocketServer.service(fr))
-          .bindHttp(8081, if (b) "0.0.0.0" else "localhost")
-          .serve
-          .compile
-          .drain
-          .unsafeRunSync
+  def server(implicit c: ConcurrentEffect[IO], t: Timer[IO]) =
+    Command(
+      name = "server",
+      header = "IDML language server"
+    ) {
+      val bindAll = Opts.flag("bind-all", "Bind to all interfaces", short = "b").orFalse
+      (bindAll, functionResolver).mapN {
+        case (b, fr) =>
+          BlazeBuilder[IO]
+            .mountService(WebsocketServer.service(fr), "/")
+            .bindHttp(8081, if (b) "0.0.0.0" else "localhost")
+            .serve
+            .compile
+            .lastOrError
+      }
     }
-  }
 
   val apply = Command(
     name = "apply",
@@ -83,51 +86,54 @@ object IdmlTools {
     (pretty, unmapped, strict, file, functionResolver).mapN { (p, u, s, f, fr) =>
       val config = new IdmlToolConfig(f, p, s, u)
 
-      val ptolemy = if (config.unmapped) {
-        new Ptolemy(
-          new PtolemyConf,
-          List[PtolemyListener](new UnmappedFieldsFinder).asJava,
-          fr
-        )
-      } else {
-        new Ptolemy(
-          new PtolemyConf,
-          fr
-        )
-      }
-      val (found, missing) = config.files.partition(_.exists())
-      missing.isEmpty match {
-        case false =>
-          missing.foreach { f =>
-            println("Couldn't load mapping from %s".format(f))
-          }
-          sys.exit(1)
-        case true =>
-          val maps  = found.map(f => ptolemy.fromFile(f.getAbsolutePath))
-          val chain = ptolemy.newChain(maps: _*)
-          if (config.strict) {
-            maps.foreach { m =>
-              DocumentValidator.validate(m.nodes)
+      IO {
+        val ptolemy = if (config.unmapped) {
+          new Ptolemy(
+            new PtolemyConf,
+            List[PtolemyListener](new UnmappedFieldsFinder).asJava,
+            fr
+          )
+        } else {
+          new Ptolemy(
+            new PtolemyConf,
+            fr
+          )
+        }
+        val (found, missing) = config.files.partition(_.exists())
+        missing.isEmpty match {
+          case false =>
+            missing.foreach { f =>
+              println("Couldn't load mapping from %s".format(f))
             }
-          }
-          scala.io.Source.stdin
-            .getLines()
-            .filter(!_.isEmpty)
-            .map { s: String =>
-              Try {
-                chain.run(PtolemyJson.parse(s))
+            ExitCode.Error
+          case true =>
+            val maps  = found.map(f => ptolemy.fromFile(f.getAbsolutePath))
+            val chain = ptolemy.newChain(maps: _*)
+            if (config.strict) {
+              maps.foreach { m =>
+                DocumentValidator.validate(m.nodes)
               }
             }
-            .foreach {
-              case Success(json) =>
-                config.pretty match {
-                  case true  => println(PtolemyJson.pretty(json))
-                  case false => println(PtolemyJson.compact(json))
+            scala.io.Source.stdin
+              .getLines()
+              .filter(!_.isEmpty)
+              .map { s: String =>
+                Try {
+                  chain.run(PtolemyJson.parse(s))
                 }
-                Console.flush()
-              case Failure(e) =>
-                log.error("Unable to process input", e)
-            }
+              }
+              .foreach {
+                case Success(json) =>
+                  config.pretty match {
+                    case true  => println(PtolemyJson.pretty(json))
+                    case false => println(PtolemyJson.compact(json))
+                  }
+                  Console.flush()
+                case Failure(e) =>
+                  log.error("Unable to process input", e)
+              }
+        }
+        ExitCode.Success
       }
     }
   }

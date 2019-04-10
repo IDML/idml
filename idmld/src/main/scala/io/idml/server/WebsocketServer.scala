@@ -20,6 +20,7 @@ import io.idml.jsoup.JsoupFunctionResolver
 import io.idml._
 import fs2._
 import org.http4s.server.websocket.WebSocketBuilder
+import org.http4s.websocket.WebSocketFrame.Text
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext
@@ -30,8 +31,7 @@ object WebsocketServer {
   val log = LoggerFactory.getLogger(getClass)
 
   import org.http4s.dsl.io._
-  import org.http4s.websocket.WebsocketBits._
-  import org.http4s.server.websocket.WS
+  import org.http4s.websocket._
 
   case class Request(in: List[Json], idml: String, path: Option[String])
   case class Response(out: Option[List[Json]], errors: Option[List[String]])
@@ -51,7 +51,7 @@ object WebsocketServer {
     )
   )
 
-  def service(fr: FunctionResolverService)(implicit ec: ExecutionContext) = {
+  def service(fr: FunctionResolverService)(implicit ec: ExecutionContext, c: Concurrent[IO]) = {
     val ptolemy = new Ptolemy(new PtolemyConf(), fr)
     HttpService[IO] {
       case GET -> Root / "functions" / partial =>
@@ -67,7 +67,7 @@ object WebsocketServer {
           .flatMap(Ok(_))
 
       case req @ GET -> Root =>
-        val queue = async.unboundedQueue[IO, WebSocketFrame]
+        val queue = fs2.concurrent.Queue.unbounded[IO, WebSocketFrame]
         val echoReply: Pipe[IO, WebSocketFrame, WebSocketFrame] = _.collect {
           case Text(msg, _) => Text("You sent the server: " + msg)
           case _            => Text("Something new")

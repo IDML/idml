@@ -8,28 +8,23 @@ import cats.syntax._
 import cats.data._
 import com.monovore.decline._
 import DeclineHelpers._
-import io.idml.{Ptolemy, PtolemyConf, PtolemyJson, UnmappedFieldsFinder}
-import io.idml.utils.DocumentValidator
-import org.slf4j.LoggerFactory
+import io.idml.BuildInfo
+import io.idml.tool.IOCommandApp
 
-import scala.util.{Failure, Success, Try}
+object IdmlTool extends IOCommandApp[IO[ExitCode]] {
+  override def name: String   = "idml"
+  override def header: String = "IDML command line tools"
+  override def version: String = BuildInfo.version
+  override def commandLine: Opts[IO[ExitCode]] =
+    NonEmptyList
+      .of(
+        IdmlTools.repl,
+        IdmlTools.apply,
+        IdmlTools.server,
+        io.idml.test.Main.execute()
+      )
+      .map(c => Opts.subcommand(c))
+      .reduceK
 
-object IdmlTool
-    extends CommandApp(
-      name = "idml",
-      header = "IDML command line tools",
-      main = {
-        NonEmptyList
-          .of(
-            IdmlTools.repl,
-            IdmlTools.apply,
-            IdmlTools.server,
-            io.idml.test.Main.execute().map { f =>
-              f.unsafeRunSync()
-              ()
-            }
-          )
-          .map(c => Opts.subcommand(c))
-          .reduceK
-      }
-    ) {}
+  override def main(c: IO[ExitCode]): IO[ExitCode] = c
+}
