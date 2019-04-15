@@ -63,19 +63,25 @@
     "name": "abs normal usage",
     "mapping": "output = 123.456.abs()",
     "input": {},
-    "output": {"output":  123.456}
+    "output": {"output": 123.456}
   },
   {
     "name": "abs normal usage 2",
     "mapping": "output = -123.456.abs()",
     "input": {},
-    "output": {"output":  123.456}
+    "output": {"output": 123.456}
   },
   {
     "name": "abs normal usage 3",
+    "mapping": "output = (4).abs()",
+    "input": {},
+    "output": {"output": 4}
+  },
+  {
+    "name": "abs normal usage 4",
     "mapping": "output = (0).abs()",
     "input": {},
-    "output": {"output":  0.0}
+    "output": {"output": 0}
   },
   {
     "name": "log normal usage",

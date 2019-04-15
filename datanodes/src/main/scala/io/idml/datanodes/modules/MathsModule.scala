@@ -81,9 +81,10 @@ trait MathsModule {
     case None              => InvalidCaller
   }
 
-  def abs(): PtolemyValue = extractDouble(this) match {
-    case Some(d) => PDouble(java.lang.Math.abs(d))
-    case None    => InvalidCaller
+  def abs(): PtolemyValue = this match {
+    case PInt(i)    => PInt(java.lang.Math.abs(i))
+    case PDouble(d) => PDouble(java.lang.Math.abs(d))
+    case _          => InvalidCaller
   }
 
   def pow(e: PtolemyValue): PtolemyValue = (extractDouble(this), extractDouble(e)) match {
