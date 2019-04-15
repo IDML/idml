@@ -58,5 +58,47 @@
     "mapping": "output = 123.456.sigfig(4)",
     "input": {},
     "output": {"output": 123.5}
+  },
+  {
+    "name": "abs normal usage",
+    "mapping": "output = 123.456.abs()",
+    "input": {},
+    "output": {"output":  123.456}
+  },
+  {
+    "name": "abs normal usage 2",
+    "mapping": "output = -123.456.abs()",
+    "input": {},
+    "output": {"output":  123.456}
+  },
+  {
+    "name": "abs normal usage 3",
+    "mapping": "output = (0).abs()",
+    "input": {},
+    "output": {"output":  0.0}
+  },
+  {
+    "name": "log normal usage",
+    "mapping": "output = (4).log()",
+    "input": {},
+    "output": {"output": 1.3862943611198906}
+  },
+  {
+    "name": "log normal usage 2",
+    "mapping": "output = (1).log()",
+    "input": {},
+    "output": {"output": 0.0}
+  },
+  {
+    "name": "log zero",
+    "mapping": "output = (0).log()",
+    "input": {},
+    "output": {}
+  },
+  {
+    "name": "log negative",
+    "mapping": "output = (-4).log()",
+    "input": {},
+    "output": {}
   }
 ]
