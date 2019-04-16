@@ -58,7 +58,7 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
       }.flatMap(parseJ).map(_.foldWith(notNulls))
     })
 
-  def runMulti(implicit timer: Timer[IO]): (Option[Long], String, List[Json]) => IO[List[Json]] =
+  def runMulti(implicit timer: ContextShift[IO]): (Option[Long], String, List[Json]) => IO[List[Json]] =
     run({ (m: PtolemyMapping, js: List[Json]) =>
       js.parTraverse { j =>
         IO { PtolemyJson.compact(m.run(PtolemyJson.parse(j.toString))) }.flatMap(parseJ).map(_.foldWith(notNulls))
@@ -81,7 +81,7 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
   case class DifferentOutput(name: String, diff: String)
 
   trait PtolemyUtils[T] {
-    def run(implicit timer: Timer[IO]): (Option[Long], String, T) => IO[T]
+    def run(implicit timer: ContextShift[IO]): (Option[Long], String, T) => IO[T]
     def toString(t: T): String
     def validate(t: ResolvedTest[T]): Either[Throwable, ResolvedTest[T]]
     def inspectOutput(resolved: ResolvedTest[T], output: T, diff: (Json, Json) => String): List[Either[DifferentOutput, String]]
@@ -90,9 +90,9 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
     def apply[T: PtolemyUtils]: PtolemyUtils[T] = implicitly
   }
   implicit val singlePtolemyRun = new PtolemyUtils[Json] {
-    override def run(implicit timer: Timer[IO])  = runSingle
-    override def toString(t: Json)               = spaces2butDropNulls.pretty(t)
-    override def validate(t: ResolvedTest[Json]) = Right(t)
+    override def run(implicit timer: ContextShift[IO]) = runSingle
+    override def toString(t: Json)                     = spaces2butDropNulls.pretty(t)
+    override def validate(t: ResolvedTest[Json])       = Right(t)
     override def inspectOutput(resolved: ResolvedTest[Json],
                                output: Json,
                                diff: (Json, Json) => String): List[Either[DifferentOutput, String]] =
@@ -105,8 +105,8 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
 
   }
   implicit val multiPtolemyRun = new PtolemyUtils[List[Json]] {
-    override def run(implicit timer: Timer[IO]) = runMulti
-    override def toString(t: List[Json])        = spaces2butDropNulls.pretty(Json.arr(t: _*))
+    override def run(implicit timer: ContextShift[IO]) = runMulti
+    override def toString(t: List[Json])               = spaces2butDropNulls.pretty(Json.arr(t: _*))
     override def validate(t: ResolvedTest[List[Json]]) = Either.cond(
       t.input.size == t.output.size,
       t,

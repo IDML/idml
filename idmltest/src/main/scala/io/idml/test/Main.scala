@@ -52,21 +52,26 @@ object Main extends IOApp {
 
   def execute(injectedRunner: Option[Runner] = None): Command[IO[ExitCode]] = command.map {
     case (paths, filter, update, failures, dynamic, plugins, noReport, jdiff, threads) =>
-      val timer: Resource[IO, Timer[IO]] = threads
-        .map(n =>
-          Resource.make(IO { Executors.newFixedThreadPool(n) })(p => IO { p.shutdown() }).map { p =>
-            IO.timer(ExecutionContext.fromExecutor(p))
-        })
-        .getOrElse(Resource.liftF(IO { IO.timer(ExecutionContext.global) }))
-      timer.use { t =>
-        implicit val it: Timer[IO] = t
-        val runner                 = injectedRunner.getOrElse(new Runner(dynamic, plugins, jdiff))
-        for {
-          results <- if (update) paths.traverse(runner.updateTest(failures, filter)(t))
-                    else paths.traverse(runner.runTest(failures, filter)(t))
-          results2 = results.toList.flatten
-          _        <- noReport.pure[IO].ifM(IO.unit, runner.report(results2))
-        } yield TestState.toExitCode(results2.combineAll)
+      val cs: Resource[IO, (ExecutionContext, ContextShift[IO])] =
+        threads
+          .map(n =>
+            Resource.make(IO { Executors.newFixedThreadPool(n) })(p => IO { p.shutdown() }).map { p =>
+              val ec: ExecutionContext = ExecutionContext.fromExecutor(p)
+              (ec, IO.contextShift(ec))
+          })
+          .getOrElse(Resource.liftF(IO {
+            (ExecutionContext.global.asInstanceOf[ExecutionContext], IO.contextShift(ExecutionContext.global))
+          }))
+      cs.use {
+        case (ec, c) =>
+          implicit val ics: ContextShift[IO] = c
+          val runner                         = injectedRunner.getOrElse(new Runner(dynamic, plugins, jdiff, ec)(c))
+          for {
+            results <- if (update) paths.traverse(runner.updateTest(failures, filter)(c))
+                      else paths.traverse(runner.runTest(failures, filter)(c))
+            results2 = results.toList.flatten
+            _        <- noReport.pure[IO].ifM(IO.unit, runner.report(results2))
+          } yield TestState.toExitCode(results2.combineAll)
       }
   }
 }

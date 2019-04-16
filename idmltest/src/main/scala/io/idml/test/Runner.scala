@@ -17,19 +17,21 @@ import gnieh.diffson.circe._
 import diffable.TestDiff
 import Test._
 
+import scala.concurrent.ExecutionContext
 import scala.util.Try
 
 class TestUtils[F[_]: Sync] {
-  def readAll(p: Path): F[String]   = fs2.io.file.readAll[F](p, 2048).through(fs2.text.utf8Decode[F]).compile.foldMonoid
+  def readAll(ec: ExecutionContext)(p: Path)(implicit cs: ContextShift[F]): F[String] =
+    fs2.io.file.readAll[F](p, ec, 2048).through(fs2.text.utf8Decode[F]).compile.foldMonoid
   def parseJ(s: String): F[Json]    = Sync[F].fromEither(parseJson(s))
   def parseY(s: String): F[Json]    = Sync[F].fromEither(parseYaml(s))
   def as[T: Decoder](j: Json): F[T] = Sync[F].fromEither(j.as[T])
   def refToPath(parent: Path, r: Ref): F[Path] = Sync[F].fromTry(
     Try { parent.toAbsolutePath.getParent.resolve(r.`$ref`) }
   )
-  def writeAll(p: Path)(s: Stream[F, String]): F[Unit] =
+  def writeAll(ec: ExecutionContext)(p: Path)(s: Stream[F, String])(implicit cs: ContextShift[F]): F[Unit] =
     s.through(fs2.text.utf8Encode[F])
-      .to(fs2.io.file.writeAll(p, List(StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)))
+      .to(fs2.io.file.writeAll(p, ec, List(StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)))
       .compile
       .drain
   def print(a: Any): F[Unit]         = Sync[F].delay { println(a) }
@@ -38,29 +40,30 @@ class TestUtils[F[_]: Sync] {
   def blue[T <: Any](t: T): F[Unit]  = print(fansi.Color.Cyan(t.toString))
 }
 
-class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolean)
+class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolean, blockingEc: ExecutionContext)(
+    implicit cs: ContextShift[IO])
     extends RunnerUtils(dynamic, plugins)
     with CirceEitherEncoders {
 
   def load(test: Path): IO[Either[Tests[List[Json]], Tests[Json]]] =
-    readAll(test).flatMap(parseJ).flatMap(as[Either[Tests[List[Json]], Tests[Json]]])
+    readAll(blockingEc)(test).flatMap(parseJ).flatMap(as[Either[Tests[List[Json]], Tests[Json]]])
   def resolve[T: Decoder](path: Path, tests: Tests[T]): IO[List[ResolvedTest[T]]] =
     tests.tests.traverse(
       _.resolve(
-        refToPath(path, _).flatMap(readAll),
+        refToPath(path, _).flatMap(readAll(blockingEc)),
         parseJ
       ))
   def updateResolve[T: Decoder](path: Path, tests: Tests[T]): IO[List[UpdatableTest[T]]] =
     tests.tests.traverse(
       _.updateResolve(
-        refToPath(path, _).flatMap(readAll),
+        refToPath(path, _).flatMap(readAll(blockingEc)),
         parseJ
       ))
 
   def patternToFilter(filter: Option[Pattern]): String => Boolean = (s: String) => filter.map(_.matches(s)).getOrElse(true)
 
-  def runTest(failedOnly: Boolean, filter: Option[Pattern] = None)(timer: Timer[IO])(path: Path): IO[List[TestState]] = {
-    implicit val it: Timer[IO] = timer
+  def runTest(failedOnly: Boolean, filter: Option[Pattern] = None)(cs: ContextShift[IO])(path: Path): IO[List[TestState]] = {
+    implicit val ics: ContextShift[IO] = cs
     for {
       t <- load(path)
       r <- t.bitraverse(runTests[List[Json]](failedOnly, filter)(path), runTests[Json](failedOnly, filter)(path))
@@ -68,7 +71,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
   }
 
   def runTests[T: Encoder: Decoder: Eq: PtolemyUtils](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(t: Tests[T])(
-      implicit timer: Timer[IO]): IO[List[TestState]] =
+      implicit cs: ContextShift[IO]): IO[List[TestState]] =
     for {
       result <- EitherT(resolve(path, t).attempt)
                  .flatMap { resolved =>
@@ -114,8 +117,8 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                 )
     } yield outputs.leftMap(List(_)).map(_.flatten.map(_.merge)).merge
 
-  def updateTest(failedOnly: Boolean, filter: Option[Pattern] = None)(timer: Timer[IO])(path: Path): IO[List[TestState]] = {
-    implicit val t: Timer[IO] = timer
+  def updateTest(failedOnly: Boolean, filter: Option[Pattern] = None)(cs: ContextShift[IO])(path: Path): IO[List[TestState]] = {
+    implicit val ics: ContextShift[IO] = cs
     for {
       test <- load(path)
       r    <- test.bitraverse(updateTests[List[Json]](failedOnly, filter)(path), updateTests[Json](failedOnly, filter)(path))
@@ -123,7 +126,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
   }
 
   def updateTests[T: Encoder: Decoder: Eq](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(
-      test: Tests[T])(implicit runner: PtolemyUtils[T], timer: Timer[IO]): IO[List[TestState]] =
+      test: Tests[T])(implicit runner: PtolemyUtils[T], cs: ContextShift[IO]): IO[List[TestState]] =
     for {
       updatable <- updateResolve(path, test).attempt
       result <- updatable.bitraverse(
@@ -140,13 +143,13 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                         { r =>
                           for {
                             p           <- refToPath(path, r)
-                            oldcontents <- readAll(p).attempt.map(_.leftMap(_ => "").merge)
+                            oldcontents <- readAll(blockingEc)(p).attempt.map(_.leftMap(_ => "").merge)
                             contents    = runner.toString(result)
                             status <- IO
                                        .pure(contents === oldcontents)
                                        .ifM(
                                          IO.pure(failedOnly).ifM(IO.unit, green(s"${u.name} unchanged")).as(TestState.success),
-                                         blue(s"${u.name} updated") *> writeAll(p)(Stream.emit(contents)).as(TestState.updated)
+                                         blue(s"${u.name} updated") *> writeAll(blockingEc)(p)(Stream.emit(contents)).as(TestState.updated)
                                        )
                           } yield (status, u.original.get)
                         },
@@ -172,7 +175,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                  .pure[IO]
                  .ifM(
                    blue(s"flushing update to ${path.getFileName}")
-                     *> writeAll(path)(Stream.emit(spaces2butDropNulls.pretty(Tests(u.map(_.merge._2)).asJson)))
+                     *> writeAll(blockingEc)(path)(Stream.emit(spaces2butDropNulls.pretty(Tests(u.map(_.merge._2)).asJson)))
                        .as(TestState.updated),
                    failedOnly.pure[IO].ifM(IO.unit, green(s"${path.getFileName} unchanged, not flushing file")).as(TestState.success)
                  )
