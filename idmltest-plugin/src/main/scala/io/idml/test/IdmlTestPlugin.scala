@@ -9,7 +9,7 @@ import cats._
 import cats.implicits._
 
 import scala.collection.JavaConverters._
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.global
 import scala.util.control.NoStackTrace
 
 object IdmlTestPlugin extends AutoPlugin {
@@ -27,13 +27,13 @@ object IdmlTestPlugin extends AutoPlugin {
     idmlTestDirectory := (sourceDirectory in sbt.Test).value / "idml",
     (sbt.Test / test) := ((sbt.Test / test) dependsOn idmlTest).value,
     idmlTest := {
-      val runner = new Runner(true, None, false)
+      implicit val cs = cats.effect.IO.contextShift(global)
+      val runner = new Runner(true, None, false, global)
       val folder = idmlTestDirectory.value.toPath
       println(s"Executing IDML tests in $folder")
       val tests = Files.walk(folder).iterator().asScala.filter(_.getParent == folder).filter(_.toString.endsWith(".json")).toList
-      val timer = cats.effect.IO.timer(ExecutionContext.global)
       val run = for {
-        results  <- tests.traverse(runner.runTest(false)(timer))
+        results  <- tests.traverse(runner.runTest(false)(cs))
         results2 = results.flatten
         _        <- runner.report(results2)
         combined = results2.combineAll
