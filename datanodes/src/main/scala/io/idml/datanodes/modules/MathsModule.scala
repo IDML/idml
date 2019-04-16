@@ -75,10 +75,9 @@ trait MathsModule {
   }
 
   def log(): PtolemyValue = extractDouble(this) match {
-    case Some(0.0)         => InvalidCaller
-    case Some(d) if d <= 0 => InvalidCaller
-    case Some(d)           => PDouble(java.lang.Math.log(d))
-    case None              => InvalidCaller
+    case Some(d) if d <= 0.0 => InvalidCaller
+    case Some(d)             => PDouble(java.lang.Math.log(d))
+    case None                => InvalidCaller
   }
 
   def abs(): PtolemyValue = this match {
