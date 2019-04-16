@@ -21,7 +21,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
     override def print(a: Any): IO[Unit] = IO { printed.append(a.toString) }
   }
 
-  val timer = IO.timer(ExecutionContext.global)
+  val cs = IO.contextShift(ExecutionContext.global)
 
   "Runner" should {
     "be able to run IDML" in {
@@ -54,7 +54,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to run a test" in {
     val test  = Paths.get(getClass.getResource("/tests/basic.json").getFile)
     val r     = new TestRunner
-    val state = r.runTest(false)(timer)(test).unsafeRunSync()
+    val state = r.runTest(false)(cs)(test).unsafeRunSync()
     state must equal(List(TestState.Success))
     r.printed.toList must equal(
       List(fansi.Color.Green("basic test passed").toString())
@@ -63,7 +63,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to run a test with nulls" in {
     val test  = Paths.get(getClass.getResource("/tests/null-behaviour.json").getFile)
     val r     = new TestRunner
-    val state = r.runTest(false)(timer)(test).unsafeRunSync()
+    val state = r.runTest(false)(cs)(test).unsafeRunSync()
     state must equal(List(TestState.Success))
     r.printed.toList must equal(
       List(fansi.Color.Green("null behaviour passed").toString())
@@ -72,7 +72,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to run a multitest" in {
     val test  = Paths.get(getClass.getResource("/tests/basic-multitest.json").getFile)
     val r     = new TestRunner
-    val state = r.runTest(false)(timer)(test).unsafeRunSync()
+    val state = r.runTest(false)(cs)(test).unsafeRunSync()
     state must equal(List(TestState.Success, TestState.Success))
     r.printed.toList must equal(
       List(
@@ -84,7 +84,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to run a test with an injected time" in {
     val test  = Paths.get(getClass.getResource("/tests/inject-now.json").getFile)
     val r     = new TestRunner
-    val state = r.runTest(false)(timer)(test).unsafeRunSync()
+    val state = r.runTest(false)(cs)(test).unsafeRunSync()
     state must equal(List(TestState.Success))
     r.printed.toList must equal(
       List(fansi.Color.Green("injected now test passed").toString())
@@ -93,7 +93,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to run a test with a ref" in {
     val test  = Paths.get(getClass.getResource("/tests/basic-ref.json").getFile)
     val r     = new TestRunner
-    val state = r.runTest(false)(timer)(test).unsafeRunSync()
+    val state = r.runTest(false)(cs)(test).unsafeRunSync()
     state must equal(List(TestState.Success))
     r.printed.toList must equal(
       List(fansi.Color.Green("basic test with a ref passed").toString())
@@ -102,13 +102,13 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to run a test which fails" in {
     val test  = Paths.get(getClass.getResource("/tests/basic-failed.json").getFile)
     val r     = new TestRunner
-    val state = r.runTest(false)(timer)(test).unsafeRunSync()
+    val state = r.runTest(false)(cs)(test).unsafeRunSync()
     state must equal(List(TestState.Failed))
   }
   "be able to run a test which has an invalid reference" in {
     val test  = Paths.get(getClass.getResource("/tests/basic-invalid-ref.json").getFile)
     val r     = new TestRunner
-    val state = r.runTest(false)(timer)(test).unsafeRunSync()
+    val state = r.runTest(false)(cs)(test).unsafeRunSync()
     state must equal(List(TestState.Error))
   }
   "be able to print out a report" in {
@@ -136,7 +136,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to tell when a test doesn't need updating" in {
     val test  = Paths.get(getClass.getResource("/tests/basic.json").getFile)
     val r     = new TestRunner
-    val state = r.updateTest(false)(timer)(test).unsafeRunSync()
+    val state = r.updateTest(false)(cs)(test).unsafeRunSync()
     state must equal(List(TestState.Success, TestState.Success))
     r.printed.toList must equal(
       List(
@@ -160,7 +160,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
         }
       }"""
     r.writeAll(test)(fs2.Stream.emit(testJson.spaces2)).unsafeRunSync()
-    val state = r.updateTest(false)(timer)(test).unsafeRunSync()
+    val state = r.updateTest(false)(cs)(test).unsafeRunSync()
     Files.delete(test)
     state must equal(List(TestState.Updated, TestState.Updated))
     r.printed.toList must equal(
@@ -191,7 +191,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
         )
         _       <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
         _       <- r.writeAll(output)(fs2.Stream.emit("{}"))
-        state   <- r.updateTest(false)(timer)(test)
+        state   <- r.updateTest(false)(cs)(test)
         _       <- IO { Files.delete(test) }
         updated <- r.readAll(output).flatMap(r.parseJ)
         _       <- IO { Files.delete(output) }
@@ -226,7 +226,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
           )
         )
         _       <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
-        state   <- r.updateTest(false)(timer)(test)
+        state   <- r.updateTest(false)(cs)(test)
         _       <- IO { Files.delete(test) }
         updated <- r.readAll(output).flatMap(r.parseJ)
         _       <- IO { Files.delete(output) }
@@ -245,7 +245,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to filter tests in run" in {
     val test  = Paths.get(getClass.getResource("/tests/two-tests.json").getFile)
     val r     = new TestRunner
-    val state = r.runTest(false, Some(Pattern.compile(".*aaa")))(timer)(test).unsafeRunSync()
+    val state = r.runTest(false, Some(Pattern.compile(".*aaa")))(cs)(test).unsafeRunSync()
     state must equal(List(TestState.Success))
     r.printed.toList must equal(
       List(fansi.Color.Green("basic test aaa passed").toString())
@@ -254,7 +254,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to filter tests in update" in {
     val test  = Paths.get(getClass.getResource("/tests/two-tests.json").getFile)
     val r     = new TestRunner
-    val state = r.updateTest(false, Some(Pattern.compile(".*aaa")))(timer)(test).unsafeRunSync()
+    val state = r.updateTest(false, Some(Pattern.compile(".*aaa")))(cs)(test).unsafeRunSync()
     state must equal(List(TestState.Success, TestState.Success))
     r.printed.toList must equal(
       List(
@@ -266,7 +266,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to tell when a test with an injected time doesn't need updating" in {
     val test  = Paths.get(getClass.getResource("/tests/inject-now.json").getFile)
     val r     = new TestRunner
-    val state = r.updateTest(false)(timer)(test).unsafeRunSync()
+    val state = r.updateTest(false)(cs)(test).unsafeRunSync()
     state must equal(List(TestState.Success, TestState.Success))
     r.printed.toList must equal(
       List(
@@ -278,7 +278,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to fail validation of a multitest with mismatched arrays" in {
     val test  = Paths.get(getClass.getResource("/tests/bad-multitest.json").getFile)
     val r     = new TestRunner
-    val state = r.runTest(false)(timer)(test).unsafeRunSync()
+    val state = r.runTest(false)(cs)(test).unsafeRunSync()
     state must equal(List(TestState.Error))
     r.printed.toList must equal(
       List(
@@ -305,7 +305,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
           "output" -> Json.arr()
         )
         _       <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
-        state   <- r.updateTest(false)(timer)(test)
+        state   <- r.updateTest(false)(cs)(test)
         updated <- r.readAll(test).flatMap(r.parseJ)
         _       <- IO { Files.delete(test) }
       } yield {
@@ -343,7 +343,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
         )
         _       <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
         _       <- r.writeAll(output)(fs2.Stream.emit("[]"))
-        state   <- r.updateTest(false)(timer)(test)
+        state   <- r.updateTest(false)(cs)(test)
         _       <- IO { Files.delete(test) }
         updated <- r.readAll(output).flatMap(r.parseJ)
         _       <- IO { Files.delete(output) }

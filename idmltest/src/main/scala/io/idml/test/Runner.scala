@@ -59,8 +59,8 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
 
   def patternToFilter(filter: Option[Pattern]): String => Boolean = (s: String) => filter.map(_.matches(s)).getOrElse(true)
 
-  def runTest(failedOnly: Boolean, filter: Option[Pattern] = None)(timer: Timer[IO])(path: Path): IO[List[TestState]] = {
-    implicit val it: Timer[IO] = timer
+  def runTest(failedOnly: Boolean, filter: Option[Pattern] = None)(cs: ContextShift[IO])(path: Path): IO[List[TestState]] = {
+    implicit val ics: ContextShift[IO] = cs
     for {
       t <- load(path)
       r <- t.bitraverse(runTests[List[Json]](failedOnly, filter)(path), runTests[Json](failedOnly, filter)(path))
@@ -68,7 +68,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
   }
 
   def runTests[T: Encoder: Decoder: Eq: PtolemyUtils](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(t: Tests[T])(
-      implicit timer: Timer[IO]): IO[List[TestState]] =
+      implicit cs: ContextShift[IO]): IO[List[TestState]] =
     for {
       result <- EitherT(resolve(path, t).attempt)
                  .flatMap { resolved =>
@@ -114,8 +114,8 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                 )
     } yield outputs.leftMap(List(_)).map(_.flatten.map(_.merge)).merge
 
-  def updateTest(failedOnly: Boolean, filter: Option[Pattern] = None)(timer: Timer[IO])(path: Path): IO[List[TestState]] = {
-    implicit val t: Timer[IO] = timer
+  def updateTest(failedOnly: Boolean, filter: Option[Pattern] = None)(cs: ContextShift[IO])(path: Path): IO[List[TestState]] = {
+    implicit val ics: ContextShift[IO] = cs
     for {
       test <- load(path)
       r    <- test.bitraverse(updateTests[List[Json]](failedOnly, filter)(path), updateTests[Json](failedOnly, filter)(path))
@@ -123,7 +123,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
   }
 
   def updateTests[T: Encoder: Decoder: Eq](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(
-      test: Tests[T])(implicit runner: PtolemyUtils[T], timer: Timer[IO]): IO[List[TestState]] =
+      test: Tests[T])(implicit runner: PtolemyUtils[T], cs: ContextShift[IO]): IO[List[TestState]] =
     for {
       updatable <- updateResolve(path, test).attempt
       result <- updatable.bitraverse(
