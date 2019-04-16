@@ -13,15 +13,15 @@ import io.circe.literal._
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.global
 
 class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
 
-  class TestRunner extends Runner(false, None, true) {
+  implicit val cs = IO.contextShift(global)
+  class TestRunner extends Runner(false, None, true, global)(cs) {
     val printed                          = mutable.Buffer.empty[String]
     override def print(a: Any): IO[Unit] = IO { printed.append(a.toString) }
   }
-
-  val cs = IO.contextShift(ExecutionContext.global)
 
   "Runner" should {
     "be able to run IDML" in {
@@ -159,7 +159,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
         "output" : {
         }
       }"""
-    r.writeAll(test)(fs2.Stream.emit(testJson.spaces2)).unsafeRunSync()
+    r.writeAll(global)(test)(fs2.Stream.emit(testJson.spaces2)).unsafeRunSync()
     val state = r.updateTest(false)(cs)(test).unsafeRunSync()
     Files.delete(test)
     state must equal(List(TestState.Updated, TestState.Updated))
@@ -189,11 +189,11 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
             "$ref" -> Json.fromString(output.getFileName.toString)
           )
         )
-        _       <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
-        _       <- r.writeAll(output)(fs2.Stream.emit("{}"))
+        _       <- r.writeAll(global)(test)(fs2.Stream.emit(testJson.spaces2))
+        _       <- r.writeAll(global)(output)(fs2.Stream.emit("{}"))
         state   <- r.updateTest(false)(cs)(test)
         _       <- IO { Files.delete(test) }
-        updated <- r.readAll(output).flatMap(r.parseJ)
+        updated <- r.readAll(global)(output).flatMap(r.parseJ)
         _       <- IO { Files.delete(output) }
       } yield {
         state must equal(List(TestState.Success, TestState.Updated))
@@ -225,10 +225,10 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
             "$ref" -> Json.fromString(output.toAbsolutePath.toString)
           )
         )
-        _       <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
+        _       <- r.writeAll(global)(test)(fs2.Stream.emit(testJson.spaces2))
         state   <- r.updateTest(false)(cs)(test)
         _       <- IO { Files.delete(test) }
-        updated <- r.readAll(output).flatMap(r.parseJ)
+        updated <- r.readAll(global)(output).flatMap(r.parseJ)
         _       <- IO { Files.delete(output) }
       } yield {
         state must equal(List(TestState.Success, TestState.Updated))
@@ -304,9 +304,9 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
           ),
           "output" -> Json.arr()
         )
-        _       <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
+        _       <- r.writeAll(global)(test)(fs2.Stream.emit(testJson.spaces2))
         state   <- r.updateTest(false)(cs)(test)
-        updated <- r.readAll(test).flatMap(r.parseJ)
+        updated <- r.readAll(global)(test).flatMap(r.parseJ)
         _       <- IO { Files.delete(test) }
       } yield {
         state must equal(List(TestState.Updated, TestState.Updated))
@@ -341,11 +341,11 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
             "$ref" -> Json.fromString(output.getFileName.toString)
           )
         )
-        _       <- r.writeAll(test)(fs2.Stream.emit(testJson.spaces2))
-        _       <- r.writeAll(output)(fs2.Stream.emit("[]"))
+        _       <- r.writeAll(global)(test)(fs2.Stream.emit(testJson.spaces2))
+        _       <- r.writeAll(global)(output)(fs2.Stream.emit("[]"))
         state   <- r.updateTest(false)(cs)(test)
         _       <- IO { Files.delete(test) }
-        updated <- r.readAll(output).flatMap(r.parseJ)
+        updated <- r.readAll(global)(output).flatMap(r.parseJ)
         _       <- IO { Files.delete(output) }
       } yield {
         state must equal(List(TestState.Success, TestState.Updated))

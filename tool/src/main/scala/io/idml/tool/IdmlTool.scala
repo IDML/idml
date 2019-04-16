@@ -12,8 +12,8 @@ import io.idml.BuildInfo
 import io.idml.tool.IOCommandApp
 
 object IdmlTool extends IOCommandApp[IO[ExitCode]] {
-  override def name: String   = "idml"
-  override def header: String = "IDML command line tools"
+  override def name: String    = "idml"
+  override def header: String  = "IDML command line tools"
   override def version: String = BuildInfo.version
   override def commandLine: Opts[IO[ExitCode]] =
     NonEmptyList

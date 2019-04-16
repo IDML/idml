@@ -10,9 +10,11 @@ import io.circe.syntax._
 import org.scalatest.{MustMatchers, WordSpec}
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext.global
 
 class MainSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
-  class TestRunner extends Runner(false, None, true) {
+  implicit val cs = IO.contextShift(global)
+  class TestRunner extends Runner(false, None, true, global) {
     val printed                          = mutable.Buffer.empty[String]
     override def print(a: Any): IO[Unit] = IO { printed.append(a.toString) }
   }
