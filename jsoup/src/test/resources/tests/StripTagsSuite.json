@@ -101,5 +101,16 @@
     "output": {
       "a": "ab123g"
     }
+  },
+
+  {
+    "name": "stripTags will resolve entities",
+    "mapping": "a = b.stripTags()",
+    "input": {
+      "b": "ab<cd>1<ef>2</ef>3</cd>g&amp;"
+    },
+    "output": {
+      "a": "ab123g&"
+    }
   }
 ]
