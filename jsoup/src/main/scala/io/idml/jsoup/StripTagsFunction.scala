@@ -5,6 +5,7 @@ import io.idml.{InvalidCaller, PtolemyContext}
 import io.idml.ast.{Pipeline, PtolemyFunction}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.parser.Parser
 import org.jsoup.safety.Whitelist
 
 object StripTagsFunction extends PtolemyFunction {
@@ -13,7 +14,12 @@ object StripTagsFunction extends PtolemyFunction {
   override def invoke(ctx: PtolemyContext): Unit = {
     ctx.cursor = ctx.cursor match {
       case PString(str) =>
-        PString(Jsoup.clean(str, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false)))
+        PString(
+          Parser.unescapeEntities(
+            Jsoup.clean(str, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false)),
+            false
+          )
+        )
       case _ =>
         InvalidCaller
     }
