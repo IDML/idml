@@ -1,7 +1,7 @@
 name := "idml-test"
 
 libraryDependencies ++= Seq(
-  "co.fs2"        %% "fs2-io"        % "1.0.0-M1",
+  "co.fs2"        %% "fs2-io"        % "1.0.4",
   "org.typelevel" %% "cats-effect"   % "1.2.0",
   "com.monovore"  %% "decline"       % "0.5.0",
   "io.circe"      %% "circe-generic" % "0.11.1",
