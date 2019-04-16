@@ -16,13 +16,13 @@
   },
 
   {
-    "name": "stripTags wants to treat <efg as an implicit <efg>",
+    "name": "stripTags won't strip whitespace",
     "mapping": "a = b.stripTags()",
     "input": {
-      "b": "ab>cd<efg"
+      "b": "abcd.\n123 <br> "
     },
     "output": {
-      "a": "ab>cd"
+      "a": "abcd.\n123  "
     }
   },
 
