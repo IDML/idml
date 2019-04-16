@@ -6,3 +6,5 @@ target/
 lang/gen/
 scalastyle-output.xml
 idml.jar
+.bloop
+.metals
