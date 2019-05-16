@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters._
 import org.http4s.server.blaze.BlazeBuilder
 import io.idml.server.WebsocketServer
+import io.circe._
 
 import scala.util.{Failure, Success, Try}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -72,21 +73,21 @@ object IdmlTools {
       }
     }
 
-  val apply = Command(
-    name = "apply",
-    header = "IDML command line tool",
-  ) {
-    val pretty   = Opts.flag("pretty", "Enable pretty printing of output", short = "p").orFalse
-    val unmapped = Opts.flag("unmapped", "This probably doesn't do what you think it does", short = "u").orFalse
-    val strict   = Opts.flag("strict", "Enable strict mode", short = "s").orFalse
-    val file     = Opts.arguments[File]("mapping file").orEmpty
+  def apply(implicit cs: ContextShift[IO]) =
+    Command(
+      name = "apply",
+      header = "IDML command line tool",
+    ) {
+      val pretty   = Opts.flag("pretty", "Enable pretty printing of output", short = "p").orFalse
+      val unmapped = Opts.flag("unmapped", "This probably doesn't do what you think it does", short = "u").orFalse
+      val strict   = Opts.flag("strict", "Enable strict mode", short = "s").orFalse
+      val file     = Opts.arguments[File]("mapping file").orEmpty
 
-    val log = LoggerFactory.getLogger("idml-tool")
+      val log = LoggerFactory.getLogger("idml-tool")
 
-    (pretty, unmapped, strict, file, functionResolver).mapN { (p, u, s, f, fr) =>
-      val config = new IdmlToolConfig(f, p, s, u)
+      (pretty, unmapped, strict, file, functionResolver).mapN { (p, u, s, f, fr) =>
+        val config = new IdmlToolConfig(f, p, s, u)
 
-      IO {
         val ptolemy = if (config.unmapped) {
           new Ptolemy(
             new PtolemyConf,
@@ -102,39 +103,59 @@ object IdmlTools {
         val (found, missing) = config.files.partition(_.exists())
         missing.isEmpty match {
           case false =>
-            missing.foreach { f =>
-              println("Couldn't load mapping from %s".format(f))
-            }
-            ExitCode.Error
+            missing.traverse { f =>
+              IO {
+                s"Couldn't load mapping from ${f.toString}"
+              }
+            } *> IO.pure(ExitCode.Error)
           case true =>
-            val maps  = found.map(f => ptolemy.fromFile(f.getAbsolutePath))
-            val chain = ptolemy.newChain(maps: _*)
-            if (config.strict) {
-              maps.foreach { m =>
-                DocumentValidator.validate(m.nodes)
-              }
-            }
-            scala.io.Source.stdin
-              .getLines()
-              .filter(!_.isEmpty)
-              .map { s: String =>
-                Try {
-                  chain.run(PtolemyJson.parse(s))
-                }
-              }
-              .foreach {
-                case Success(json) =>
-                  config.pretty match {
-                    case true  => println(PtolemyJson.pretty(json))
-                    case false => println(PtolemyJson.compact(json))
-                  }
-                  Console.flush()
-                case Failure(e) =>
-                  log.error("Unable to process input", e)
-              }
+            for {
+              maps  <- found.traverse(f => IO { ptolemy.fromFile(f.getAbsolutePath) })
+              chain = ptolemy.newChain(maps: _*)
+              _ <- OptionT
+                    .fromOption[IO](Option(()).filter(_ => config.strict))
+                    .semiflatMap(_ => maps.traverse(m => IO { DocumentValidator.validate(m.nodes) }))
+                    .value
+              _ <- fs2.io
+                    .stdin[IO](1024, global)
+                    .through(fs2.text.utf8Decode[IO])
+                    .through(fs2.text.lines[IO])
+                    .filter(_.nonEmpty)
+                    .evalMap { line =>
+                      IO {
+                        chain.run(PtolemyJson.parse(line))
+                      }.attemptT
+                        .map { result =>
+                          if (config.pretty) {
+                            PtolemyJson.pretty(result)
+                          } else {
+                            PtolemyJson.compact(result)
+                          }
+                        }
+                        .leftMap { exception =>
+                          val output = Json.obj(
+                            "error" -> Json.fromString(exception.getLocalizedMessage),
+                            "input" -> Json.fromString(line)
+                          )
+                          if (config.pretty) {
+                            output.spaces2
+                          } else {
+                            output.noSpaces
+                          }
+                        }
+                        .value
+                    }
+                    .evalTap(
+                      s =>
+                        s.bitraverse(
+                            l => IO { System.err.println(l) },
+                            r => IO { System.out.println(r) }
+                          )
+                          .void)
+                    .compile
+                    .drain
+            } yield ExitCode.Success
         }
-        ExitCode.Success
       }
     }
-  }
 }
