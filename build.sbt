@@ -43,6 +43,8 @@ lazy val lang = project.settings(commonSettings)
 
 lazy val datanodes = project.settings(commonSettings)
 
+lazy val circe = project.dependsOn(datanodes).settings(commonSettings)
+
 lazy val core = project
   .dependsOn(datanodes)
   .dependsOn(lang)
@@ -83,6 +85,20 @@ lazy val `idmldoc-plugin` = project.dependsOn(idmldoc).settings(commonSettings)
 lazy val idmltest = project.dependsOn(core).dependsOn(utils).settings(commonSettings)
 
 lazy val `idmltest-plugin` = project.dependsOn(idmltest).dependsOn(hashing).dependsOn(geo).dependsOn(jsoup).settings(commonSettings)
+
+lazy val idmltutor = project.dependsOn(hashing).dependsOn(geo).dependsOn(jsoup).dependsOn(circe).dependsOn(idmltest).settings(commonSettings).settings(
+    assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript)),
+    dockerExposedPorts := Seq(8081),
+    packageName in Docker := "idml",
+    dockerUpdateLatest in Docker := true,
+    assembly / assemblyOption := (assembly / assemblyOption).value.copy(prependShellScript = Some(defaultShellScript)),
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", "MANIFEST.MF")                                    => MergeStrategy.discard
+      case PathList("buildinfo/BuildInfo$.class")                                 => MergeStrategy.first
+      case PathList("META-INF", "services", "io.idml.functions.FunctionResolver") => MergeStrategy.concat
+      case _                                                                      => MergeStrategy.first
+    }
+)
 
 lazy val tool = project
   .dependsOn(core)
