@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters._
 import org.http4s.server.blaze.BlazeBuilder
 import io.idml.server.WebsocketServer
+import io.idml.utils.Tracer.Annotator
 
 import scala.util.{Failure, Success, Try}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -72,69 +73,123 @@ object IdmlTools {
       }
     }
 
-  val apply = Command(
-    name = "apply",
-    header = "IDML command line tool",
-  ) {
-    val pretty   = Opts.flag("pretty", "Enable pretty printing of output", short = "p").orFalse
-    val unmapped = Opts.flag("unmapped", "This probably doesn't do what you think it does", short = "u").orFalse
-    val strict   = Opts.flag("strict", "Enable strict mode", short = "s").orFalse
-    val file     = Opts.arguments[File]("mapping file").orEmpty
+  def apply(implicit cs: ContextShift[IO]) =
+    Command(
+      name = "apply",
+      header = "IDML command line tool",
+    ) {
+      val pretty   = Opts.flag("pretty", "Enable pretty printing of output", short = "p").orFalse
+      val unmapped = Opts.flag("unmapped", "This probably doesn't do what you think it does", short = "u").orFalse
+      val strict   = Opts.flag("strict", "Enable strict mode", short = "s").orFalse
+      val file     = Opts.arguments[File]("mapping file").orEmpty
+      val traced   = Opts.flag("traced", "Enable tracing mode", short = "t").orFalse
 
-    val log = LoggerFactory.getLogger("idml-tool")
+      val log = LoggerFactory.getLogger("idml-tool")
 
-    (pretty, unmapped, strict, file, functionResolver).mapN { (p, u, s, f, fr) =>
-      val config = new IdmlToolConfig(f, p, s, u)
+      (pretty, unmapped, strict, file, functionResolver, traced)
+        .mapN { (p, u, s, f, fr, traced) =>
+          val config = new IdmlToolConfig(f, p, s, u)
 
-      IO {
-        val ptolemy = if (config.unmapped) {
-          new Ptolemy(
+          val listeners = if (config.unmapped) List[PtolemyListener](new UnmappedFieldsFinder) else List.empty
+          val ptolemy = new Ptolemy(
             new PtolemyConf,
-            List[PtolemyListener](new UnmappedFieldsFinder).asJava,
+            listeners.asJava,
             fr
           )
-        } else {
-          new Ptolemy(
-            new PtolemyConf,
-            fr
-          )
-        }
-        val (found, missing) = config.files.partition(_.exists())
-        missing.isEmpty match {
-          case false =>
-            missing.foreach { f =>
-              println("Couldn't load mapping from %s".format(f))
-            }
-            ExitCode.Error
-          case true =>
-            val maps  = found.map(f => ptolemy.fromFile(f.getAbsolutePath))
-            val chain = ptolemy.newChain(maps: _*)
-            if (config.strict) {
-              maps.foreach { m =>
-                DocumentValidator.validate(m.nodes)
-              }
-            }
-            scala.io.Source.stdin
-              .getLines()
-              .filter(!_.isEmpty)
-              .map { s: String =>
-                Try {
-                  chain.run(PtolemyJson.parse(s))
-                }
-              }
-              .foreach {
-                case Success(json) =>
-                  config.pretty match {
-                    case true  => println(PtolemyJson.pretty(json))
-                    case false => println(PtolemyJson.compact(json))
+
+          for {
+            files <- EitherT(IO {
+                      val (found, missing) = config.files.partition(_.exists())
+                      NonEmptyList.fromList(missing) match {
+                        case Some(missingnel) =>
+                          missingnel.map(f => s"Couldn't load mapping from $f").asLeft[List[File]]
+                        case None =>
+                          found.asRight[NonEmptyList[String]]
+                      }
+                    })
+            _ <- EitherT.cond[IO](!(traced && files.size > 1),(),  NonEmptyList.of("You can only trace with a single mapping"))
+            bodies <- files
+                       .traverse { f =>
+                         fs2.io.file
+                           .readAll[IO](f.toPath, global, 2048)
+                           .through(fs2.text.utf8Decode[IO])
+                           .compile
+                           .foldMonoid
+                       }
+                       .attemptT
+                       .leftMap(e => NonEmptyList.of(e.getLocalizedMessage))
+            compiled <- bodies
+                         .traverse { s =>
+                           IO { ptolemy.fromString(s) }
+                         }
+                         .attemptT
+                         .leftMap(e => NonEmptyList.of(e.getLocalizedMessage))
+            chain = ptolemy.newChain(compiled: _*)
+            _ <- compiled
+                  .traverse { c =>
+                    config.strict
+                      .pure[IO]
+                      .ifM(
+                        IO { DocumentValidator.validate(c.nodes) },
+                        IO.unit
+                      )
                   }
-                  Console.flush()
-                case Failure(e) =>
-                  log.error("Unable to process input", e)
-              }
+                  .attemptT
+                  .leftMap(e => NonEmptyList.of(e.getLocalizedMessage))
+            _ <- traced
+                  .pure[IO]
+                  .ifM(
+                    for {
+                      input <- fs2.io
+                                .stdin[IO](2048, global)
+                                .through(fs2.text.utf8Decode[IO])
+                                .compile
+                                .foldMonoid
+                      json <- IO {
+                               PtolemyJson.parse(input)
+                             }
+                      out <- IO {
+                              val a   = new Annotator
+                              val out = PtolemyJson.newObject()
+                              val ctx = new PtolemyContext(json, out, List[PtolemyListener](a))
+                              compiled.head.run(ctx)
+                              a.render(bodies.head)
+                            }
+                      _ <- IO {
+                        println(out)
+                      }
+                    } yield (),
+                    fs2.io
+                      .stdin[IO](2048, global)
+                      .through(fs2.text.utf8Decode[IO])
+                      .through(fs2.text.lines[IO])
+                      .evalTap { line =>
+                        IO {
+                          chain.run(PtolemyJson.parse(line))
+                        }.attemptT
+                          .semiflatMap { out =>
+                            config.pretty
+                              .pure[IO]
+                              .ifM(
+                                IO { println(PtolemyJson.pretty(out)) },
+                                IO { println(PtolemyJson.compact(out)) }
+                              )
+                          }
+                          .leftSemiflatMap { err =>
+                            IO { System.err.println(err.getLocalizedMessage) }
+                          }
+                          .merge
+                      }
+                      .compile
+                      .drain
+                  )
+                  .attemptT
+                  .leftMap(e => NonEmptyList.of(e.getLocalizedMessage))
+          } yield ()
         }
-        ExitCode.Success
-      }
+        .map(_.biSemiflatMap(
+          errors => errors.traverse(e => IO { System.err.println(e) }).as(ExitCode.Error),
+          _ => ExitCode.Success.pure[IO]
+        ).merge)
     }
-  }
 }
