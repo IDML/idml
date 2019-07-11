@@ -7,10 +7,10 @@ import scala.collection.mutable
 /** The PtolemyValue that represents objects */
 abstract class PtolemyObject extends PtolemyValue {
 
-  def formatValue: mutable.Map[String, PtolemyValue] = fields
+  def formatValue: mutable.SortedMap[String, PtolemyValue] = fields
 
   /** The underlying field container for this object */
-  def fields: mutable.Map[String, PtolemyValue]
+  def fields: mutable.SortedMap[String, PtolemyValue]
 
   override def equals(o: Any): Boolean = o match {
     case n: PtolemyObject => n.fields == fields

@@ -10,12 +10,12 @@ object PObject {
 
   /** Create a PObject from a variable number of parameters */
   def apply(fields: (String, PtolemyValue)*): PObject = {
-    PObject(mutable.Map(fields: _*))
+    PObject(mutable.SortedMap(fields: _*))
   }
 }
 
 /** The default PtolemyValue implementation for an object */
-case class PObject(fields: mutable.Map[String, PtolemyValue]) extends PtolemyObject {
+case class PObject(fields: mutable.SortedMap[String, PtolemyValue]) extends PtolemyObject {
 
   /** Create a copy of this object that can be safely modified */
   override def deepCopy: PObject =

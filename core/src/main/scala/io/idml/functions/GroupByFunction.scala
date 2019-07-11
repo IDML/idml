@@ -41,7 +41,7 @@ case class GroupByFunction(expr: Node) extends PtolemyFunction {
             .groupBy(_._1)
             .mapValues(_.map(_._2))
             .mapValues(PArray(_))
-          PObject(mutable.Map[String, PtolemyValue](vs.toList: _*))
+          PObject(mutable.SortedMap[String, PtolemyValue](vs.toList: _*))
         }
         ctx.cursor = results
       case _ =>

@@ -45,7 +45,7 @@ class PObjectTest extends FunSuite with MustMatchers {
 
   def withPrimitives =
     new PObject(
-      mutable.Map(
+      mutable.SortedMap(
         "s" -> PtolemyValue("abc"),
         "i" -> PtolemyValue(123),
         "f" -> PtolemyValue(123.4),
@@ -54,9 +54,9 @@ class PObjectTest extends FunSuite with MustMatchers {
 
   def withNestedObjects =
     new PObject(
-      mutable.Map(
+      mutable.SortedMap(
         "o" -> new PObject(
-          mutable.Map(
+          mutable.SortedMap(
             "s" -> PtolemyValue("abc"),
             "i" -> PtolemyValue(123),
             "f" -> PtolemyValue(123.4),
@@ -65,7 +65,7 @@ class PObjectTest extends FunSuite with MustMatchers {
 
   def withNestedArrays =
     new PObject(
-      mutable.Map(
+      mutable.SortedMap(
         "a" -> new PArray(
           mutable.ListBuffer(
             PtolemyValue("abc"),

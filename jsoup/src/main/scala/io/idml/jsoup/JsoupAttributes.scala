@@ -19,8 +19,8 @@ class JsoupAttributes(val attributes: Attributes) extends PtolemyObject {
   // scalastyle:on null
 
   /** The underlying field container for this object */
-  override val fields: mutable.Map[String, PtolemyValue] =
-    mutable.Map[String, PtolemyValue](attributes.asScala.map {
+  override val fields: mutable.SortedMap[String, PtolemyValue] =
+    mutable.SortedMap[String, PtolemyValue](attributes.asScala.map {
       case attrib: Attribute => attrib.getKey -> PString(attrib.getValue)
     }.toSeq: _*)
 }

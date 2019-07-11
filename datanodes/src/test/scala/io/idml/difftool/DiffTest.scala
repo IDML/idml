@@ -207,8 +207,8 @@ class DiffTest extends FunSuite {
       Diff.pretty(left, right) ===
         """{
         |  "x" : {
-        |    "z" : "b",
-        |    "y"<removed> : "a"</removed>
+        |    "y"<removed> : "a"</removed>,
+        |    "z" : "b"
         |  }
         |}""".stripMargin)
   }

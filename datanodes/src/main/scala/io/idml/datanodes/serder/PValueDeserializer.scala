@@ -58,7 +58,7 @@ class PValueDeserializer(factory: TypeFactory, klass: Class[_]) extends JsonDese
   }
 
   def fieldNameOrEndObject(jp: JsonParser, ctxt: DeserializationContext): PObject = {
-    val fields = mutable.Map[String, PtolemyValue]()
+    val fields = mutable.SortedMap[String, PtolemyValue]()
     while (jp.getCurrentToken != JsonToken.END_OBJECT) {
       val name = jp.getCurrentName
       jp.nextToken()

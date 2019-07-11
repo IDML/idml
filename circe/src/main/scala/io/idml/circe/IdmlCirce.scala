@@ -14,29 +14,20 @@ package object circe {
     override def onNull: PtolemyValue                    = PtolemyNull
     override def onBoolean(value: Boolean): PtolemyValue = PBool(value)
     override def onNumber(value: JsonNumber): PtolemyValue =
-      value.toLong
-        .map { l =>
-          PInt(l)
-        }
-        .getOrElse(
-          PDouble(value.toDouble)
-        )
+      value.toLong.fold[PtolemyValue](PDouble(value.toDouble))(l => PInt(l))
     override def onString(value: String): PtolemyValue = PString(value)
     override def onArray(value: Vector[Json]): PtolemyValue = new PArray(
       value.map(_.foldWith(rawIdmlCirceDecoder)).toBuffer
     )
-    override def onObject(value: JsonObject): PtolemyValue = {
-      val m = mutable.Map.empty[String, PtolemyValue]
-      value.toIterable.foreach {
-        case (k, v) =>
-          m.put(k, v.foldWith(rawIdmlCirceDecoder))
+    override def onObject(value: JsonObject): PtolemyValue = new PObject(
+      value.toIterable.foldLeft(mutable.SortedMap.empty[String, PtolemyValue]) {
+        case (acc, (k, v)) => acc += k -> v.foldWith(rawIdmlCirceDecoder)
       }
-      new PObject(m)
-    }
+    )
   }
 
   implicit val decoder: Decoder[PtolemyValue] =
-    Decoder.instance(c => Try { c.value.foldWith(rawIdmlCirceDecoder) }.toEither.leftMap(e => DecodingFailure.fromThrowable(e, List.empty)))
+    Decoder[Json].emapTry(o => Try(o.foldWith(rawIdmlCirceDecoder)))
 
   lazy val rawIdmlCirceEncoder: PtolemyValue => Json = {
     case n: PtolemyInt    => Json.fromLong(n.value)
@@ -59,7 +50,9 @@ package object circe {
   implicit val idmlCirceEncoder: Encoder[PtolemyValue] = Encoder.instance(rawIdmlCirceEncoder)
 
   // and for PtolemyObject
-  implicit val ptolemyObjectEncoder: Encoder[PtolemyObject] = idmlCirceEncoder.contramap(_.asInstanceOf[PtolemyValue])
+  implicit val ptolemyObjectEncoder: Encoder[PtolemyObject] = idmlCirceEncoder.narrow[PtolemyObject]
+  // and for PObject just for ease of use
+  implicit val ptolemyPObjectEncoder: Encoder[PObject] = idmlCirceEncoder.narrow[PObject]
 
   object PtolemyJson {
     def parse(in: String): Either[Error, PtolemyValue] = io.circe.parser.decode[PtolemyValue](in)

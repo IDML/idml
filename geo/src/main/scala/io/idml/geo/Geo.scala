@@ -9,7 +9,7 @@ import scala.collection.mutable
 case class Geo(lat: Double, long: Double) extends PtolemyObject with CompositeValue {
 
   /** The fields */
-  val fields = mutable.Map(
+  val fields = mutable.SortedMap(
     "latitude"  -> PtolemyValue(lat),
     "longitude" -> PtolemyValue(long)
   )

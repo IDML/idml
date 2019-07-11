@@ -76,7 +76,7 @@ class PArrayTest extends FunSuite with MustMatchers {
     new PArray(
       mutable.ListBuffer(
         new PObject(
-          mutable.Map(
+          mutable.SortedMap(
             "s" -> PtolemyValue("abc"),
             "i" -> PtolemyValue(123),
             "f" -> PtolemyValue(123.4),
