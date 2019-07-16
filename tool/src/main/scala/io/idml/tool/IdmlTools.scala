@@ -8,7 +8,7 @@ import cats.syntax._
 import cats.data._
 import com.monovore.decline._
 import DeclineHelpers._
-import io.idml._
+import io.idml.{jackson, _}
 import io.idml.utils.DocumentValidator
 import io.idmlrepl.Repl
 import io.idml.hashing.HashingFunctionResolver
@@ -119,14 +119,14 @@ object IdmlTools {
               .filter(!_.isEmpty)
               .map { s: String =>
                 Try {
-                  chain.run(PtolemyJson.parse(s))
+                  chain.run(jackson.PtolemyJson.parse(s))
                 }
               }
               .foreach {
                 case Success(json) =>
                   config.pretty match {
-                    case true  => println(PtolemyJson.pretty(json))
-                    case false => println(PtolemyJson.compact(json))
+                    case true  => println(jackson.PtolemyJson.pretty(json))
+                    case false => println(jackson.PtolemyJson.compact(json))
                   }
                   Console.flush()
                 case Failure(e) =>

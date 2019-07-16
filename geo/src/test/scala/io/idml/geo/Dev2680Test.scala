@@ -1,6 +1,6 @@
 package io.idml.geo
 
-import io.idml.{Ptolemy, PtolemyJson}
+import io.idml.Ptolemy
 import org.scalatest.FunSuite
 
 class Dev2680Test extends FunSuite {

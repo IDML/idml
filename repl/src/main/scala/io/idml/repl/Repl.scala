@@ -7,6 +7,7 @@ import java.util.Properties
 import io.idml.datanodes.PObject
 import io.idml._
 import io.idml.hashing.HashingFunctionResolver
+import io.idml.jackson.PtolemyJackson
 import io.idml.jsoup.{JsoupFunctionResolver, PtolemyJsoup}
 
 import scala.sys.ShutdownHookThread
@@ -30,6 +31,8 @@ class Repl {
   val out                  = new PrintWriter(reader.getOutput)
   var mode: String         = "json"
   var doc: Option[PObject] = None
+
+  val ptolemyJson = PtolemyJackson.default
 
   def run(args: Array[String]) = runInner(args)
 
@@ -135,7 +138,7 @@ class Repl {
   def processJson(input: String) {
     // Store and parse the JSON.
     try {
-      doc = Some(PtolemyJson.parse(input).asInstanceOf[PObject])
+      doc = Some(ptolemyJson.parse(input).asInstanceOf[PObject])
       out.println("JSON accepted")
       mode = "idml"
     } catch {
@@ -148,7 +151,7 @@ class Repl {
     try {
       val mapping = ptolemy.fromString(input)
       val output  = mapping.run(doc.get)
-      out.println(PtolemyJson.pretty(output))
+      out.println(ptolemyJson.pretty(output))
     } catch {
       case e: Throwable =>
         out.println("Error: " + e.getMessage)
@@ -164,7 +167,7 @@ class Repl {
       }
       val schema = ptolemy.fromString(mapping + input)
       val output = schema.run(doc.get)
-      out.println(PtolemyJson.pretty(output))
+      out.println(ptolemyJson.pretty(output))
     } catch {
       case e: Throwable =>
         out.println("Error: " + e.getMessage)

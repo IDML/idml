@@ -122,7 +122,9 @@ BacktickLabel   : '`' ~[<`]* '`';
 Whitespace      : [ \t\n\r]+ -> skip;
 Int             : [0-9]+;
 String          : '"'  ( EscapeSeq | ~( '\\'|'\n'|'"' ) )* '"'
-                | '\'' ( EscapeSeq | ~( '\\'|'\n'|'\'' ) )* '\'';
+                | '\'' ( EscapeSeq | ~( '\\'|'\n'|'\'' ) )* '\''
+                | '"""' ( EscapeSeq | ~( '\\') )* '"""';
+
 Float           : [0-9]+ '.' [0-9]*;
 
 fragment EscapeSeq : '\\' . ;

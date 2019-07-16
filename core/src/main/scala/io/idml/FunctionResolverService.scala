@@ -7,6 +7,7 @@ import io.idml.functions.FunctionResolver
 
 import scala.util.Try
 import cats._, cats.implicits._
+import scala.collection.JavaConverters._
 
 /** A factory for functions that utilizes the Java ServiceLoader pattern */
 class FunctionResolverService {
@@ -30,7 +31,8 @@ class FunctionResolverService {
           | This is probably a misconfiguration of the classpath!""".stripMargin)
     }
     while (result.isEmpty && resolvers.hasNext) {
-      result = resolvers.next().resolve(name, args)
+      val nxt = resolvers.next()
+      result = nxt.resolve(name, args)
     }
     result.getOrElse(throw new UnknownFunctionException(s"Unsupported function '$name' with ${args.size} params"))
   }

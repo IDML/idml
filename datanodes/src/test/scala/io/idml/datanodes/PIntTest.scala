@@ -1,23 +1,9 @@
 package io.idml.datanodes
 
-import io.idml.PtolemyJson
 import org.scalatest._
 
 /** Test the behaviour of the PInt class */
 class PIntTest extends FunSuite {
-  import PtolemyJson._
-
-  // Parsing
-  test("parse(int min)")(PtolemyJson.parse(Int.MinValue.toString) === PInt(Int.MinValue))
-  test("parse(int max)")(PtolemyJson.parse(Int.MaxValue.toString) === PInt(Int.MaxValue))
-  test("parse(long min)")(PtolemyJson.parse(Long.MinValue.toString) === PInt(Long.MinValue))
-  test("parse(long max)")(PtolemyJson.parse(Long.MaxValue.toString) === PInt(Long.MaxValue))
-
-  // Generation
-  test("generate(int min)")(Int.MinValue.toString === compact(PInt(Int.MinValue)))
-  test("generate(int max)")(Int.MaxValue.toString === compact(PInt(Int.MaxValue)))
-  test("generate(long min)")(Long.MinValue.toString === compact(PInt(Long.MinValue)))
-  test("generate(long max)")(Long.MaxValue.toString === compact(PInt(Long.MaxValue)))
 
   // Int equality
   test("PInt(int min) == PInt(int min)")(PInt(Int.MinValue) === PInt(Int.MinValue))

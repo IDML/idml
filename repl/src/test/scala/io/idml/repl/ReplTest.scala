@@ -2,7 +2,7 @@ package io.idmlrepl
 
 import java.io.PrintWriter
 
-import io.idml._
+import io.idml.{jackson, _}
 import org.scalatest.{BeforeAndAfterAll, FunSpec}
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito.{never, stub, verify, when}
@@ -132,7 +132,7 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
       repl.processJson(INPUT_JSON)
 
       assert(
-        repl.doc.get == PtolemyJson
+        repl.doc.get == jackson.PtolemyJson
           .parse(INPUT_JSON)
           .asInstanceOf[PtolemyObject])
       verify(repl.out).println(
@@ -160,7 +160,7 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
       repl.processJson(INPUT_JSON)
       repl.processIdml(ptolemy)(INPUT_IDML)
       val mapping      = ptolemy.fromString(INPUT_IDML)
-      val expectedJson = PtolemyJson.pretty(mapping.run(repl.doc.get))
+      val expectedJson = jackson.PtolemyJson.pretty(mapping.run(repl.doc.get))
 
       verify(repl.out).println(expectedJson)
     }
@@ -168,7 +168,7 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
     it("should print an error if an exception is thrown whilst processing") {
       val ptolemy      = new Ptolemy(new PtolemyConf)
       val mapping      = ptolemy.fromString(INPUT_IDML)
-      val expectedJson = PtolemyJson.pretty(mapping.run(repl.doc.get))
+      val expectedJson = jackson.PtolemyJson.pretty(mapping.run(repl.doc.get))
 
       when(repl.out.println(expectedJson))
         .thenThrow(new RuntimeException(PROCESS_IDML_EXCEPTION))
@@ -190,7 +190,7 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
 
       val repl = new TestRepl()
       repl.processJson(INPUT_JSON)
-      val expectedJson = PtolemyJson.pretty(mapping.run(repl.doc.get))
+      val expectedJson = jackson.PtolemyJson.pretty(mapping.run(repl.doc.get))
 
       repl.processSchema(ptolemy)(INPUT_SCHEMA)
       verify(repl.out).println(PROCESS_JSON_ACCEPTED)
@@ -204,7 +204,7 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
 
       val repl = new TestRepl()
       repl.processJson(INPUT_JSON)
-      val output = PtolemyJson.pretty(mapping.run(repl.doc.get))
+      val output = jackson.PtolemyJson.pretty(mapping.run(repl.doc.get))
 
       when(repl.out.println(output))
         .thenThrow(new RuntimeException(PROCESS_SCHEMA_EXCEPTION))

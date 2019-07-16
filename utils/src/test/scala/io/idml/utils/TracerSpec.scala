@@ -1,6 +1,6 @@
 package io.idml.utils
 import io.idml.utils.Tracer.Annotator
-import io.idml.{Ptolemy, PtolemyContext, PtolemyJson, PtolemyListener}
+import io.idml.{Ptolemy, PtolemyContext, PtolemyListener}
 import org.scalatest.{MustMatchers, WordSpec}
 
 class TracerSpec extends WordSpec with MustMatchers {

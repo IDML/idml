@@ -1,17 +1,10 @@
 package io.idml.datanodes
 
-import io.idml.{CastFailed, InvalidCaller, InvalidParameters, PtolemyJson}
+import io.idml.{CastFailed, InvalidCaller, InvalidParameters}
 import org.scalatest._
 
 /** Test the behaviour of the PString class */
 class PStringTest extends FunSuite with MustMatchers {
-  import PtolemyJson._
-
-  // Parsing
-  test("parse string")(PtolemyJson.parse("\"a string\"") must equal(new PString("a string")))
-
-  // Generation
-  test("generate string")("\"a string\"" must equal(compact(new PString("a string"))))
 
   // Equality
   test("string == string")(new PString("a string") must equal(new PString("a string")))
@@ -45,8 +38,6 @@ class PStringTest extends FunSuite with MustMatchers {
   test("plus int")(new PString("v") + new PInt(42) must equal(new PString("v42")))
   test("plus double")(new PString("D") + new PDouble(3.142) must equal(new PString("D3.142")))
 
-  //random
-  test("random")(new PString("hello").random() must equal(PInt(1816935814987899352L)))
 
   // capitalize
   test("capitalize")(new PString("hello world").capitalize() must equal(new PString("Hello World")))

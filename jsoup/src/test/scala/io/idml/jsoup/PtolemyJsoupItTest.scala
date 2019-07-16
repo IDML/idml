@@ -1,7 +1,7 @@
 package io.idml.jsoup
 
 import io.idml.datanodes._
-import io.idml.{PtolemyJson, PtolemyValue}
+import io.idml.PtolemyValue
 import org.scalatest.FunSuite
 
 /** Integration tests for the PtolemyJsoup library */

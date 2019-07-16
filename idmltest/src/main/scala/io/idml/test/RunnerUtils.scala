@@ -10,15 +10,7 @@ import io.circe._
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.Printer.spaces2
-import io.idml.{
-  FunctionResolverService,
-  PluginFunctionResolverService,
-  Ptolemy,
-  PtolemyConf,
-  PtolemyJson,
-  PtolemyMapping,
-  StaticFunctionResolverService
-}
+import io.idml.{FunctionResolverService, PluginFunctionResolverService, Ptolemy, PtolemyConf, PtolemyMapping, StaticFunctionResolverService}
 import fs2._
 import Test._
 

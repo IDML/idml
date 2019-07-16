@@ -40,5 +40,6 @@ abstract class PtolemyObject extends PtolemyValue {
   override def `object`(): PtolemyObject = this
   // scalastyle:on method.name
 
-  override def toStringOption: Option[String] = Some(PtolemyJson.compact(this))
+  override def toStringOption: Option[String] =
+    Some("{" + fields.flatMap{case (k, v) => v.toStringOption.map(k -> _)}.map{case (k, v) => s""""$k":$v"""}.mkString(",") + "}")
 }

@@ -46,6 +46,8 @@ case class PObject(fields: mutable.SortedMap[String, PtolemyValue]) extends Ptol
             k -> v1
           case (k, None, Some(v2)) =>
             k -> v2
+          case (_, None, None) =>
+            throw new Throwable("This can't happen because we only iterated keys that are in both objects")
         }
         PObject(fs: _*)
       case (a: PtolemyValue, b: PtolemyValue) =>

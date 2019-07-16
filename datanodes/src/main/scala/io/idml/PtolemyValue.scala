@@ -15,8 +15,6 @@ abstract class PtolemyValue
     with MathsModule
     with RegexModule
     with ArrayModule
-    with RandomModule
-    with UUIDModule
 
 /** The base class for all json values */
 object PtolemyValue {

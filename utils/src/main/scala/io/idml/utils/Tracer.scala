@@ -1,5 +1,5 @@
 package io.idml.utils
-import io.idml._
+import io.idml.{jackson, _}
 import io.idml.ast._
 
 import scala.collection.mutable
@@ -30,7 +30,7 @@ object Tracer {
       val output = s.lines.toArray
       results.foreach {
         case (Position(line, char), r) =>
-          output(line - 1) = output(line - 1) + " # " + PtolemyJson.compact(r)
+          output(line - 1) = output(line - 1) + " # " + jackson.PtolemyJson.compact(r)
       }
       output.mkString("\n")
     }
@@ -39,7 +39,7 @@ object Tracer {
   def annotate(s: String)(j: String): String = {
     val a   = new Annotator()
     val p   = new Ptolemy(new PtolemyConf(), List[PtolemyListener](a).asJava)
-    val ctx = new PtolemyContext(PtolemyJson.parse(j), PtolemyJson.newObject(), List[PtolemyListener](a))
+    val ctx = new PtolemyContext(jackson.PtolemyJson.parse(j), jackson.PtolemyJson.newObject(), List[PtolemyListener](a))
     p.fromString(s).run(ctx).output
     a.render(s)
   }

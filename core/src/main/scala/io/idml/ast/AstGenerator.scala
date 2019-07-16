@@ -3,10 +3,11 @@
 // scalastyle:off number.of.methods
 package io.idml.ast
 
+import atto.Parser
 import io.idml.datanodes._
 import io.idml.lang.MappingParser._
 import io.idml.lang.MappingVisitor
-import io.idml.{FunctionResolverService, PtolemyJson}
+import io.idml.FunctionResolverService
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor
 
 import scala.collection.JavaConverters._
@@ -372,16 +373,44 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
     }
   }
 
+  /* This is the atto stringLiteral but modified a bit */
+  val stringParser: Parser[PString] = {
+    import atto._, Atto._, cats._, cats.implicits._
+
+    // Unicode escaped characters
+    val unicode: Parser[Char] =
+      string("\\u") ~> count(4, hexDigit).map(ds => Integer.parseInt(new String(ds.toArray), 16).toChar)
+
+    def quotedString(outer: Char) = {
+      // Unescaped characters
+      val nesc: Parser[Char] =
+        elem(c => c =!= '\\' && c =!= outer && !c.isControl)
+
+      // Escaped characters
+      val esc: Parser[Char] =
+        (char('\\') *> char(outer)) |
+          string("\\\\") >| '\\' |
+          string("\\/") >| '/' |
+          string("\\b") >| '\b' |
+          string("\\f") >| '\f' |
+          string("\\n") >| '\n' |
+          string("\\r") >| '\r' |
+          string("\\t") >| '\t'
+
+      // Quoted strings
+      char(outer) ~> many(nesc | esc | unicode).map(cs => new String(cs.toArray)) <~ char(outer)
+    }
+    val singleQuoted = quotedString('\'')
+    val doubleQuoted = quotedString('"')
+    val triple = "\"\"\""
+    val tripleQuoted = string(triple) *> manyUntil(unicode | anyChar, string(triple)).map(_.mkString(""))
+    (singleQuoted | tripleQuoted | doubleQuoted).map(s => PString(s))
+  }
+
   /** Decode a string from its parsed form */
   def decodeString(in: String): PString = {
-    // this is a bit lazy but works: assume the text is just a json string, which it probably should be. the added
-    // benefit is that if the lexer matches the string correctly, we should be able to support the full json spec for
-    // free, including unicode escape sequences.
-    PtolemyJson.parse(in) match {
-      case str: PString => str
-      case other: Any =>
-        throw new IllegalArgumentException("Lexer returned invalid string content: " + in)
-    }
+    import atto._, Atto._, cats._, cats.implicits._
+    stringParser.parseOnly(in).done.either.leftMap(e => new Throwable(s"Couldn't parse string literal: $e")).toTry.get
   }
 
   /** Create a literal value like a string or an int */

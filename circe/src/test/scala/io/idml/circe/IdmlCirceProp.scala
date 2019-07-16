@@ -5,6 +5,8 @@ import io.circe.testing.ArbitraryInstances
 import org.scalacheck.Properties
 import org.scalacheck.Prop.forAll
 import io.circe._
+import io.idml.jackson
+
 import scala.util.Try
 
 class IdmlCirceProp extends Properties("IdmlCirce") with ArbitraryInstances {
@@ -12,7 +14,7 @@ class IdmlCirceProp extends Properties("IdmlCirce") with ArbitraryInstances {
   property("is identical to the jackson parser") = forAll { j: Json =>
     val str = j.noSpaces
     Try {
-      PtolemyJson.parseUnsafe(str) == io.idml.PtolemyJson.parse(str)
+      PtolemyJson.parseUnsafe(str) == jackson.PtolemyJson.parse(str)
     }.recover {
         case _: JsonParseException => true
       }

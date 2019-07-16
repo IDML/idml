@@ -1,5 +1,7 @@
 package io.idml.functions
 
+import java.lang.reflect.Modifier
+
 import io.idml.PtolemyValue
 import io.idml.ast.{Argument, Pipeline, PtolemyFunctionMetadata}
 

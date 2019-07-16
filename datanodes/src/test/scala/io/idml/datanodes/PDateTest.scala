@@ -1,7 +1,6 @@
 package io.idml.datanodes
 
 import io.idml.datanodes.modules.DateModule
-import io.idml.PtolemyJson
 import org.joda.time.format.DateTimeFormatterBuilder
 import org.joda.time.{DateTime, DateTimeZone, Hours}
 import org.scalatest._
@@ -14,15 +13,12 @@ class PDateTest extends FunSuite with MustMatchers {
   val now        = new DateTime(nowMs)
   val format1    = "yyyy.MM.dd G 'at' HH:mm:ss z"
   val format1Val = "2001.07.04 AD at 12:08:56 PDT"
-  //jackson will fail to parse format1Val as a JSON string so we have to wrap it in an array and take it out later
-  val format1ValArr = "[\"" + format1Val + "\"]"
   val format1Parser =
     new DateTimeFormatterBuilder().appendPattern(format1).toFormatter
 
-  test("parse timestamp")(PtolemyJson.parse((nowMs / 1000).toString).date() must equal(new PDate(now)))
+  test("parse timestamp")(PInt((nowMs / 1000)).date() must equal(new PDate(now)))
 
-  val pDate = PtolemyJson.parse(format1ValArr).asInstanceOf[PArray].items.head
-  test("parsed date must match original string")(pDate.asInstanceOf[PString].value must equal(format1Val))
+  val pDate = PString(format1Val)
 
   test("must be able to parse custom format")(
     pDate.date(new PString(format1)).asInstanceOf[PDate].dateVal
@@ -35,7 +31,7 @@ class PDateTest extends FunSuite with MustMatchers {
 
   test("Correctly interpret millisecond timestamps from a long") {
     val now    = 1414755054310L
-    val parsed = PtolemyJson.parse("" + now)
+    val parsed = PInt(now)
     val actual = parsed.millis()
     assert(classOf[PDate] isAssignableFrom actual.getClass)
     actual.asInstanceOf[PDate].dateVal.isEqual(now) must equal(true)
@@ -43,8 +39,7 @@ class PDateTest extends FunSuite with MustMatchers {
 
   test("Correctly interpret millisecond timestamps from a string") {
     val nowLong = 1414755054310L
-    val now     = "\"" + nowLong + "\""
-    val parsed  = PtolemyJson.parse(now)
+    val parsed = PString(nowLong.toString)
     val actual  = parsed.millis()
     //make sure the parsed value is actually a PString
     assert(classOf[PString] isAssignableFrom parsed.getClass)
@@ -53,7 +48,7 @@ class PDateTest extends FunSuite with MustMatchers {
     actual.asInstanceOf[PDate].dateVal.equals(new DateTime(nowLong)) must equal(true)
   }
 
-  test("parse millis timestamp")(PtolemyJson.parse(nowMs.toString).millis() must equal(new PDate(now, DateModule.DefaultDateFormat)))
+  test("parse millis timestamp")(PString(nowMs.toString).millis() must equal(new PDate(now, DateModule.DefaultDateFormat)))
 
   test("Parse timezone offsets") {
     import io.idml.datanodes.modules.DateModule._
@@ -76,9 +71,8 @@ class PDateTest extends FunSuite with MustMatchers {
 
   test("Localize with timezone offsets") {
     val nowLong = 1414755054310L
-    val now     = "\"" + nowLong + "\""
     val nowdt   = new DateTime(nowLong)
-    val parsed  = PtolemyJson.parse(now)
+    val parsed  = PString(nowLong.toString)
     val actual  = parsed.millis().timezone(PString("-0800"))
     assert(classOf[PDate] isAssignableFrom actual.getClass)
     actual.asInstanceOf[PDate].dateVal.getZone.toString must equal("-08:00")

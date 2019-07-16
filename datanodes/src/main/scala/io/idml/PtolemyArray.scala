@@ -1,6 +1,7 @@
 package io.idml
 
 import io.idml.datanodes.{CompositeValue, PArray, PBool, PInt}
+
 import scala.collection.mutable
 import scala.util.Try
 
@@ -55,5 +56,5 @@ trait PtolemyArray extends PtolemyValue with CompositeValue {
     Try(items(wrapIndex(index, items.size))).getOrElse(MissingIndex)
   }
 
-  override def toStringOption: Option[String] = Some(PtolemyJson.compact(this))
+  override def toStringOption: Option[String] = Some("["+items.flatMap(_.toStringOption).mkString(",")+"]")
 }

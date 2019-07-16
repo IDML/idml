@@ -12,11 +12,6 @@ trait ObjectModule {
   /** Remove a field by name */
   def remove(path: String) {}
 
-  def serialize(): PtolemyValue = this match {
-    case o: PtolemyObject => PtolemyValue(PtolemyJson.compact(o))
-    case _                => InvalidCaller
-  }
-
   def values(): PtolemyValue = this match {
     case o: PtolemyObject => PArray(o.fields.values.toBuffer)
     case _                => InvalidCaller
@@ -27,8 +22,5 @@ trait ObjectModule {
     case _                => InvalidCaller
   }
 
-  def parseJson(): PtolemyValue = this match {
-    case s: PtolemyString => Try { PtolemyJson.parse(s.value) }.getOrElse(InvalidCaller)
-    case _                => InvalidCaller
-  }
+
 }

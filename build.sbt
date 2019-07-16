@@ -43,9 +43,9 @@ lazy val lang = project.settings(commonSettings)
 
 lazy val datanodes = project.settings(commonSettings)
 
-lazy val circe = project.dependsOn(datanodes).settings(commonSettings)
+lazy val circe = project.dependsOn(datanodes).dependsOn(core).settings(commonSettings)
 
-lazy val core = project
+lazy val core: Project = project
   .dependsOn(datanodes)
   .dependsOn(lang)
   .enablePlugins(BuildInfoPlugin)
@@ -54,6 +54,14 @@ lazy val core = project
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
     buildInfoPackage := "io.idml",
     buildInfoOptions += BuildInfoOption.BuildTime
+  )
+
+lazy val test = project
+  .dependsOn(core)
+  .dependsOn(jackson % "compile->test")
+  .settings(commonSettings)
+  .settings(
+    publishArtifact := false
   )
 
 lazy val geo = project
@@ -72,9 +80,11 @@ lazy val jsoup = project.dependsOn(core).settings(commonSettings)
 
 lazy val hashing = project.dependsOn(core).settings(commonSettings)
 
+lazy val jackson: Project = project.dependsOn(core).settings(commonSettings)
+
 lazy val utils = project.dependsOn(core).dependsOn(jsoup).settings(commonSettings)
 
-lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).settings(commonSettings)
+lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).dependsOn(jackson).settings(commonSettings)
 
 lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils).settings(commonSettings)
 
@@ -99,6 +109,15 @@ lazy val idmltutor = project.dependsOn(hashing).dependsOn(geo).dependsOn(jsoup).
       case _                                                                      => MergeStrategy.first
     }
 )
+
+lazy val bench = project
+  .dependsOn(core)
+  .dependsOn(circe)
+  .dependsOn(datanodes)
+  .dependsOn(jsoup)
+  .dependsOn(geo)
+  .dependsOn(hashing)
+  .enablePlugins(JmhPlugin)
 
 lazy val tool = project
   .dependsOn(core)

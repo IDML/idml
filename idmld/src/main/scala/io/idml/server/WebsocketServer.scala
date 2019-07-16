@@ -61,7 +61,7 @@ object WebsocketServer {
           .as[Complete]
           .map { c =>
             c.in.flatMap { doc =>
-              AutoComplete.complete(completionPtolemy)(PtolemyJson.parse(doc.noSpaces).asInstanceOf[PtolemyObject], c.idml, c.position)
+              AutoComplete.complete(completionPtolemy)(jackson.PtolemyJson.parse(doc.noSpaces).asInstanceOf[PtolemyObject], c.idml, c.position)
             }.asJson
           }
           .flatMap(Ok(_))
@@ -90,12 +90,12 @@ object WebsocketServer {
                       Try {
                         log.info(x.toString)
                         val chain = ptolemy.fromString(x.idml)
-                        val jsons = x.in.map(i => PtolemyJson.parse(i.toString))
+                        val jsons = x.in.map(i => jackson.PtolemyJson.parse(i.toString))
                         val p     = x.path.getOrElse("root")
                         val path  = ptolemy.fromString(s"result = $p")
                         jsons
                           .map { j =>
-                            parse(PtolemyJson.compact(path.run(chain.run(j)))).toTry
+                            parse(jackson.PtolemyJson.compact(path.run(chain.run(j)))).toTry
                           }
                           .sequence
                           .toEither

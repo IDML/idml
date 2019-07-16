@@ -4,7 +4,7 @@ import java.nio.charset.Charset
 
 import io.idml.ast.{Pipeline, PtolemyFunction}
 import io.idml.functions.PtolemyFunction2
-import io.idml.{PtolemyJson, PtolemyValue}
+import io.idml.PtolemyValue
 import com.google.common.io.Resources
 
 object IsoRegionFunction {
