@@ -18,7 +18,6 @@ abstract class PtolemyValue
 
 /** The base class for all json values */
 object PtolemyValue {
-
   /** Create a new PInt */
   def apply(v: Long): PtolemyValue = new PInt(v)
 

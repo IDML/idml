@@ -1,8 +1,7 @@
-package io.idml.utils
+package io.idml.jackson
 
 import io.idml.Ptolemy
 import org.scalatest.{MustMatchers, WordSpec}
-import io.idml.utils.JsonAstGenerator._
 
 class JsonAstGeneratorTest extends WordSpec with MustMatchers {
   val p = new Ptolemy()

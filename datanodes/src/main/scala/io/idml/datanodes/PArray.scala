@@ -17,6 +17,10 @@ object PArray {
     case arr: PArray => Some(arr.items)
     case _           => None
   }
+
+  def of(arr: Array[PtolemyValue]): PArray = {
+    PArray(arr.toBuffer)
+  }
 }
 
 /** The standard implementation of an array. Encapsulates a mutable array buffer */

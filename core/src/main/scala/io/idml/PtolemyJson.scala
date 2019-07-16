@@ -1,8 +1,10 @@
 package io.idml
 
-import io.idml.datanodes.PObject
+import java.util.ServiceLoader
 
-import cats._, cats.implicits._
+import io.idml.datanodes.PObject
+import cats._
+import cats.implicits._
 
 /**
   * Interface for any JSON parser which can work with the IDML datanodes hierarchy
@@ -36,6 +38,8 @@ trait PtolemyJson {
 }
 
 object PtolemyJson {
+  @throws[NoSuchElementException]("if there isn't an available implementation")
+  def load(): PtolemyJson = ServiceLoader.load(classOf[PtolemyJson]).iterator().next()
   def newObject(): PObject = PObject()
 }
 

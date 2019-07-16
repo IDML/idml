@@ -1,12 +1,13 @@
 package io.idml.utils
-import io.idml.{jackson, _}
+import io.idml._
 import io.idml.ast._
+import io.idml.datanodes.PObject
 
 import scala.collection.mutable
 import scala.collection.JavaConverters._
 
 object Tracer {
-  class Annotator extends PtolemyListener {
+  class Annotator(json: PtolemyJson) extends PtolemyListener {
     val results = mutable.ListBuffer[(Position, PtolemyValue)]()
 
     override def exitAssignment(ctx: PtolemyContext, assignment: Assignment): Unit = {
@@ -30,16 +31,16 @@ object Tracer {
       val output = s.lines.toArray
       results.foreach {
         case (Position(line, char), r) =>
-          output(line - 1) = output(line - 1) + " # " + jackson.PtolemyJson.compact(r)
+          output(line - 1) = output(line - 1) + " # " + json.compact(r)
       }
       output.mkString("\n")
     }
   }
 
-  def annotate(s: String)(j: String): String = {
-    val a   = new Annotator()
+  def annotate(json: PtolemyJson)(s: String)(j: String): String = {
+    val a   = new Annotator(json)
     val p   = new Ptolemy(new PtolemyConf(), List[PtolemyListener](a).asJava)
-    val ctx = new PtolemyContext(jackson.PtolemyJson.parse(j), jackson.PtolemyJson.newObject(), List[PtolemyListener](a))
+    val ctx = new PtolemyContext(json.parse(j), PObject(), List[PtolemyListener](a))
     p.fromString(s).run(ctx).output
     a.render(s)
   }

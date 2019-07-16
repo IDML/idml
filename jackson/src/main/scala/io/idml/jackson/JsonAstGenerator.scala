@@ -1,12 +1,12 @@
-package io.idml.utils
+package io.idml.jackson
 
-import io.idml.datanodes.{PBool, PDouble, PInt, PString}
-import io.idml.ast.{Assignment, Block, ExecNavLiteral, Pipeline, PtolemyFunction, Reassignment}
-import io.idml.functions.{ArrayFunction, PtolemyFunction0, PtolemyValueFunction, SetSizeFunction}
-import io.idml.PtolemyMapping
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.{JsonSerializer, ObjectMapper, SerializerProvider}
+import io.idml.PtolemyMapping
+import io.idml.ast._
+import io.idml.datanodes.{PBool, PDouble, PInt, PString}
+import io.idml.functions.{ArrayFunction, PtolemyFunction0, PtolemyValueFunction, SetSizeFunction}
 import org.json4s.jackson.Json4sScalaModule
 
 /**
@@ -29,7 +29,7 @@ object JsonAstGenerator {
   /**
     * Implicit extension to PtolemyMapping to provide .toJson
     * Usage:
-    *  import io.idml.utils.JsonAstGenerator._
+    *  import io.idml.jackson.JsonAstGenerator._
     *  ...
     *  ptolemy.fromString("foo = bar").toJson
     * @param m mapping to wrap

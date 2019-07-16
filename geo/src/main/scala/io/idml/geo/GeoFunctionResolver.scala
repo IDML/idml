@@ -1,9 +1,29 @@
 package io.idml.geo
 
+import java.nio.charset.Charset
+
+import com.google.common.io.Resources
+import io.idml.{PtolemyJson, PtolemyValue}
 import io.idml.ast.{Argument, Pipeline, PtolemyFunction, PtolemyFunctionMetadata}
 import io.idml.functions.FunctionResolver
 
-class GeoFunctionResolver extends FunctionResolver {
+class DefaultGeoFunctionResolver extends GeoFunctionResolver(PtolemyJson.load())
+
+class GeoFunctionResolver(json: PtolemyJson) extends FunctionResolver {
+
+  lazy val countries: PtolemyValue = json.parse(
+    Resources
+      .toString(Resources.getResource("io/idml/geo/Countries.json"), Charset.defaultCharset())
+      .ensuring(_ != null)
+  )
+
+  lazy val regions: PtolemyValue = json.parse(
+    Resources
+      .toString(Resources.getResource("io/idml/geo/Regions.json"), Charset.defaultCharset())
+      .ensuring(_ != null)
+  )
+
+
   override def resolve(name: String, args: List[Argument]): Option[PtolemyFunction] = {
     (name, args) match {
       case ("geo", Nil) =>
@@ -11,9 +31,9 @@ class GeoFunctionResolver extends FunctionResolver {
       case ("geo", (lat: Pipeline) :: (long: Pipeline) :: Nil) =>
         Some(Geo2Function(lat, long))
       case ("country", (country: Pipeline) :: Nil) =>
-        Some(IsoCountryFunction(country))
+        Some(new IsoCountryFunction(countries, country))
       case ("region", (country: Pipeline) :: (region: Pipeline) :: Nil) =>
-        Some(IsoRegionFunction(country, region))
+        Some(new IsoRegionFunction(regions, country, region))
       case ("timezone", Nil) =>
         Some(TimezoneFunction.TimezoneFunction)
       case _ => None

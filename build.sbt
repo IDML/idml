@@ -67,6 +67,8 @@ lazy val test = project
 lazy val geo = project
   .dependsOn(core)
   .settings(commonSettings)
+  .dependsOn(jackson % "test->test")
+  .dependsOn(test % "test->test")
   .settings(
     fork in Test := true,
     envVars in Test := Map(

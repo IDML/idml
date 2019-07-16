@@ -4,6 +4,7 @@ import io.idml.{PtolemyArray, PtolemyObject, PtolemyValue}
 
 import scala.collection.mutable
 import scala.util.Try
+import scala.collection.JavaConverters._
 
 /** The empty PObject */
 object PObject {
@@ -11,6 +12,10 @@ object PObject {
   /** Create a PObject from a variable number of parameters */
   def apply(fields: (String, PtolemyValue)*): PObject = {
     PObject(mutable.SortedMap(fields: _*))
+  }
+
+  def of(kv: java.util.Map[String, PtolemyValue]): PObject = {
+    PObject(mutable.SortedMap(kv.asScala.toList :_*))
   }
 }
 
