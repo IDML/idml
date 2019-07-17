@@ -85,7 +85,7 @@ lazy val jsoup = project.dependsOn(core).dependsOn(test % "test->test").settings
 lazy val hashing = project.dependsOn(core).settings(commonSettings)
 
 
-lazy val utils = project.dependsOn(core).dependsOn(jsoup).settings(commonSettings)
+lazy val utils = project.dependsOn(core).dependsOn(jsoup).dependsOn(jackson % "test->test").settings(commonSettings)
 
 lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).dependsOn(jackson).settings(commonSettings)
 

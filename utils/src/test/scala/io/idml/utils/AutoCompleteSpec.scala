@@ -1,5 +1,6 @@
 package io.idml.utils
 import io.idml.datanodes.{PArray, PInt, PObject, PString}
+import io.idml.jackson.PtolemyJackson
 import io.idml.{jackson, _}
 import org.scalatest.words.ShouldVerb
 import org.scalatest.{FlatSpec, MustMatchers}
@@ -10,7 +11,7 @@ import org.scalatest.Matchers._
 class AutoCompleteSpec extends FlatSpec with MustMatchers {
   val ptolemy = new Ptolemy(new PtolemyConf(),
                             new StaticFunctionResolverService(
-                              (StaticFunctionResolverService.defaults.asScala ++ List(new AnalysisModule)).asJava
+                              (StaticFunctionResolverService.defaults(PtolemyJackson.default).asScala ++ List(new AnalysisModule)).asJava
                             ))
 
   "complete" should "complete base level keys" in {
@@ -27,7 +28,7 @@ class AutoCompleteSpec extends FlatSpec with MustMatchers {
   }
   "complete" should "complete within a map" in {
     val in = PObject("xs" -> PArray(PObject("a" -> PInt(1)), PObject("b" -> PInt(2))))
-    println(jackson.PtolemyJson.compact(in))
+    println(PtolemyJackson.default.compact(in))
     val doc    = "result = root.xs.map()"
     val cursor = doc.length - 1
     AutoComplete.complete(ptolemy)(in, doc, cursor) should contain theSameElementsAs List("a", "b")

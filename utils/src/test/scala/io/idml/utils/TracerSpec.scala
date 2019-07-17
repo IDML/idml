@@ -1,14 +1,17 @@
 package io.idml.utils
+import io.idml.jackson.PtolemyJackson
 import io.idml.utils.Tracer.Annotator
-import io.idml.{Ptolemy, PtolemyContext, PtolemyListener}
+import io.idml.{Ptolemy, PtolemyContext, PtolemyJson, PtolemyListener}
 import org.scalatest.{MustMatchers, WordSpec}
 
 class TracerSpec extends WordSpec with MustMatchers {
 
+  val json: PtolemyJson = PtolemyJackson.default
+
   "the tracing annotator" should {
     "trace simple IDML" in {
       val p    = new Ptolemy()
-      val a    = new Annotator()
+      val a    = new Annotator(json)
       val ctx  = new PtolemyContext(PtolemyJson.newObject(), PtolemyJson.newObject(), List[PtolemyListener](a))
       val idml = "result = 2 + 2"
       p.fromString(idml).run(ctx)
@@ -17,7 +20,7 @@ class TracerSpec extends WordSpec with MustMatchers {
 
     "trace multi line IDML" in {
       val p   = new Ptolemy()
-      val a   = new Annotator()
+      val a   = new Annotator(json)
       val ctx = new PtolemyContext(PtolemyJson.newObject(), PtolemyJson.newObject(), List[PtolemyListener](a))
       val idml =
         """a = 1
@@ -33,7 +36,7 @@ class TracerSpec extends WordSpec with MustMatchers {
 
     "trace multi section IDML" in {
       val p   = new Ptolemy()
-      val a   = new Annotator()
+      val a   = new Annotator(json)
       val ctx = new PtolemyContext(PtolemyJson.newObject(), PtolemyJson.newObject(), List[PtolemyListener](a))
       val idml =
         """[main]
@@ -51,8 +54,8 @@ class TracerSpec extends WordSpec with MustMatchers {
 
     "cope with input and functions" in {
       val p    = new Ptolemy()
-      val a    = new Annotator()
-      val ctx  = new PtolemyContext(PtolemyJson.parse("""{"a": "hello", "b": "world"}"""), PtolemyJson.newObject(), List[PtolemyListener](a))
+      val a    = new Annotator(json)
+      val ctx  = new PtolemyContext(json.parse("""{"a": "hello", "b": "world"}"""), PtolemyJson.newObject(), List[PtolemyListener](a))
       val idml = """result = "%s %s".format(a, b)"""
       p.fromString(idml).run(ctx)
       a.render(idml) must equal("""result = "%s %s".format(a, b) # "hello world"""")
