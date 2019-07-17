@@ -2,7 +2,7 @@ package io.idmlrepl
 
 import java.io.PrintWriter
 
-import io.idml.jackson.PtolemyJackson
+import io.idml.jackson.IdmlJackson
 import io.idml.{jackson, _}
 import org.scalatest.{BeforeAndAfterAll, FunSpec}
 import org.scalatest.mock.MockitoSugar
@@ -70,8 +70,8 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
     }
   }
 
-  val ptolemy = new Ptolemy(
-    new PtolemyConf,
+  val ptolemy = new Idml(
+    new IdmlConf,
     new FunctionResolverService()
   )
 
@@ -82,40 +82,40 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
     it("should pass the input on for json processing if mode is appropriate") {
       val mockRepl = mock[Repl]
       stub(mockRepl.out).toReturn(mockPrintWriter)
-      when(mockRepl.processInput(any[Ptolemy]())(anyString())).thenCallRealMethod()
+      when(mockRepl.processInput(any[Idml]())(anyString())).thenCallRealMethod()
       stub(mockRepl.mode).toReturn(INPUT_MODE_JSON)
       mockRepl.processInput(ptolemy)(INPUT_JSON)
       verify(mockRepl).processJson(INPUT_JSON)
-      verify(mockRepl, never()).processIdml(any[Ptolemy])(anyString())
-      verify(mockRepl, never()).processSchema(any[Ptolemy])(anyString())
+      verify(mockRepl, never()).processIdml(any[Idml])(anyString())
+      verify(mockRepl, never()).processSchema(any[Idml])(anyString())
     }
 
     it("should pass the input on for IDML processing if mode is appropriate") {
       val mockRepl = mock[Repl]
       stub(mockRepl.out).toReturn(mockPrintWriter)
-      when(mockRepl.processInput(any[Ptolemy])(anyString())).thenCallRealMethod()
+      when(mockRepl.processInput(any[Idml])(anyString())).thenCallRealMethod()
       stub(mockRepl.mode).toReturn(INPUT_MODE_IDML)
       mockRepl.processInput(ptolemy)(INPUT_IDML)
       verify(mockRepl).processIdml(ptolemy)(INPUT_IDML)
       verify(mockRepl, never()).processJson(anyString())
-      verify(mockRepl, never()).processSchema(any[Ptolemy])(anyString())
+      verify(mockRepl, never()).processSchema(any[Idml])(anyString())
     }
 
     it("should pass the input on for schema processing if mode is appropriate") {
       val mockRepl = mock[Repl]
       stub(mockRepl.out).toReturn(mockPrintWriter)
-      when(mockRepl.processInput(any[Ptolemy])(anyString())).thenCallRealMethod()
+      when(mockRepl.processInput(any[Idml])(anyString())).thenCallRealMethod()
       stub(mockRepl.mode).toReturn(INPUT_MODE_SCHEMA)
       mockRepl.processInput(ptolemy)(INPUT_SCHEMA)
       verify(mockRepl).processSchema(ptolemy)(INPUT_SCHEMA)
-      verify(mockRepl, never()).processIdml(any[Ptolemy])(anyString())
+      verify(mockRepl, never()).processIdml(any[Idml])(anyString())
       verify(mockRepl, never()).processJson(anyString())
     }
 
     it("should print out an error if the mode does not match") {
       val mockRepl = mock[Repl]
       stub(mockRepl.out).toReturn(mockPrintWriter)
-      when(mockRepl.processInput(any[Ptolemy])(anyString())).thenCallRealMethod()
+      when(mockRepl.processInput(any[Idml])(anyString())).thenCallRealMethod()
       stub(mockRepl.mode).toReturn(INPUT_MODE_INVALID)
       mockRepl.processInput(ptolemy)(INPUT_JSON)
       verify(mockPrintWriter).println(
@@ -133,9 +133,9 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
       repl.processJson(INPUT_JSON)
 
       assert(
-        repl.doc.get == PtolemyJackson.default
+        repl.doc.get == IdmlJackson.default
           .parse(INPUT_JSON)
-          .asInstanceOf[PtolemyObject])
+          .asInstanceOf[IdmlObject])
       verify(repl.out).println(
         PROCESS_JSON_ACCEPTED
       )
@@ -161,15 +161,15 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
       repl.processJson(INPUT_JSON)
       repl.processIdml(ptolemy)(INPUT_IDML)
       val mapping      = ptolemy.fromString(INPUT_IDML)
-      val expectedJson = PtolemyJackson.default.pretty(mapping.run(repl.doc.get))
+      val expectedJson = IdmlJackson.default.pretty(mapping.run(repl.doc.get))
 
       verify(repl.out).println(expectedJson)
     }
 
     it("should print an error if an exception is thrown whilst processing") {
-      val ptolemy      = new Ptolemy(new PtolemyConf)
+      val ptolemy      = new Idml(new IdmlConf)
       val mapping      = ptolemy.fromString(INPUT_IDML)
-      val expectedJson = PtolemyJackson.default.pretty(mapping.run(repl.doc.get))
+      val expectedJson = IdmlJackson.default.pretty(mapping.run(repl.doc.get))
 
       when(repl.out.println(expectedJson))
         .thenThrow(new RuntimeException(PROCESS_IDML_EXCEPTION))
@@ -185,13 +185,13 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
   describe("processing of schema input") {
 
     it("should construct a mapping string and attempt to parse then print the input if valid") {
-      val ptolemy = new Ptolemy(new PtolemyConf)
+      val ptolemy = new Idml(new IdmlConf)
       val mapping =
         ptolemy.fromString(PROCESS_SCHEMA_EXPECTED_MAPPING + INPUT_SCHEMA)
 
       val repl = new TestRepl()
       repl.processJson(INPUT_JSON)
-      val expectedJson = PtolemyJackson.default.pretty(mapping.run(repl.doc.get))
+      val expectedJson = IdmlJackson.default.pretty(mapping.run(repl.doc.get))
 
       repl.processSchema(ptolemy)(INPUT_SCHEMA)
       verify(repl.out).println(PROCESS_JSON_ACCEPTED)
@@ -199,13 +199,13 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
     }
 
     it("should print an error if an exception is thrown whilst processing") {
-      val ptolemy = new Ptolemy(new PtolemyConf)
+      val ptolemy = new Idml(new IdmlConf)
       val mapping =
         ptolemy.fromString(PROCESS_SCHEMA_EXPECTED_MAPPING + INPUT_SCHEMA)
 
       val repl = new TestRepl()
       repl.processJson(INPUT_JSON)
-      val output = PtolemyJackson.default.pretty(mapping.run(repl.doc.get))
+      val output = IdmlJackson.default.pretty(mapping.run(repl.doc.get))
 
       when(repl.out.println(output))
         .thenThrow(new RuntimeException(PROCESS_SCHEMA_EXCEPTION))

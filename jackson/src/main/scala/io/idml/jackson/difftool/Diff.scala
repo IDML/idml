@@ -1,17 +1,17 @@
 package io.idml.jackson.difftool
 
 import io.idml.datanodes.{PArray, PObject, PString}
-import io.idml.{MissingIndex, PtolemyArray, PtolemyObject, PtolemyValue}
+import io.idml.{IdmlArray, IdmlObject, IdmlValue, MissingIndex}
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
 
 import scala.collection.mutable
 
-/** Compares PtolemyValue objects and creates a diff.
+/** Compares IdmlValue objects and creates a diff.
   *
   * This aims to be similar to the results of a text diff tool except it works on deeply nested object graphs.
   *
-  * In order to do this we introduce a new Diff PtolemyValue type which is equivalent to a json array of the form
+  * In order to do this we introduce a new Diff IdmlValue type which is equivalent to a json array of the form
   * ["__DIFF__", left, right] in each case where the left and right side do not match, or otherwise return the original
   * value if both sides match.
   *
@@ -19,7 +19,7 @@ import scala.collection.mutable
   */
 object Diff {
 
-  val marker: PtolemyValue = PString("__DIFF__")
+  val marker: IdmlValue = PString("__DIFF__")
 
   val mapper: ObjectMapper = new ObjectMapper()
     .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
@@ -30,7 +30,7 @@ object Diff {
   /**
     * Determine if a value is a diff
     */
-  def isDiff(value: PtolemyValue): Boolean = value match {
+  def isDiff(value: IdmlValue): Boolean = value match {
     case PArray(Seq(this.marker, left, right)) => true
     case _                                     => false
   }
@@ -38,14 +38,14 @@ object Diff {
   /**
     * Compare two objects
     */
-  def compareObjects(left: PtolemyObject, right: PtolemyObject): PtolemyValue = {
+  def compareObjects(left: IdmlObject, right: IdmlObject): IdmlValue = {
     if (left == right) {
       left
     } else {
-      val diffs = mutable.SortedMap[String, PtolemyValue]()
+      val diffs = mutable.SortedMap[String, IdmlValue]()
 
       left.fields.foreach {
-        case (k: String, leftValue: PtolemyValue) =>
+        case (k: String, leftValue: IdmlValue) =>
           val rightValue = right.get(k)
           if (leftValue != rightValue) {
             diffs(k) = compare(leftValue, rightValue)
@@ -55,7 +55,7 @@ object Diff {
       }
 
       right.fields.foreach {
-        case (k: String, rightValue: PtolemyValue) =>
+        case (k: String, rightValue: IdmlValue) =>
           val leftValue = left.get(k)
           if (leftValue != rightValue) {
             diffs(k) = compare(leftValue, rightValue)
@@ -71,7 +71,7 @@ object Diff {
   /**
     * Compare two arrays
     */
-  def compareArrays(left: PtolemyArray, right: PtolemyArray): PtolemyValue = {
+  def compareArrays(left: IdmlArray, right: IdmlArray): IdmlValue = {
     if (left == right) {
       left
     } else {
@@ -84,18 +84,18 @@ object Diff {
   /**
     * Compare two values in a tuple
     */
-  def compare(tuple: (PtolemyValue, PtolemyValue)): PtolemyValue = {
+  def compare(tuple: (IdmlValue, IdmlValue)): IdmlValue = {
     compare(tuple._1, tuple._2)
   }
 
   /**
     * Compare two values
     */
-  def compare(left: PtolemyValue, right: PtolemyValue): PtolemyValue = {
+  def compare(left: IdmlValue, right: IdmlValue): IdmlValue = {
     (left, right) match {
-      case (left: PtolemyObject, right: PtolemyObject) =>
+      case (left: IdmlObject, right: IdmlObject) =>
         compareObjects(left, right)
-      case (left: PtolemyArray, right: PtolemyArray) =>
+      case (left: IdmlArray, right: IdmlArray) =>
         compareArrays(left, right)
       case _ if left != right =>
         createDiff(left, right)
@@ -107,17 +107,17 @@ object Diff {
   /**
     * Create a diff marker
     */
-  def createDiff(left: PtolemyValue, right: PtolemyValue): PtolemyValue = {
+  def createDiff(left: IdmlValue, right: IdmlValue): IdmlValue = {
     PArray(marker, left, right)
   }
 
   /** Render a DataNode hierarchy as a pretty-printed json dom */
-  def pretty(left: PtolemyValue, right: PtolemyValue): String = {
+  def pretty(left: IdmlValue, right: IdmlValue): String = {
     pretty(compare(left, right))
   }
 
   /** Render a diff tree */
-  def pretty(result: PtolemyValue): String = {
+  def pretty(result: IdmlValue): String = {
     val writer = mapper.writerWithDefaultPrettyPrinter()
     writer.writeValueAsString(result)
   }

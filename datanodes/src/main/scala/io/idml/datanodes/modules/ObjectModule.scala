@@ -7,19 +7,19 @@ import scala.util.Try
 
 /** Adds object-like behaviour */
 trait ObjectModule {
-  this: PtolemyValue =>
+  this: IdmlValue =>
 
   /** Remove a field by name */
   def remove(path: String) {}
 
-  def values(): PtolemyValue = this match {
-    case o: PtolemyObject => PArray(o.fields.values.toBuffer)
-    case _                => InvalidCaller
+  def values(): IdmlValue = this match {
+    case o: IdmlObject => PArray(o.fields.values.toBuffer)
+    case _             => InvalidCaller
   }
 
-  def keys(): PtolemyValue = this match {
-    case o: PtolemyObject => PArray(o.fields.keys.map(PString.apply).toBuffer[PtolemyValue])
-    case _                => InvalidCaller
+  def keys(): IdmlValue = this match {
+    case o: IdmlObject => PArray(o.fields.keys.map(PString.apply).toBuffer[IdmlValue])
+    case _             => InvalidCaller
   }
 
 }

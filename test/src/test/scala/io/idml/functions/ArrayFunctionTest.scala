@@ -1,7 +1,7 @@
 package io.idml.functions
 
 import io.idml.datanodes.{PArray, PObject}
-import io.idml.{InvalidCaller, PtolemyContext, PtolemyValue}
+import io.idml.{IdmlContext, IdmlValue, InvalidCaller}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{FunSuite, MustMatchers}
@@ -12,15 +12,15 @@ class ArrayFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
   val sizeTwoArray = PArray(PObject(), PObject())
 
   test("Cursor becomes InvalidCaller if the original cursor wasn't an array") {
-    val ctx   = mock[PtolemyContext]
+    val ctx   = mock[IdmlContext]
     val inner = mock[ApplyFunction]
-    when(ctx.cursor).thenReturn(PtolemyValue(10))
+    when(ctx.cursor).thenReturn(IdmlValue(10))
     ArrayFunction(inner).invoke(ctx)
     verify(ctx).cursor_=(InvalidCaller)
   }
 
   test("Cursor becomes an empty array if the original cursor was an array") {
-    val ctx   = mock[PtolemyContext]
+    val ctx   = mock[IdmlContext]
     val inner = mock[ApplyFunction]
     when(ctx.cursor).thenReturn(PArray())
     ArrayFunction(inner).invoke(ctx)
@@ -29,7 +29,7 @@ class ArrayFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
 
   test("Cursor becomes a size-two array if the original cursor was size two") {
     pending
-    val ctx   = mock[PtolemyContext]
+    val ctx   = mock[IdmlContext]
     val inner = mock[ApplyFunction]
     when(ctx.cursor).thenReturn(sizeTwoArray)
     when(ctx.output).thenReturn(PObject())
@@ -39,7 +39,7 @@ class ArrayFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
   }
 
   test("The wrapped block is invoked for each item in the cursor array") {
-    val ctx   = mock[PtolemyContext]
+    val ctx   = mock[IdmlContext]
     val inner = mock[ApplyFunction]
     when(ctx.cursor).thenReturn(sizeTwoArray)
     when(ctx.output).thenReturn(PObject())
@@ -48,7 +48,7 @@ class ArrayFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
   }
 
   test("The original output is preserved") {
-    val ctx      = mock[PtolemyContext]
+    val ctx      = mock[IdmlContext]
     val inner    = mock[ApplyFunction]
     val expected = ctx.output
     when(ctx.cursor).thenReturn(PArray.empty)

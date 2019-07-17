@@ -70,24 +70,24 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
     } yield r.merge
   }
 
-  def runTests[T: Encoder: Decoder: Eq: PtolemyUtils](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(t: Tests[T])(
+  def runTests[T: Encoder: Decoder: Eq: IdmlUtils](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(t: Tests[T])(
       implicit cs: ContextShift[IO]): IO[List[TestState]] =
     for {
       result <- EitherT(resolve(path, t).attempt)
                  .flatMap { resolved =>
                    resolved.traverse { t =>
-                     EitherT.fromEither[IO](PtolemyUtils[T].validate(t))
+                     EitherT.fromEither[IO](IdmlUtils[T].validate(t))
                    }
                  }
                  .semiflatMap { resolved =>
                    resolved
                      .filter(patternToFilter(filter).compose(_.name))
-                     .parTraverse(r => PtolemyUtils[T].run(implicitly)(r.time, r.code, r.input).tupleLeft(r))
+                     .parTraverse(r => IdmlUtils[T].run(implicitly)(r.time, r.code, r.input).tupleLeft(r))
                  }
                  .map {
                    _.map {
                      case (resolved, output) =>
-                       PtolemyUtils[T].inspectOutput(resolved, output, if (jdiff) { (j1: Json, j2: Json) =>
+                       IdmlUtils[T].inspectOutput(resolved, output, if (jdiff) { (j1: Json, j2: Json) =>
                          JsonDiff.simpleDiff(j1, j2, true).toString()
                        } else { (j1: Json, j2: Json) =>
                          TestDiff.generateDiff(j1, j2)
@@ -126,7 +126,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
   }
 
   def updateTests[T: Encoder: Decoder: Eq](failedOnly: Boolean, filter: Option[Pattern] = None)(path: Path)(
-      test: Tests[T])(implicit runner: PtolemyUtils[T], cs: ContextShift[IO]): IO[List[TestState]] =
+      test: Tests[T])(implicit runner: IdmlUtils[T], cs: ContextShift[IO]): IO[List[TestState]] =
     for {
       updatable <- updateResolve(path, test).attempt
       result <- updatable.bitraverse(

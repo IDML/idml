@@ -5,57 +5,57 @@ import io.idml.datanodes.{PBool, PFalse, PTrue}
 import io.idml.{
   CastUnsupported,
   FailedRequirement,
-  PtolemyArray,
-  PtolemyBool,
-  PtolemyDouble,
-  PtolemyInt,
-  PtolemyNothing,
-  PtolemyNull,
-  PtolemyObject,
-  PtolemyString,
-  PtolemyValue
+  IdmlArray,
+  IdmlBool,
+  IdmlDouble,
+  IdmlInt,
+  IdmlNothing,
+  IdmlNull,
+  IdmlObject,
+  IdmlString,
+  IdmlValue
 }
 
 /** This trait adds basic schema functions */
 trait SchemaModule {
-  this: PtolemyValue =>
+  this: IdmlValue =>
 
   // scalastyle:off method.name
   /** Transform this field into an object */
-  def `object`(): PtolemyValue = this match {
-    case _: PtolemyObject | _: PtolemyNothing => this
-    case _                                    => CastUnsupported
+  def `object`(): IdmlValue = this match {
+    case _: IdmlObject | _: IdmlNothing => this
+    case _                              => CastUnsupported
   }
   // scalastyle:on method.name
 
   /** Transform this field into a floating-point number */
-  def float(): PtolemyValue = this match {
-    case _: PtolemyDouble | _: PtolemyNothing => this
-    case _                                    => CastUnsupported
+  def float(): IdmlValue = this match {
+    case _: IdmlDouble | _: IdmlNothing => this
+    case _                              => CastUnsupported
   }
 
   /** Transform this field into a natural number */
-  def int(): PtolemyValue = this match {
-    case _: PtolemyInt | _: PtolemyNothing => this
-    case _                                 => CastUnsupported
+  def int(): IdmlValue = this match {
+    case _: IdmlInt | _: IdmlNothing => this
+    case _                           => CastUnsupported
   }
 
   /** Transform this field into a boolean */
-  def bool(): PtolemyValue = this match {
-    case _: PtolemyBool | _: PtolemyNothing => this
-    case _                                  => CastUnsupported
+  def bool(): IdmlValue = this match {
+    case _: IdmlBool | _: IdmlNothing => this
+    case _                            => CastUnsupported
   }
 
   /** Transform this field into a float */
-  def double(): PtolemyValue = this match {
-    case _: PtolemyDouble | _: PtolemyNothing => this
-    case _                                    => CastUnsupported
+  def double(): IdmlValue = this match {
+    case _: IdmlDouble | _: IdmlNothing => this
+    case _                              => CastUnsupported
   }
 
   /** Transform this field into an array */
-  def array(): PtolemyValue = this match {
-    case _: PtolemyArray | _: PtolemyNothing => this
-    case _                                   => CastUnsupported
+  def array(): IdmlValue = this match {
+    case _: IdmlArray | _: IdmlNothing => this
+    case _                             => CastUnsupported
   }
 
   /** Extract the underlying float value for this node if it has one, otherwise return a default */
@@ -95,7 +95,7 @@ trait SchemaModule {
   def toStringOption: Option[String] = None
 
   /** Iterate over the sub-components of this node */
-  def iterator: Iterator[PtolemyValue] = Iterator.empty
+  def iterator: Iterator[IdmlValue] = Iterator.empty
 
   /** Is this true? */
   def isTrue: PBool = PBool(isTrueValue)
@@ -113,53 +113,53 @@ trait SchemaModule {
   def isNull: PBool = PBool(isNullValue)
 
   /** Is this value null? */
-  def isNullValue: Boolean = this == PtolemyNull
+  def isNullValue: Boolean = this == IdmlNull
 
   /** Is this value nothing? */
   def isNothing: PBool = PBool(isNothingValue)
 
   /** Is this value nothing? */
-  def isNothingValue: Boolean = isInstanceOf[PtolemyNothing]
+  def isNothingValue: Boolean = isInstanceOf[IdmlNothing]
 
   /** Is this a string? */
   def isString: PBool = PBool(isStringValue)
 
   /** Is this a string? */
-  def isStringValue: Boolean = isInstanceOf[PtolemyString]
+  def isStringValue: Boolean = isInstanceOf[IdmlString]
 
   /** Is this an int? */
-  def isInt: PBool = PBool(this.isInstanceOf[PtolemyInt])
+  def isInt: PBool = PBool(this.isInstanceOf[IdmlInt])
 
   /** Is this an array? */
-  def isArray: PBool = PBool(this.isInstanceOf[PtolemyArray])
+  def isArray: PBool = PBool(this.isInstanceOf[IdmlArray])
 
   /** Is this an object? */
-  def isObject: PBool = PBool(this.isInstanceOf[PtolemyObject])
+  def isObject: PBool = PBool(this.isInstanceOf[IdmlObject])
 
   /** Is this a float? */
-  def isFloat: PBool = PBool(this.isInstanceOf[PtolemyDouble])
+  def isFloat: PBool = PBool(this.isInstanceOf[IdmlDouble])
 
   /** This is a form of type coercion similar to php's empty(..) function; false, null, missing
     * values, empty arrays and objects all return true for isEmpty */
   def isEmpty: PBool = PBool(isFalseValue || isNullValue || isNothingValue)
 
   /** Annotate any missing fields. This is useful later on for processes like schema matching */
-  def required(): PtolemyValue = this match {
-    case reason: PtolemyNothing => FailedRequirement(reason)
-    case success: Any           => success
+  def required(): IdmlValue = this match {
+    case reason: IdmlNothing => FailedRequirement(reason)
+    case success: Any        => success
   }
 
   /** If the value is missing then use a default value instead */
-  def default(value: PtolemyValue): PtolemyValue =
+  def default(value: IdmlValue): IdmlValue =
     if (this.isNothing || this.isNull) value else this
 
   /* alias for default */
-  def orElse(value: PtolemyValue): PtolemyValue = this.default(value)
+  def orElse(value: IdmlValue): IdmlValue = this.default(value)
 
   /** Create a new version of this object that can be safely modified by other callers */
-  def deepCopy: PtolemyValue = this
+  def deepCopy: IdmlValue = this
 
   /** Convert to Json */
-  //def json: String = PtolemyJson.compact(this)
+  //def json: String = IdmlJson.compact(this)
 }
 // scalastyle:on number.of.methods

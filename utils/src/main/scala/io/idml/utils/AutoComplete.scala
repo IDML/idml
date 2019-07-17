@@ -2,24 +2,24 @@ package io.idml.utils
 
 import io.idml.datanodes.PObject
 import io.idml._
-import io.idml.ast.{Argument, Pipeline, PtolemyFunction, PtolemyFunctionMetadata}
+import io.idml.ast.{Argument, IdmlFunction, IdmlFunctionMetadata, Pipeline}
 import io.idml.functions.FunctionResolver
 
 import scala.collection.mutable
 
 object AutoComplete {
 
-  def complete(ptolemy: Ptolemy)(doc: PtolemyObject, document: String, cursor: Int) = {
+  def complete(ptolemy: Idml)(doc: IdmlObject, document: String, cursor: Int) = {
     val newdoc = document.slice(0, cursor) + "analyse()" + document.slice(cursor, document.length)
-    val ctx    = new PtolemyContext()
-    ctx.state.put(AnalyseFunction.AnalysisState, mutable.Buffer[PtolemyValue]())
+    val ctx    = new IdmlContext()
+    ctx.state.put(AnalyseFunction.AnalysisState, mutable.Buffer[IdmlValue]())
     ctx.input = doc
     ctx.scope = doc
     ptolemy.fromString(newdoc).run(ctx)
     ctx.state
       .get(AnalyseFunction.AnalysisState)
-      .asInstanceOf[Option[mutable.Buffer[PtolemyValue]]]
-      .getOrElse(mutable.Buffer.empty[PtolemyValue])
+      .asInstanceOf[Option[mutable.Buffer[IdmlValue]]]
+      .getOrElse(mutable.Buffer.empty[IdmlValue])
       .toList
       .flatMap {
         case o: PObject =>
@@ -32,20 +32,20 @@ object AutoComplete {
 }
 
 class AnalysisModule extends FunctionResolver {
-  override def providedFunctions(): List[PtolemyFunctionMetadata] = List.empty // we don't reveal this module to discoverability
-  override def resolve(name: String, args: List[Argument]): Option[PtolemyFunction] = (name, args) match {
+  override def providedFunctions(): List[IdmlFunctionMetadata] = List.empty // we don't reveal this module to discoverability
+  override def resolve(name: String, args: List[Argument]): Option[IdmlFunction] = (name, args) match {
     case ("analyse", Nil) => Some(AnalyseFunction)
     case _                => None
   }
 }
 
-object AnalyseFunction extends PtolemyFunction {
+object AnalyseFunction extends IdmlFunction {
   case object AnalysisState
 
   override def name: String = "analyse"
-  override def invoke(ctx: PtolemyContext): Unit = {
-    List(ctx.cursor, ctx.scope, ctx.input).find(_ != PtolemyNull).foreach { r =>
-      ctx.state.get(AnalysisState).get.asInstanceOf[mutable.Buffer[PtolemyValue]].append(r.deepCopy)
+  override def invoke(ctx: IdmlContext): Unit = {
+    List(ctx.cursor, ctx.scope, ctx.input).find(_ != IdmlNull).foreach { r =>
+      ctx.state.get(AnalysisState).get.asInstanceOf[mutable.Buffer[IdmlValue]].append(r.deepCopy)
     }
   }
   override def args: List[Pipeline] = List.empty

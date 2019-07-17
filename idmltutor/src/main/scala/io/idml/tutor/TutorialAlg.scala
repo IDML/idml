@@ -6,7 +6,7 @@ import cats.implicits._
 import cats.effect._
 import cats.effect.implicits._
 import fansi._
-import io.idml.{Ptolemy, PtolemyValue}
+import io.idml.{Idml, IdmlValue}
 import Colours._
 import io.idml.test.diffable.TestDiff
 import io.circe._, io.circe.syntax._
@@ -32,13 +32,13 @@ class TutorialAlg[F[_]](jline: JLine[F])(implicit F: Sync[F]) {
   def exerciseMulti(body: String, pairs: List[(Json, Json)], multiline: Boolean = false): F[Unit] =
     for {
       ptolemy <- F.delay {
-                  new Ptolemy()
+                  new Idml()
                 }
       pvs = pairs.map {
         case (k, v) =>
           (
-            k.as[PtolemyValue].toOption.get,
-            v.as[PtolemyValue].toOption.get
+            k.as[IdmlValue].toOption.get,
+            v.as[IdmlValue].toOption.get
           )
       }
       rendered = pairs.map {

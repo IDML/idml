@@ -10,7 +10,7 @@ import io.circe._
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.Printer.spaces2
-import io.idml.circe.PtolemyCirce
+import io.idml.circe.IdmlCirce
 import io.idml.circe.instances._
 import io.idml._
 import fs2._
@@ -22,23 +22,23 @@ class UnbalancedMultiTest(s: String) extends Throwable(s)
 
 class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends TestUtils[IO] {
 
-  def ptolemy(time: Option[Long]): IO[Ptolemy] = IO {
+  def ptolemy(time: Option[Long]): IO[Idml] = IO {
     val baseFunctionResolver =
       new StaticFunctionResolverService(
-        (new DeterministicTime(time.getOrElse(0L)) :: StaticFunctionResolverService.defaults(PtolemyCirce).asScala.toList).asJava)
+        (new DeterministicTime(time.getOrElse(0L)) :: StaticFunctionResolverService.defaults(IdmlCirce).asScala.toList).asJava)
     val frs = plugins.fold[FunctionResolverService](
       baseFunctionResolver
     )(
       urls => FunctionResolverService.orElse(baseFunctionResolver, new PluginFunctionResolverService(urls.toList.toArray)),
     )
-    new Ptolemy(
-      new PtolemyConf(),
+    new Idml(
+      new IdmlConf(),
       if (dynamic) frs.orElse(new FunctionResolverService())
       else frs
     )
   }
 
-  def run[T, O](f: (PtolemyMapping, T) => IO[O])(time: Option[Long], code: String, input: T): IO[O] =
+  def run[T, O](f: (IdmlMapping, T) => IO[O])(time: Option[Long], code: String, input: T): IO[O] =
     for {
       p <- ptolemy(time.map(_ * 1000))
       m <- IO { p.fromString(code) }
@@ -46,17 +46,17 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
     } yield r
 
   def runSingle: (Option[Long], String, Json) => IO[Json] =
-    run({ (m: PtolemyMapping, j: Json) =>
+    run({ (m: IdmlMapping, j: Json) =>
       IO {
-        j.as[PtolemyObject].map(m.run).map(_.asJson.foldWith(notNulls)).leftWiden[Throwable]
+        j.as[IdmlObject].map(m.run).map(_.asJson.foldWith(notNulls)).leftWiden[Throwable]
       }.rethrow
     })
 
   def runMulti(implicit timer: ContextShift[IO]): (Option[Long], String, List[Json]) => IO[List[Json]] =
-    run({ (m: PtolemyMapping, js: List[Json]) =>
+    run({ (m: IdmlMapping, js: List[Json]) =>
       js.parTraverse { j =>
         IO {
-          j.as[PtolemyObject].map(m.run).map(_.asJson.foldWith(notNulls)).leftWiden[Throwable]
+          j.as[IdmlObject].map(m.run).map(_.asJson.foldWith(notNulls)).leftWiden[Throwable]
         }.rethrow
       }
     })
@@ -76,16 +76,16 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
 
   case class DifferentOutput(name: String, diff: String)
 
-  trait PtolemyUtils[T] {
+  trait IdmlUtils[T] {
     def run(implicit timer: ContextShift[IO]): (Option[Long], String, T) => IO[T]
     def toString(t: T): String
     def validate(t: ResolvedTest[T]): Either[Throwable, ResolvedTest[T]]
     def inspectOutput(resolved: ResolvedTest[T], output: T, diff: (Json, Json) => String): List[Either[DifferentOutput, String]]
   }
-  object PtolemyUtils {
-    def apply[T: PtolemyUtils]: PtolemyUtils[T] = implicitly
+  object IdmlUtils {
+    def apply[T: IdmlUtils]: IdmlUtils[T] = implicitly
   }
-  implicit val singlePtolemyRun = new PtolemyUtils[Json] {
+  implicit val singleIdmlRun = new IdmlUtils[Json] {
     override def run(implicit timer: ContextShift[IO]) = runSingle
     override def toString(t: Json)                     = spaces2butDropNulls.pretty(t)
     override def validate(t: ResolvedTest[Json])       = Right(t)
@@ -100,7 +100,7 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
         ))
 
   }
-  implicit val multiPtolemyRun = new PtolemyUtils[List[Json]] {
+  implicit val multiIdmlRun = new IdmlUtils[List[Json]] {
     override def run(implicit timer: ContextShift[IO]) = runMulti
     override def toString(t: List[Json])               = spaces2butDropNulls.pretty(Json.arr(t: _*))
     override def validate(t: ResolvedTest[List[Json]]) = Either.cond(

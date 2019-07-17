@@ -3,10 +3,10 @@ package io.idml.jackson
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.{JsonSerializer, ObjectMapper, SerializerProvider}
-import io.idml.PtolemyMapping
+import io.idml.IdmlMapping
 import io.idml.ast._
 import io.idml.datanodes.{PBool, PDouble, PInt, PString}
-import io.idml.functions.{ArrayFunction, PtolemyFunction0, PtolemyValueFunction, SetSizeFunction}
+import io.idml.functions.{ArrayFunction, IdmlFunction0, IdmlValueFunction, SetSizeFunction}
 import org.json4s.jackson.Json4sScalaModule
 
 /**
@@ -14,27 +14,27 @@ import org.json4s.jackson.Json4sScalaModule
   */
 object JsonAstGenerator {
   val OM = new ObjectMapper()
-  OM.registerModule(PtolemyAstSerializers.ptolemyAstModule)
+  OM.registerModule(IdmlAstSerializers.ptolemyAstModule)
   OM.registerModule(Json4sScalaModule)
 
   /**
-    * Turn a parsed PtolemyMapping into a JSON string
+    * Turn a parsed IdmlMapping into a JSON string
     * @param p
     * @return
     */
-  def generateJson(p: PtolemyMapping): String = {
+  def generateJson(p: IdmlMapping): String = {
     OM.writeValueAsString(p)
   }
 
   /**
-    * Implicit extension to PtolemyMapping to provide .toJson
+    * Implicit extension to IdmlMapping to provide .toJson
     * Usage:
     *  import io.idml.jackson.JsonAstGenerator._
     *  ...
     *  ptolemy.fromString("foo = bar").toJson
     * @param m mapping to wrap
     */
-  implicit class SerializablePtolemyMapping(m: PtolemyMapping) {
+  implicit class SerializableIdmlMapping(m: IdmlMapping) {
     def toJson: String = generateJson(m)
   }
 }
@@ -42,21 +42,21 @@ object JsonAstGenerator {
 /**
   * Implements serializes that are capable of turning a parsed IDML document into a JSON representation
   */
-object PtolemyAstSerializers {
-  val ptolemyAstModule: SimpleModule = new SimpleModule("PtolemyAst")
+object IdmlAstSerializers {
+  val ptolemyAstModule: SimpleModule = new SimpleModule("IdmlAst")
 
-  class PtolemyMappingSerializer extends JsonSerializer[PtolemyMapping] {
-    override def serialize(m: PtolemyMapping, jgen: JsonGenerator, sp: SerializerProvider): Unit = {
+  class IdmlMappingSerializer extends JsonSerializer[IdmlMapping] {
+    override def serialize(m: IdmlMapping, jgen: JsonGenerator, sp: SerializerProvider): Unit = {
       m.nodes.blocks.filter(_._1 == "main").foreach { kv =>
         val (name, block) = kv
         jgen.writeObject(block)
       }
     }
-    override def handledType(): Class[PtolemyMapping] = classOf[PtolemyMapping]
+    override def handledType(): Class[IdmlMapping] = classOf[IdmlMapping]
   }
-  ptolemyAstModule.addSerializer(new PtolemyAstSerializers.PtolemyMappingSerializer)
+  ptolemyAstModule.addSerializer(new IdmlAstSerializers.IdmlMappingSerializer)
 
-  class PtolemyBlockSerializer extends JsonSerializer[Block] {
+  class IdmlBlockSerializer extends JsonSerializer[Block] {
     override def serialize(b: Block, jgen: JsonGenerator, sp: SerializerProvider): Unit = {
       jgen.writeStartArray()
       b.rules.foreach { r =>
@@ -77,25 +77,25 @@ object PtolemyAstSerializers {
     }
     override def handledType(): Class[Block] = classOf[Block]
   }
-  ptolemyAstModule.addSerializer(new PtolemyAstSerializers.PtolemyBlockSerializer)
+  ptolemyAstModule.addSerializer(new IdmlAstSerializers.IdmlBlockSerializer)
 
-  class PtolemyPipelineSerializer extends JsonSerializer[Pipeline] {
+  class IdmlPipelineSerializer extends JsonSerializer[Pipeline] {
     private val TYPEFUNCTIONS =
       Set("int", "string", "geo", "bool", "date", "url")
 
     private def findFunction(p: Pipeline): Option[String] = {
       p.exps
-        .find(_.isInstanceOf[PtolemyFunction])
-        .map(_.asInstanceOf[PtolemyFunction].name)
+        .find(_.isInstanceOf[IdmlFunction])
+        .map(_.asInstanceOf[IdmlFunction].name)
     }
 
     override def serialize(p: Pipeline, jgen: JsonGenerator, sp: SerializerProvider): Unit = {
       p.exps.foreach {
-        case vf: PtolemyValueFunction if TYPEFUNCTIONS.contains(vf.name) =>
+        case vf: IdmlValueFunction if TYPEFUNCTIONS.contains(vf.name) =>
           jgen.writeObjectField("type", vf.name)
-        case vf: PtolemyFunction0 if TYPEFUNCTIONS.contains(vf.name) =>
+        case vf: IdmlFunction0 if TYPEFUNCTIONS.contains(vf.name) =>
           jgen.writeObjectField("type", vf.name)
-        case vf: PtolemyValueFunction =>
+        case vf: IdmlValueFunction =>
           ptolemyValueFunction(jgen, sp, vf)
         case ssf: SetSizeFunction => // the size function doesn't work like anything else, so it's got a special case
           jgen.writeObjectField(ssf.name, ssf.arg)
@@ -108,7 +108,7 @@ object PtolemyAstSerializers {
       }
     }
 
-    private def ptolemyValueFunction(jgen: JsonGenerator, sp: SerializerProvider, vf: PtolemyValueFunction): Unit = {
+    private def ptolemyValueFunction(jgen: JsonGenerator, sp: SerializerProvider, vf: IdmlValueFunction): Unit = {
       vf.args.length match {
         case l: Any if l == 0 =>
           jgen.writeObjectField(vf.name, true)
@@ -147,5 +147,5 @@ object PtolemyAstSerializers {
     override def handledType(): Class[Pipeline] = classOf[Pipeline]
   }
 
-  ptolemyAstModule.addSerializer(new PtolemyAstSerializers.PtolemyPipelineSerializer)
+  ptolemyAstModule.addSerializer(new IdmlAstSerializers.IdmlPipelineSerializer)
 }

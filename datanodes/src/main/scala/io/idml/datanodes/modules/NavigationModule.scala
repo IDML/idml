@@ -5,22 +5,22 @@ import io.idml._
 import scala.annotation.tailrec
 
 trait NavigationModule {
-  this: PtolemyValue =>
+  this: IdmlValue =>
 
   /** It's possible to get an item by its index */
-  def get(index: Int): PtolemyValue = NoIndex
+  def get(index: Int): IdmlValue = NoIndex
 
   /** Fetch a field by name */
-  def get(name: String): PtolemyValue = NoFields
+  def get(name: String): IdmlValue = NoFields
 
   /** It's possible to get an item by its index or field name */
-  def get(index: PtolemyValue): PtolemyValue = index match {
-    case str: PtolemyString => get(str.toStringValue)
-    case int: PtolemyInt    => get(int.toIntValue)
-    case _                  => InvalidParameters
+  def get(index: IdmlValue): IdmlValue = index match {
+    case str: IdmlString => get(str.toStringValue)
+    case int: IdmlInt    => get(int.toIntValue)
+    case _               => InvalidParameters
   }
 
-  def deleted(): PtolemyValue = Deleted
+  def deleted(): IdmlValue = Deleted
 
   /** Nested path removal. Will leave empty arrays and objects lingering */
   @tailrec
@@ -49,13 +49,13 @@ trait NavigationModule {
   }
 
   /** It's possible to slice a range of values by index */
-  def slice(from: Option[Int], to: Option[Int]): PtolemyValue = NoIndex
+  def slice(from: Option[Int], to: Option[Int]): IdmlValue = NoIndex
 
   /** Slice can be called by users */
-  def slice(from: PtolemyValue, to: PtolemyValue): PtolemyValue =
+  def slice(from: IdmlValue, to: IdmlValue): IdmlValue =
     slice(from.toIntOption, to.toIntOption)
 
   /** Find the index of an item */
-  def indexOf(value: PtolemyValue): PtolemyValue = NoIndex
+  def indexOf(value: IdmlValue): IdmlValue = NoIndex
 
 }

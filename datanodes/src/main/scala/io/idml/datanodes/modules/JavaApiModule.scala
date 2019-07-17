@@ -3,13 +3,13 @@ package io.idml.datanodes.modules
 import java.util.Optional
 import java.lang._
 
-import io.idml.PtolemyValue
+import io.idml.IdmlValue
 import io.idml.datanodes.{PArray, PBool, PDouble, PInt, PObject, PString}
 
 import scala.collection.JavaConverters._
 
 trait JavaApiModule {
-  this: PtolemyValue =>
+  this: IdmlValue =>
 
   def asBoolean(): Optional[Boolean] = this match {
     case b: PBool => Optional.of(b.value.asInstanceOf[java.lang.Boolean])
@@ -31,14 +31,14 @@ trait JavaApiModule {
     case _          => Optional.empty[java.lang.Double]
   }
 
-  def asObject(): Optional[java.util.Map[String, PtolemyValue]] = this match {
+  def asObject(): Optional[java.util.Map[String, IdmlValue]] = this match {
     case o: PObject => Optional.of(o.fields.asJava)
-    case _          => Optional.empty[java.util.Map[String, PtolemyValue]]
+    case _          => Optional.empty[java.util.Map[String, IdmlValue]]
   }
 
-  def asList(): Optional[java.util.List[PtolemyValue]] = this match {
+  def asList(): Optional[java.util.List[IdmlValue]] = this match {
     case a: PArray => Optional.of(a.items.asJava)
-    case _         => Optional.empty[java.util.List[PtolemyValue]]
+    case _         => Optional.empty[java.util.List[IdmlValue]]
   }
 
 }

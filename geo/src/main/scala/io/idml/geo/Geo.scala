@@ -1,17 +1,17 @@
 package io.idml.geo
 
 import io.idml.datanodes.CompositeValue
-import io.idml.{CastFailed, PtolemyDouble, PtolemyObject, PtolemyValue}
+import io.idml.{CastFailed, IdmlDouble, IdmlObject, IdmlValue}
 
 import scala.collection.mutable
 
 /** A geo-tag object */
-case class Geo(lat: Double, long: Double) extends PtolemyObject with CompositeValue {
+case class Geo(lat: Double, long: Double) extends IdmlObject with CompositeValue {
 
   /** The fields */
   val fields = mutable.SortedMap(
-    "latitude"  -> PtolemyValue(lat),
-    "longitude" -> PtolemyValue(long)
+    "latitude"  -> IdmlValue(lat),
+    "longitude" -> IdmlValue(long)
   )
 }
 
@@ -19,9 +19,9 @@ case class Geo(lat: Double, long: Double) extends PtolemyObject with CompositeVa
 object Geo {
 
   /** Transform arbitrary nodes into geo-tags */
-  def apply(lat: PtolemyValue, long: PtolemyValue): PtolemyValue =
+  def apply(lat: IdmlValue, long: IdmlValue): IdmlValue =
     (lat, long) match {
-      case (lat: PtolemyDouble, long: PtolemyDouble) =>
+      case (lat: IdmlDouble, long: IdmlDouble) =>
         Geo(lat.value, long.value)
       case _ => CastFailed
     }

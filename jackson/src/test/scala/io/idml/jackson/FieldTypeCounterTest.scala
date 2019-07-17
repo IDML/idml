@@ -1,12 +1,12 @@
 package io.idml.jackson
 
-import io.idml.{FieldTypeCounter, PtolemyValue}
+import io.idml.{FieldTypeCounter, IdmlValue}
 import org.scalatest.FunSuite
 
 class FieldTypeCounterTest extends FunSuite {
 
-  implicit def str2json(str: String): PtolemyValue = {
-    PtolemyJackson.default.parse(str)
+  implicit def str2json(str: String): IdmlValue = {
+    IdmlJackson.default.parse(str)
   }
 
   test("counts top-level bools") {

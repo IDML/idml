@@ -4,7 +4,7 @@ import io.idml.datanodes.PInt
 import org.scalatest.{FunSuite, MustMatchers}
 
 class IntParsingSpec extends FunSuite with MustMatchers {
-  import PtolemyJackson.default._
+  import IdmlJackson.default._
 
   // Parsing
   test("parse(int min)")(parse(Int.MinValue.toString) === PInt(Int.MinValue))

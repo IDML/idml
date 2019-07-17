@@ -1,7 +1,7 @@
 package io.idml.jackson.serder
 
 import io.idml.datanodes.{PArray, PDouble, PFalse, PInt, PObject, PString, PTrue}
-import io.idml.{PtolemyNull, PtolemyValue}
+import io.idml.{IdmlNull, IdmlValue}
 import com.fasterxml.jackson.core.{JsonParser, JsonToken}
 import com.fasterxml.jackson.databind.`type`.TypeFactory
 import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer}
@@ -17,7 +17,7 @@ class PValueDeserializer(factory: TypeFactory, klass: Class[_]) extends JsonDese
     // scalastyle:on null
 
     val value = jp.getCurrentToken match {
-      case JsonToken.VALUE_NULL         => PtolemyNull
+      case JsonToken.VALUE_NULL         => IdmlNull
       case JsonToken.VALUE_NUMBER_INT   => new PInt(jp.getLongValue)
       case JsonToken.VALUE_NUMBER_FLOAT => new PDouble(jp.getValueAsDouble)
       case JsonToken.VALUE_STRING       => new PString(jp.getText)
@@ -33,7 +33,7 @@ class PValueDeserializer(factory: TypeFactory, klass: Class[_]) extends JsonDese
       case JsonToken.FIELD_NAME | JsonToken.END_OBJECT =>
         fieldNameOrEndObject(jp, ctxt)
 
-      case _ => throw ctxt.mappingException(classOf[PtolemyValue])
+      case _ => throw ctxt.mappingException(classOf[IdmlValue])
     }
 
     if (!klass.isAssignableFrom(value.getClass))
@@ -48,21 +48,21 @@ class PValueDeserializer(factory: TypeFactory, klass: Class[_]) extends JsonDese
   }
 
   def startArray(jp: JsonParser, ctxt: DeserializationContext): PArray = {
-    val values = mutable.Buffer[PtolemyValue]()
+    val values = mutable.Buffer[IdmlValue]()
     jp.nextToken()
     while (jp.getCurrentToken != JsonToken.END_ARRAY) {
-      values += deserialize(jp, ctxt).asInstanceOf[PtolemyValue]
+      values += deserialize(jp, ctxt).asInstanceOf[IdmlValue]
       jp.nextToken()
     }
     new PArray(values)
   }
 
   def fieldNameOrEndObject(jp: JsonParser, ctxt: DeserializationContext): PObject = {
-    val fields = mutable.SortedMap[String, PtolemyValue]()
+    val fields = mutable.SortedMap[String, IdmlValue]()
     while (jp.getCurrentToken != JsonToken.END_OBJECT) {
       val name = jp.getCurrentName
       jp.nextToken()
-      fields.put(name, deserialize(jp, ctxt).asInstanceOf[PtolemyValue])
+      fields.put(name, deserialize(jp, ctxt).asInstanceOf[IdmlValue])
       jp.nextToken()
     }
     new PObject(fields)
@@ -70,8 +70,8 @@ class PValueDeserializer(factory: TypeFactory, klass: Class[_]) extends JsonDese
 
   override def isCachable: Boolean = true
 
-  override def getNullValue: Object = PtolemyNull
+  override def getNullValue: Object = IdmlNull
 
   // TODO Need to fully investigate this
-  override def getEmptyValue: Object = PtolemyNull
+  override def getEmptyValue: Object = IdmlNull
 }

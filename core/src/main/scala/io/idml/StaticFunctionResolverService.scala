@@ -2,15 +2,15 @@ package io.idml
 
 import java.util
 
-import io.idml.ast.{Argument, Pipeline, PtolemyFunction}
+import io.idml.ast.{Argument, IdmlFunction, Pipeline}
 import io.idml.functions.json.JsonFunctions
-import io.idml.functions.{BuiltinFunctionResolver, FunctionResolver, PtolemyValueFunctionResolver, PtolemyValueNaryFunctionResolver}
+import io.idml.functions.{BuiltinFunctionResolver, FunctionResolver, IdmlValueFunctionResolver, IdmlValueNaryFunctionResolver}
 
 import scala.collection.JavaConverters._
 
 object StaticFunctionResolverService {
-  def defaults(json: PtolemyJson): util.List[FunctionResolver] =
-    List(new JsonFunctions(json), new BuiltinFunctionResolver, new PtolemyValueFunctionResolver, new PtolemyValueNaryFunctionResolver).asJava
+  def defaults(json: IdmlJson): util.List[FunctionResolver] =
+    List(new JsonFunctions(json), new BuiltinFunctionResolver, new IdmlValueFunctionResolver, new IdmlValueNaryFunctionResolver).asJava
 }
 
 class StaticFunctionResolverService(rs: java.util.List[FunctionResolver]) extends FunctionResolverService {
@@ -23,9 +23,9 @@ class StaticFunctionResolverService(rs: java.util.List[FunctionResolver]) extend
     * @param args The executable arguments list
     * @return The new function
     */
-  override def resolve(name: String, args: List[Argument]): PtolemyFunction = {
-    var result: Option[PtolemyFunction] = None
-    val resolvers                       = srs.toIterator
+  override def resolve(name: String, args: List[Argument]): IdmlFunction = {
+    var result: Option[IdmlFunction] = None
+    val resolvers                    = srs.toIterator
     if (!resolvers.hasNext) {
       throw new NoFunctionResolversLoadedException("""There are no function resolvers loaded.
           | Without function resolvers it's impossible to use any functions in mappings.

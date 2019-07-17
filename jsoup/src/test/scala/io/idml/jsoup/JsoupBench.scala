@@ -1,5 +1,5 @@
 package io.idml.jsoup
 
-import io.idml.PtolemyScalaMeterBase
+import io.idml.IdmlScalaMeterBase
 
-object JsoupBench extends PtolemyScalaMeterBase("tests")
+object JsoupBench extends IdmlScalaMeterBase("tests")

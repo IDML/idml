@@ -1,6 +1,6 @@
 package io.idml.json
 
-import io.idml.{Ptolemy, PtolemyJson, PtolemyValue}
+import io.idml.{Idml, IdmlJson, IdmlValue}
 import io.idml.datanodes._
 import io.idml.functions.json.JsonFunctions
 import org.scalatest.{MustMatchers, WordSpec}
@@ -14,7 +14,7 @@ class JsonFunctionSuite(name: String, jf: JsonFunctions) extends WordSpec with M
       jf.obj.parseJson(PString("""{"v":123}""")) must equal(PObject("v" -> PInt(123)))
     }
     "be loaded automatically" in {
-      val p       = new Ptolemy()
+      val p       = new Idml()
       val program = p.fromString("""
           |uuid3 = root.uuid3()
           |uuid5 = root.uuid5()
@@ -23,7 +23,7 @@ class JsonFunctionSuite(name: String, jf: JsonFunctions) extends WordSpec with M
           |number = root.random()
           |anotherNumber = root.random(1, 100)
           |""".stripMargin)
-      val result  = program.run(PObject("hello" -> PtolemyValue("world"), "js" -> PString("{\"hello\": \"world\"}")))
+      val result  = program.run(PObject("hello" -> IdmlValue("world"), "js" -> PString("{\"hello\": \"world\"}")))
       result must equal(
         PObject(
           "alsoObject"    -> PString("""{"v":123}"""),

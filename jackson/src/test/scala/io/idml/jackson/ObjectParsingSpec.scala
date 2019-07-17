@@ -1,13 +1,13 @@
 package io.idml.jackson
 
-import io.idml.{PtolemyNull, PtolemyValue}
+import io.idml.{IdmlNull, IdmlValue}
 import io.idml.datanodes.{PArray, PInt, PObject, PString}
 import org.scalatest.{FunSuite, MustMatchers}
 
 import scala.collection.mutable
 
 class ObjectParsingSpec extends FunSuite with MustMatchers {
-  import PtolemyJackson.default._
+  import IdmlJackson.default._
 
   // Parsing
   test("parse empty")(parse("{}") must equal(PObject()))
@@ -39,10 +39,10 @@ class ObjectParsingSpec extends FunSuite with MustMatchers {
   def withPrimitives =
     new PObject(
       mutable.SortedMap(
-        "s" -> PtolemyValue("abc"),
-        "i" -> PtolemyValue(123),
-        "f" -> PtolemyValue(123.4),
-        "n" -> PtolemyNull
+        "s" -> IdmlValue("abc"),
+        "i" -> IdmlValue(123),
+        "f" -> IdmlValue(123.4),
+        "n" -> IdmlNull
       ))
 
   def withNestedObjects =
@@ -50,10 +50,10 @@ class ObjectParsingSpec extends FunSuite with MustMatchers {
       mutable.SortedMap(
         "o" -> new PObject(
           mutable.SortedMap(
-            "s" -> PtolemyValue("abc"),
-            "i" -> PtolemyValue(123),
-            "f" -> PtolemyValue(123.4),
-            "n" -> PtolemyNull
+            "s" -> IdmlValue("abc"),
+            "i" -> IdmlValue(123),
+            "f" -> IdmlValue(123.4),
+            "n" -> IdmlNull
           ))))
 
   def withNestedArrays =
@@ -61,9 +61,9 @@ class ObjectParsingSpec extends FunSuite with MustMatchers {
       mutable.SortedMap(
         "a" -> new PArray(
           mutable.ListBuffer(
-            PtolemyValue("abc"),
-            PtolemyValue(123),
-            PtolemyValue(123.4),
-            PtolemyNull
+            IdmlValue("abc"),
+            IdmlValue(123),
+            IdmlValue(123.4),
+            IdmlNull
           ))))
 }

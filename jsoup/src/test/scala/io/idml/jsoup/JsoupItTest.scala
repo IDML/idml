@@ -1,6 +1,6 @@
 package io.idml.jsoup
 
-import io.idml.PtolemyScalaTestBase
+import io.idml.IdmlScalaTestBase
 
 /** Execute all jsoup integration tests */
-class JsoupItTest extends PtolemyScalaTestBase("tests")
+class JsoupItTest extends IdmlScalaTestBase("tests")

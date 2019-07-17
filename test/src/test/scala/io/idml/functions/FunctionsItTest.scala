@@ -1,5 +1,5 @@
 package io.idml.functions
 
-import io.idml.PtolemyScalaTestBase
+import io.idml.IdmlScalaTestBase
 
-class FunctionsItTest extends PtolemyScalaTestBase("io.idml.functions")
+class FunctionsItTest extends IdmlScalaTestBase("io.idml.functions")

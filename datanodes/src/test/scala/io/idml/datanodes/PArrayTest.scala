@@ -50,10 +50,10 @@ class PArrayTest extends FunSuite with MustMatchers {
   def withPrimitives =
     new PArray(
       mutable.ListBuffer(
-        PtolemyValue("abc"),
-        PtolemyValue(123),
-        PtolemyValue(123.4),
-        PtolemyNull
+        IdmlValue("abc"),
+        IdmlValue(123),
+        IdmlValue(123.4),
+        IdmlNull
       ))
 
   def withNestedObjects =
@@ -61,10 +61,10 @@ class PArrayTest extends FunSuite with MustMatchers {
       mutable.ListBuffer(
         new PObject(
           mutable.SortedMap(
-            "s" -> PtolemyValue("abc"),
-            "i" -> PtolemyValue(123),
-            "f" -> PtolemyValue(123.4),
-            "n" -> PtolemyNull
+            "s" -> IdmlValue("abc"),
+            "i" -> IdmlValue(123),
+            "f" -> IdmlValue(123.4),
+            "n" -> IdmlNull
           ))))
 
   def withNestedArrays = new PArray(mutable.ListBuffer(withPrimitives))

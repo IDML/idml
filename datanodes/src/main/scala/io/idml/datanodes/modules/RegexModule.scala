@@ -2,13 +2,13 @@ package io.idml.datanodes.modules
 
 import io.idml.datanodes.{PArray, PBool, PString}
 import io.idml.datanodes.regex.PRegexFactory
-import io.idml.{InvalidCaller, InvalidParameters, PtolemyValue}
+import io.idml.{IdmlValue, InvalidCaller, InvalidParameters}
 
 /** Methods for working with regular expressions */
 trait RegexModule {
-  this: PtolemyValue =>
+  this: IdmlValue =>
 
-  def matches(regex: PtolemyValue): PtolemyValue = {
+  def matches(regex: IdmlValue): IdmlValue = {
     (this, regex) match {
       case (PString(s), PString(r)) =>
         PArray(
@@ -16,16 +16,16 @@ trait RegexModule {
             .getRegex(r)
             .matches(s)
             .map { inner =>
-              PArray(inner.map(PString.apply).toBuffer[PtolemyValue])
+              PArray(inner.map(PString.apply).toBuffer[IdmlValue])
             }
-            .toBuffer[PtolemyValue])
+            .toBuffer[IdmlValue])
       case (PString(_), _) => InvalidParameters
       case _               => InvalidCaller
     }
   }
 
   // scalastyle:off method.name
-  def `match`(regex: PtolemyValue): PtolemyValue = {
+  def `match`(regex: IdmlValue): IdmlValue = {
     this match {
       case t: PString =>
         regex match {
@@ -35,7 +35,7 @@ trait RegexModule {
                 .getRegex(s.value)
                 .`match`(t.value)
                 .map { PString }
-                .toBuffer[PtolemyValue])
+                .toBuffer[IdmlValue])
           case _ => InvalidParameters
         }
       case _ => InvalidCaller
@@ -43,7 +43,7 @@ trait RegexModule {
   }
   // scalastyle:on method.name
 
-  def split(delim: PtolemyValue): PtolemyValue = {
+  def split(delim: IdmlValue): IdmlValue = {
     this match {
       case t: PString =>
         delim match {
@@ -53,14 +53,14 @@ trait RegexModule {
                 .getRegex(s.value)
                 .split(t.value)
                 .map { PString }
-                .toBuffer[PtolemyValue])
+                .toBuffer[IdmlValue])
           case _ => InvalidParameters
         }
       case _ => InvalidCaller
     }
   }
 
-  def isMatch(regex: PtolemyValue): PtolemyValue = {
+  def isMatch(regex: IdmlValue): IdmlValue = {
     this match {
       case t: PString =>
         regex match {
@@ -72,7 +72,7 @@ trait RegexModule {
     }
   }
 
-  def replace(regex: PtolemyValue, replacement: PtolemyValue): PtolemyValue = {
+  def replace(regex: IdmlValue, replacement: IdmlValue): IdmlValue = {
     this match {
       case t: PString =>
         replacement match {

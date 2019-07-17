@@ -13,7 +13,7 @@ class IdmlCirceProp extends Properties("IdmlCirce") with ArbitraryInstances {
   property("is identical to the jackson parser") = forAll { j: Json =>
     val str = j.noSpaces
     Try {
-      PtolemyJson.parseUnsafe(str) == jackson.PtolemyJson.parse(str)
+      IdmlJson.parseUnsafe(str) == jackson.IdmlJson.parse(str)
     }.recover {
         case _: JsonParseException => true
       }

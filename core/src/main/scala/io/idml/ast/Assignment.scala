@@ -1,7 +1,7 @@
 package io.idml.ast
 
 import io.idml.datanodes.PObject
-import io.idml.{Deleted, PtolemyContext, PtolemyNothing, PtolemyObject, PtolemyValue}
+import io.idml.{Deleted, IdmlContext, IdmlNothing, IdmlObject, IdmlValue}
 
 import scala.annotation.tailrec
 
@@ -12,14 +12,14 @@ case class Positions(start: Position, end: Position)
 case class Assignment(dest: List[String], exps: Pipeline, positions: Option[Positions] = None) extends Rule {
 
   /** Make an assignment */
-  def invoke(ctx: PtolemyContext) {
+  def invoke(ctx: IdmlContext) {
     ctx.enterAssignment(this)
 
     exps.invoke(ctx)
     ctx.cursor match {
       case Deleted =>
         delete(ctx.output, dest)
-      case reason: PtolemyNothing => ()
+      case reason: IdmlNothing => ()
       case value: PObject if dest.isEmpty =>
         ctx.output.fields.clear()
         ctx.output.fields ++= value.deepCopy.fields
@@ -33,7 +33,7 @@ case class Assignment(dest: List[String], exps: Pipeline, positions: Option[Posi
 
   /** Traverse a JsonNode tree with a list of path parts with the ultimate goal of assigning a value */
   @tailrec
-  final protected def assign(current: PtolemyObject, path: List[String], value: PtolemyValue) {
+  final protected def assign(current: IdmlObject, path: List[String], value: IdmlValue) {
     path match {
       case Nil          => throw new IllegalArgumentException("Can't use an empty path")
       case head :: Nil  => assignValue(current, head, value)
@@ -42,13 +42,13 @@ case class Assignment(dest: List[String], exps: Pipeline, positions: Option[Posi
   }
 
   /** Adds a new field to an object. Does some additional, configurable checks */
-  protected def assignValue(current: PtolemyObject, key: String, value: PtolemyValue) {
+  protected def assignValue(current: IdmlObject, key: String, value: IdmlValue) {
     current.fields(key) = value
   }
 
   /** Traverse a JsonNode tree with a list of path parts with the ultimate goal of deleting a value */
   @tailrec
-  final protected def delete(current: PtolemyObject, path: List[String]) {
+  final protected def delete(current: IdmlObject, path: List[String]) {
     path match {
       case Nil          => throw new IllegalArgumentException("Can't use an empty path")
       case head :: Nil  => deleteValue(current, head)
@@ -56,7 +56,7 @@ case class Assignment(dest: List[String], exps: Pipeline, positions: Option[Posi
     }
   }
 
-  protected def deleteValue(current: PtolemyObject, key: String) {
+  protected def deleteValue(current: IdmlObject, key: String) {
     current.fields.remove(key)
   }
 }

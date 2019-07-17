@@ -2,7 +2,7 @@ package io.idml
 
 import io.idml.datanodes.PString
 import io.idml.ast._
-import io.idml.functions.{ApplyFunction, ArrayFunction, PtolemyValueFunction}
+import io.idml.functions.{ApplyFunction, ArrayFunction, IdmlValueFunction}
 import org.scalatest.FunSuite
 
 class FunctionResolverServiceTest extends FunSuite {
@@ -34,18 +34,18 @@ class FunctionResolverServiceTest extends FunSuite {
         .resolve("array", List(pathExpression)) === ArrayFunction(pathExpression))
   }
 
-  test("resolves a 0-arity PtolemyValue function") {
+  test("resolves a 0-arity IdmlValue function") {
     assert(
       new FunctionResolverService()
-        .resolve("int", Nil) === PtolemyValueFunction(classOf[PtolemyValue].getMethod("int"), Nil))
+        .resolve("int", Nil) === IdmlValueFunction(classOf[IdmlValue].getMethod("int"), Nil))
   }
 
-  test("resolves a 2-arity PtolemyValue function") {
+  test("resolves a 2-arity IdmlValue function") {
     assert(
       new FunctionResolverService().resolve("slice", twoArgumentExpression) ===
-        PtolemyValueFunction(classOf[PtolemyValue]
-                               .getMethod("slice", classOf[PtolemyValue], classOf[PtolemyValue]),
-                             twoArgumentExpression))
+        IdmlValueFunction(classOf[IdmlValue]
+                            .getMethod("slice", classOf[IdmlValue], classOf[IdmlValue]),
+                          twoArgumentExpression))
   }
 
   test("fails if a function is missing") {

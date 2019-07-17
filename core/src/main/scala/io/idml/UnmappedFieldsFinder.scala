@@ -1,7 +1,7 @@
 package io.idml
 
 import io.idml.datanodes.CompositeValue
-import io.idml.ast.{Assignment, ExecNav, ExecNavAbsolute, ExecNavRelative, ExecNavVariable, Field, Maths, Pipeline, PtolemyFunction}
+import io.idml.ast.{Assignment, ExecNav, ExecNavAbsolute, ExecNavRelative, ExecNavVariable, Field, IdmlFunction, Maths, Pipeline}
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
@@ -12,13 +12,13 @@ class UnmappedFieldsPath(val navType: ExecNav,
                          var isComposite: Boolean = false)
 
 /** The unmapped fields state */
-class UnmappedFields(var unmappedFields: PtolemyValue = PtolemyNull,
+class UnmappedFields(var unmappedFields: IdmlValue = IdmlNull,
                      val pathStack: mutable.Stack[UnmappedFieldsPath] = mutable.Stack(),
                      val pathParts: mutable.ListBuffer[List[String]] = mutable.ListBuffer())
 
 /** Extract the state from the context */
 object UnmappedFieldsFinder {
-  def fromContext(ctx: PtolemyContext): UnmappedFields =
+  def fromContext(ctx: IdmlContext): UnmappedFields =
     ctx.state
       .getOrElse(classOf[UnmappedFieldsFinder],
                  throw new RuntimeException("Couldn't find state in the context. Are you sure this extension is activated?"))
@@ -26,16 +26,16 @@ object UnmappedFieldsFinder {
 }
 
 /** Discovers unmapped fields */
-class UnmappedFieldsFinder extends PtolemyListenerWithState[UnmappedFields] {
+class UnmappedFieldsFinder extends IdmlListenerWithState[UnmappedFields] {
   val logger = LoggerFactory.getLogger(getClass)
 
   val StackWasEmpty = "Stack was empty. Premature end?"
 
-  protected def defaultState(ctx: PtolemyContext) = {
+  protected def defaultState(ctx: IdmlContext) = {
     new UnmappedFields()
   }
 
-  override def enterChain(ctx: PtolemyContext): Unit = {
+  override def enterChain(ctx: IdmlContext): Unit = {
     try {
       // When we enter a chain it's time to start off with a clone of the original object
       state(ctx).unmappedFields = ctx.input.deepCopy
@@ -44,7 +44,7 @@ class UnmappedFieldsFinder extends PtolemyListenerWithState[UnmappedFields] {
     }
   }
 
-  override def exitChain(ctx: PtolemyContext): Unit = {
+  override def exitChain(ctx: IdmlContext): Unit = {
     try {
       // Add the unmapped fields to the unmapped fields namespace
       val s = state(ctx)
@@ -56,10 +56,10 @@ class UnmappedFieldsFinder extends PtolemyListenerWithState[UnmappedFields] {
     }
   }
 
-  override def exitAssignment(ctx: PtolemyContext, assignment: Assignment): Unit = {
+  override def exitAssignment(ctx: IdmlContext, assignment: Assignment): Unit = {
     try {
       // If we've just made an assignment
-      if (!ctx.cursor.isInstanceOf[PtolemyNothing]) {
+      if (!ctx.cursor.isInstanceOf[IdmlNothing]) {
         val s = state(ctx)
         s.pathParts.foreach(s.unmappedFields.removeWithoutEmpty)
       }
@@ -70,11 +70,11 @@ class UnmappedFieldsFinder extends PtolemyListenerWithState[UnmappedFields] {
     }
   }
 
-  override def exitMaths(ctx: PtolemyContext, maths: Maths): Unit = {
+  override def exitMaths(ctx: IdmlContext, maths: Maths): Unit = {
     // FIXME: This was originally the same as exitAssignment but I'm skeptical that's the right choice
   }
 
-  override def exitPath(ctx: PtolemyContext, path: Field): Unit = {
+  override def exitPath(ctx: IdmlContext, path: Field): Unit = {
     try {
       val s = state(ctx)
       // Let's make sure we are tracking paths inside this expression. For now only paths in assignments are tracked
@@ -92,7 +92,7 @@ class UnmappedFieldsFinder extends PtolemyListenerWithState[UnmappedFields] {
     }
   }
 
-  override def enterPipl(ctx: PtolemyContext, pipl: Pipeline): Unit = {
+  override def enterPipl(ctx: IdmlContext, pipl: Pipeline): Unit = {
     try {
       // TODO: Restructure AST so we have separate pipl types
       pipl.exps match {
@@ -113,7 +113,7 @@ class UnmappedFieldsFinder extends PtolemyListenerWithState[UnmappedFields] {
     }
   }
 
-  override def exitPipl(ctx: PtolemyContext, pipl: Pipeline): Unit = {
+  override def exitPipl(ctx: IdmlContext, pipl: Pipeline): Unit = {
     try {
       // TODO: Restructure AST so we have separate pipl types
       pipl.exps match {
@@ -131,7 +131,7 @@ class UnmappedFieldsFinder extends PtolemyListenerWithState[UnmappedFields] {
   }
 
   /** Called at end the of a relative path */
-  protected def popRelativePath(ctx: PtolemyContext): Unit = {
+  protected def popRelativePath(ctx: IdmlContext): Unit = {
     try {
       val s = state(ctx)
       require(s.pathStack.nonEmpty, StackWasEmpty)
@@ -158,7 +158,7 @@ class UnmappedFieldsFinder extends PtolemyListenerWithState[UnmappedFields] {
   }
 
   /** Called at end the of an absolute path */
-  protected def popAbsolutePath(ctx: PtolemyContext): Unit = {
+  protected def popAbsolutePath(ctx: IdmlContext): Unit = {
     try {
       val s = state(ctx)
       require(s.pathStack.nonEmpty, StackWasEmpty)
@@ -175,7 +175,7 @@ class UnmappedFieldsFinder extends PtolemyListenerWithState[UnmappedFields] {
   }
 
   /** Called at end the of a variable path */
-  protected def popVariablePath(ctx: PtolemyContext): Unit = {
+  protected def popVariablePath(ctx: IdmlContext): Unit = {
     try {
       val s = state(ctx)
       require(s.pathStack.nonEmpty, StackWasEmpty)
@@ -187,7 +187,7 @@ class UnmappedFieldsFinder extends PtolemyListenerWithState[UnmappedFields] {
     }
   }
 
-  override def exitFunc(ctx: PtolemyContext, func: PtolemyFunction): Unit = {
+  override def exitFunc(ctx: IdmlContext, func: IdmlFunction): Unit = {
     try {
       val s = state(ctx)
       if (s.pathStack.nonEmpty && ctx.cursor.isInstanceOf[CompositeValue]) {

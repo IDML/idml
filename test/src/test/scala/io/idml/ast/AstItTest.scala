@@ -1,5 +1,5 @@
 package io.idml.ast
 
-import io.idml.PtolemyScalaTestBase
+import io.idml.IdmlScalaTestBase
 
-class AstItTest extends PtolemyScalaTestBase("io.idml.ast", findUnmappedFields = true)
+class AstItTest extends IdmlScalaTestBase("io.idml.ast", findUnmappedFields = true)

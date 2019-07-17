@@ -1,6 +1,6 @@
 package io.idml.hashing
 import io.idml.datanodes.{PInt, PObject, PString}
-import io.idml.{PtolemyContext, PtolemyValue}
+import io.idml.{IdmlContext, IdmlValue}
 import org.scalatest.{FlatSpec, MustMatchers, WordSpec}
 
 class HashingSpec extends WordSpec with MustMatchers {
@@ -22,7 +22,7 @@ class HashingSpec extends WordSpec with MustMatchers {
       ).foreach {
         case (input, output) =>
           s"match $input" in {
-            val ctx = new PtolemyContext(PObject("x" -> PString(input)))
+            val ctx = new IdmlContext(PObject("x" -> PString(input)))
             ctx.cursor = ctx.input.get("x")
             HashingFunctions.hashes("md5").invoke(ctx)
             ctx.cursor must equal(PString(output))
@@ -40,7 +40,7 @@ class HashingSpec extends WordSpec with MustMatchers {
       ).foreach {
         case (input, output) =>
           s"match $input" in {
-            val ctx = new PtolemyContext(PObject("x" -> PString(input)))
+            val ctx = new IdmlContext(PObject("x" -> PString(input)))
             ctx.cursor = ctx.input.get("x")
             HashingFunctions.hashes("xxHash32").invoke(ctx)
             ctx.cursor.parseHexUnsigned.int must equal(PInt(output))

@@ -2,7 +2,7 @@ package io.idml.utils
 
 import io.idml.utils.validators.{MappingValidator, SchemaValidator}
 import io.idml.ast.Document
-import io.idml.{Ptolemy, PtolemyConf}
+import io.idml.{Idml, IdmlConf}
 
 /** Validates IDML documents */
 object DocumentValidator {
@@ -13,10 +13,10 @@ object DocumentValidator {
     * If it returns successfully, the document is valid, otherwise it will throw an exception
     */
   def validate(str: String): Unit = {
-    validate(new Ptolemy(new PtolemyConf).fromString(str).nodes)
+    validate(new Idml(new IdmlConf).fromString(str).nodes)
   }
 
-  def validate(ptolemy: Ptolemy, str: String): Unit = {
+  def validate(ptolemy: Idml, str: String): Unit = {
     validate(ptolemy.fromString(str).nodes)
   }
 

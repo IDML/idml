@@ -14,14 +14,14 @@ case class Variable(dest: List[String], exps: Pipeline) extends Rule {
   require(dest.nonEmpty, "Cannot make an assignment to an empty path")
 
   /** Make a variable assignment */
-  def invoke(ctx: PtolemyContext) {
-    val variableStorage = ctx.state.getOrElseUpdate(Variable.stateKey, PObject()).asInstanceOf[PtolemyObject]
+  def invoke(ctx: IdmlContext) {
+    val variableStorage = ctx.state.getOrElseUpdate(Variable.stateKey, PObject()).asInstanceOf[IdmlObject]
 
     exps.invoke(ctx)
     ctx.cursor match {
       case Deleted =>
         delete(variableStorage, dest)
-      case reason: PtolemyNothing => ()
+      case reason: IdmlNothing => ()
       case value: Any =>
         assign(variableStorage, dest, value.deepCopy)
     }
@@ -29,7 +29,7 @@ case class Variable(dest: List[String], exps: Pipeline) extends Rule {
 
   /** Traverse a JsonNode tree with a list of path parts with the ultimate goal of assigning a value */
   @tailrec
-  final protected def assign(current: PtolemyObject, path: List[String], value: PtolemyValue) {
+  final protected def assign(current: IdmlObject, path: List[String], value: IdmlValue) {
     path match {
       case Nil          => throw new IllegalArgumentException("Can't use an empty path")
       case head :: Nil  => assignValue(current, head, value)
@@ -38,13 +38,13 @@ case class Variable(dest: List[String], exps: Pipeline) extends Rule {
   }
 
   /** Adds a new field to an object. Does some additional, configurable checks */
-  protected def assignValue(current: PtolemyObject, key: String, value: PtolemyValue) {
+  protected def assignValue(current: IdmlObject, key: String, value: IdmlValue) {
     current.fields(key) = value
   }
 
   /** Traverse a JsonNode tree with a list of path parts with the ultimate goal of deleting a value */
   @tailrec
-  final protected def delete(current: PtolemyObject, path: List[String]) {
+  final protected def delete(current: IdmlObject, path: List[String]) {
     path match {
       case Nil          => throw new IllegalArgumentException("Can't use an empty path")
       case head :: Nil  => deleteValue(current, head)
@@ -52,7 +52,7 @@ case class Variable(dest: List[String], exps: Pipeline) extends Rule {
     }
   }
 
-  protected def deleteValue(current: PtolemyObject, key: String) {
+  protected def deleteValue(current: IdmlObject, key: String) {
     current.fields.remove(key)
   }
 }

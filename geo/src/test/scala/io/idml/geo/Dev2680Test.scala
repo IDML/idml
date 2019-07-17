@@ -1,13 +1,13 @@
 package io.idml.geo
 
-import io.idml.Ptolemy
-import io.idml.jackson.PtolemyJackson
+import io.idml.Idml
+import io.idml.jackson.IdmlJackson
 import org.scalatest.FunSuite
 
 class Dev2680Test extends FunSuite {
 
-  test("DEV-2680: IndexOutOfBoundsException from empty field cleanup in Ptolemy") {
-    val ptolemy = new Ptolemy()
+  test("DEV-2680: IndexOutOfBoundsException from empty field cleanup in Idml") {
+    val ptolemy = new Idml()
     val chain = ptolemy.newChain(
       ptolemy.fromString("""
           |interaction.subtype = "ollie"
@@ -35,7 +35,7 @@ class Dev2680Test extends FunSuite {
         """.stripMargin
       )
     )
-    val input = PtolemyJackson.default.parse(
+    val input = IdmlJackson.default.parse(
       """
         |{
         |  "ollie": {

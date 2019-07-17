@@ -1,7 +1,7 @@
 package io.idml.ast
 
 import io.idml.datanodes._
-import io.idml.{NoFields, PtolemyContext, PtolemyListener, PtolemyValue}
+import io.idml.{IdmlContext, IdmlListener, IdmlValue, NoFields}
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
@@ -10,16 +10,16 @@ import org.scalatest.mock.MockitoSugar
 
 class AssignmentTest extends FunSuite with MockitoSugar {
 
-  def updateCursor(value: PtolemyValue): Answer[Unit] = new Answer[Unit] {
+  def updateCursor(value: IdmlValue): Answer[Unit] = new Answer[Unit] {
     override def answer(invocation: InvocationOnMock) = {
-      invocation.getArguments()(0).asInstanceOf[PtolemyContext].cursor = value
+      invocation.getArguments()(0).asInstanceOf[IdmlContext].cursor = value
     }
   }
 
   test("Invokes right hand side expression") {
     val pipl   = mock[Pipeline]
     val assign = new Assignment(List("a"), pipl)
-    val ctx    = new PtolemyContext()
+    val ctx    = new IdmlContext()
     assign.invoke(ctx)
     verify(pipl).invoke(ctx)
   }
@@ -27,7 +27,7 @@ class AssignmentTest extends FunSuite with MockitoSugar {
   test("Updates the output if the pipl updates the cursor to a value") {
     val pipl   = mock[Pipeline]
     val assign = new Assignment(List("a"), pipl)
-    val ctx    = new PtolemyContext()
+    val ctx    = new IdmlContext()
     when(pipl.invoke(ctx)).thenAnswer(updateCursor(PTrue))
     assign.invoke(ctx)
     assert(ctx.output === PObject("a" -> PTrue))
@@ -44,7 +44,7 @@ class AssignmentTest extends FunSuite with MockitoSugar {
   test("Doesn't update the output if nothing is returned") {
     val pipl   = mock[Pipeline]
     val assign = new Assignment(List("a"), pipl)
-    val ctx    = new PtolemyContext()
+    val ctx    = new IdmlContext()
     when(pipl.invoke(ctx)).thenAnswer(updateCursor(NoFields))
     assign.invoke(ctx)
     assert(ctx.output === PObject())
@@ -53,8 +53,8 @@ class AssignmentTest extends FunSuite with MockitoSugar {
   test("Triggers enter and exit events") {
     val pipl     = mock[Pipeline]
     val assign   = new Assignment(List("a"), pipl)
-    val ctx      = new PtolemyContext()
-    val listener = mock[PtolemyListener]
+    val ctx      = new IdmlContext()
+    val listener = mock[IdmlListener]
     ctx.listeners = List(listener)
     assign.invoke(ctx)
     verify(listener).enterAssignment(ctx, assign)

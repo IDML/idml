@@ -1,26 +1,26 @@
 package io.idml.functions.json
 
-import io.idml.PtolemyJson
-import io.idml.ast.{Argument, Pipeline, PtolemyFunction, PtolemyFunctionMetadata}
+import io.idml.IdmlJson
+import io.idml.ast.{Argument, IdmlFunction, IdmlFunctionMetadata, Pipeline}
 import io.idml.functions.FunctionResolver
 
-class JsonFunctions(json: PtolemyJson) extends FunctionResolver {
+class JsonFunctions(json: IdmlJson) extends FunctionResolver {
   val uuid   = new UUIDModuleJson(json)
   val obj    = uuid // it already inherits it
   val random = new RandomModuleJson(json)
 
-  override def providedFunctions(): List[PtolemyFunctionMetadata] = List(
-    PtolemyFunctionMetadata("serialize", List.empty, "serialize this object as JSON"),
-    PtolemyFunctionMetadata("parseJson", List.empty, "parse this string as JSON"),
-    PtolemyFunctionMetadata("uuid3", List.empty, "generate a type 3 UUID from this input"),
-    PtolemyFunctionMetadata("uuid5", List.empty, "generate a type 5 UUID from this input"),
-    PtolemyFunctionMetadata("random", List.empty, "generate a random number from this input"),
-    PtolemyFunctionMetadata("random",
-                            List(("min", "minimum number"), ("max", "maximum number")),
-                            "generate a random number from this input, in this range"),
+  override def providedFunctions(): List[IdmlFunctionMetadata] = List(
+    IdmlFunctionMetadata("serialize", List.empty, "serialize this object as JSON"),
+    IdmlFunctionMetadata("parseJson", List.empty, "parse this string as JSON"),
+    IdmlFunctionMetadata("uuid3", List.empty, "generate a type 3 UUID from this input"),
+    IdmlFunctionMetadata("uuid5", List.empty, "generate a type 5 UUID from this input"),
+    IdmlFunctionMetadata("random", List.empty, "generate a random number from this input"),
+    IdmlFunctionMetadata("random",
+                         List(("min", "minimum number"), ("max", "maximum number")),
+                         "generate a random number from this input, in this range"),
   )
 
-  override def resolve(name: String, args: List[Argument]): Option[PtolemyFunction] = (name, args) match {
+  override def resolve(name: String, args: List[Argument]): Option[IdmlFunction] = (name, args) match {
     case ("serialize", Nil)                                  => Some(uuid.serializeFunction)
     case ("parseJson", Nil)                                  => Some(uuid.parseJsonFunction)
     case ("uuid3", Nil)                                      => Some(uuid.uuid3Function)

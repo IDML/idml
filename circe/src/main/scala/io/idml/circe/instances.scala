@@ -12,61 +12,61 @@ import cats._, cats.implicits._
 import io.idml._
 
 /**
-  * Encoder and Decoder instances for Ptolemy types
+  * Encoder and Decoder instances for Idml types
   */
 object instances {
 
-  lazy val rawIdmlCirceDecoder: Folder[PtolemyValue] = new Folder[PtolemyValue] {
-    override def onNull: PtolemyValue                    = PtolemyNull
-    override def onBoolean(value: Boolean): PtolemyValue = PBool(value)
-    override def onNumber(value: JsonNumber): PtolemyValue =
-      value.toLong.fold[PtolemyValue](PDouble(value.toDouble))(l => PInt(l))
-    override def onString(value: String): PtolemyValue = PString(value)
-    override def onArray(value: Vector[Json]): PtolemyValue = new PArray(
+  lazy val rawIdmlCirceDecoder: Folder[IdmlValue] = new Folder[IdmlValue] {
+    override def onNull: IdmlValue                    = IdmlNull
+    override def onBoolean(value: Boolean): IdmlValue = PBool(value)
+    override def onNumber(value: JsonNumber): IdmlValue =
+      value.toLong.fold[IdmlValue](PDouble(value.toDouble))(l => PInt(l))
+    override def onString(value: String): IdmlValue = PString(value)
+    override def onArray(value: Vector[Json]): IdmlValue = new PArray(
       value.map(_.foldWith(rawIdmlCirceDecoder)).toBuffer
     )
-    override def onObject(value: JsonObject): PtolemyValue = decodeObject(value)
+    override def onObject(value: JsonObject): IdmlValue = decodeObject(value)
   }
 
-  implicit val decoder: Decoder[PtolemyValue] =
+  implicit val decoder: Decoder[IdmlValue] =
     Decoder[Json].emapTry(o => Try(o.foldWith(rawIdmlCirceDecoder)))
 
-  lazy val rawIdmlCirceEncoder: PtolemyValue => Json = {
-    case n: PtolemyInt    => Json.fromLong(n.value)
-    case n: PtolemyDouble => Json.fromDoubleOrNull(n.value)
-    case n: PtolemyString => Json.fromString(n.value)
-    case n: PtolemyBool   => Json.fromBoolean(n.value)
+  lazy val rawIdmlCirceEncoder: IdmlValue => Json = {
+    case n: IdmlInt    => Json.fromLong(n.value)
+    case n: IdmlDouble => Json.fromDoubleOrNull(n.value)
+    case n: IdmlString => Json.fromString(n.value)
+    case n: IdmlBool   => Json.fromBoolean(n.value)
 
-    case n: PtolemyArray =>
-      Json.arr(n.items.filterNot(_.isInstanceOf[PtolemyNothing]).map(rawIdmlCirceEncoder): _*)
-    case n: PtolemyObject =>
+    case n: IdmlArray =>
+      Json.arr(n.items.filterNot(_.isInstanceOf[IdmlNothing]).map(rawIdmlCirceEncoder): _*)
+    case n: IdmlObject =>
       Json.obj(
-        n.fields.toList.filterNot(_._2.isInstanceOf[PtolemyNothing]).map {
+        n.fields.toList.filterNot(_._2.isInstanceOf[IdmlNothing]).map {
           case (k, v) => k -> rawIdmlCirceEncoder(v)
         }: _*
       )
-    case _: PtolemyNothing => Json.Null
-    case PtolemyNull       => Json.Null
+    case _: IdmlNothing => Json.Null
+    case IdmlNull       => Json.Null
   }
 
-  def decodeObject(value: JsonObject): PtolemyObject =
+  def decodeObject(value: JsonObject): IdmlObject =
     new PObject(
-      value.toIterable.foldLeft(mutable.SortedMap.empty[String, PtolemyValue]) {
+      value.toIterable.foldLeft(mutable.SortedMap.empty[String, IdmlValue]) {
         case (acc, (k, v)) => acc += k -> v.foldWith(rawIdmlCirceDecoder)
       }
     )
 
-  implicit val objectDecoder: Decoder[PtolemyObject] =
+  implicit val objectDecoder: Decoder[IdmlObject] =
     Decoder[Json]
       .emap { j: Json =>
-        Either.fromOption(j.asObject, "Only an Object can be decoded into a PtolemyObject")
+        Either.fromOption(j.asObject, "Only an Object can be decoded into a IdmlObject")
       }
       .emapTry(o => Try(decodeObject(o)))
 
-  implicit val idmlCirceEncoder: Encoder[PtolemyValue] = Encoder.instance(rawIdmlCirceEncoder)
+  implicit val idmlCirceEncoder: Encoder[IdmlValue] = Encoder.instance(rawIdmlCirceEncoder)
 
-  // and for PtolemyObject
-  implicit val ptolemyObjectEncoder: Encoder[PtolemyObject] = idmlCirceEncoder.narrow[PtolemyObject]
+  // and for IdmlObject
+  implicit val ptolemyObjectEncoder: Encoder[IdmlObject] = idmlCirceEncoder.narrow[IdmlObject]
   // and for PObject just for ease of use
   implicit val ptolemyPObjectEncoder: Encoder[PObject] = idmlCirceEncoder.narrow[PObject]
 

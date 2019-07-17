@@ -2,22 +2,22 @@ package io.idml.datanodes
 
 import javax.mail.internet.InternetAddress
 
-import io.idml.{MissingField, PtolemyString, PtolemyValue}
+import io.idml.{IdmlString, IdmlValue, MissingField}
 
 /** Represents a valid Email */
-class PEmail(email: InternetAddress) extends PtolemyString with CompositeValue {
+class PEmail(email: InternetAddress) extends IdmlString with CompositeValue {
 
   /** Extract the address component */
-  def address: PtolemyValue = PtolemyValue(addressValue)
+  def address: IdmlValue = IdmlValue(addressValue)
 
   /** Extract the name component */
-  def name: PtolemyValue = PtolemyValue(nameValue)
+  def name: IdmlValue = IdmlValue(nameValue)
 
   /** Extract the username component */
-  def username: PtolemyValue = PtolemyValue(usernameValue)
+  def username: IdmlValue = IdmlValue(usernameValue)
 
   /** Extract the domain component */
-  def domain: PtolemyValue = PtolemyValue(domainValue)
+  def domain: IdmlValue = IdmlValue(domainValue)
 
   /** Extract the address component */
   def addressValue: String = email.getAddress
@@ -35,11 +35,11 @@ class PEmail(email: InternetAddress) extends PtolemyString with CompositeValue {
     s"${getClass.getSimpleName}(${email.toString})"
 
   /** Override get(..) to provide custom field accessors */
-  override def get(name: String): PtolemyValue = name match {
-    case "address"  => PtolemyValue(addressValue)
-    case "name"     => PtolemyValue(nameValue)
-    case "domain"   => PtolemyValue(domainValue)
-    case "username" => PtolemyValue(usernameValue)
+  override def get(name: String): IdmlValue = name match {
+    case "address"  => IdmlValue(addressValue)
+    case "name"     => IdmlValue(nameValue)
+    case "domain"   => IdmlValue(domainValue)
+    case "username" => IdmlValue(usernameValue)
     case _          => MissingField
   }
 

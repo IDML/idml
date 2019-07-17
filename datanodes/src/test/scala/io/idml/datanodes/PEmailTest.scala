@@ -2,7 +2,7 @@ package io.idml.datanodes
 
 import javax.mail.internet.InternetAddress
 
-import io.idml.{CastFailed, NoFields, PtolemyNull}
+import io.idml.{CastFailed, IdmlNull, NoFields}
 import org.scalatest._
 
 /** Test the behaviour of the PEmail class */
@@ -65,7 +65,7 @@ class PEmailTest extends FunSuite with MustMatchers {
   test("Get fields from a simple email address") {
     val email = PString("andi.miller@datasift.com").email()
     email.get("address") must equal(PString("andi.miller@datasift.com"))
-    email.get("name") must equal(PtolemyNull)
+    email.get("name") must equal(IdmlNull)
     email.get("domain") must equal(PString("datasift.com"))
     email.get("username") must equal(PString("andi.miller"))
   }

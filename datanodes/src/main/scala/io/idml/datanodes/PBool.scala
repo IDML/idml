@@ -1,9 +1,9 @@
 package io.idml.datanodes
 
-import io.idml.PtolemyBool
+import io.idml.IdmlBool
 
-/** The default PtolemyValue implementation of a boolean */
-case class PBool(value: Boolean) extends PtolemyBool {
+/** The default IdmlValue implementation of a boolean */
+case class PBool(value: Boolean) extends IdmlBool {
 
   // scalastyle:off method.name
   def ||(r: PBool): Boolean = value || r.value

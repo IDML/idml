@@ -1,6 +1,6 @@
 package io.idml.datanodes
 
-import io.idml.PtolemyValue
+import io.idml.IdmlValue
 
 /** Indicates we should not track sub-paths of this value */
-trait CompositeValue extends PtolemyValue
+trait CompositeValue extends IdmlValue

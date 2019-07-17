@@ -1,46 +1,36 @@
 package io.idml.jackson.serder
 
-import io.idml.{
-  PtolemyArray,
-  PtolemyBool,
-  PtolemyDouble,
-  PtolemyInt,
-  PtolemyNothing,
-  PtolemyNull,
-  PtolemyObject,
-  PtolemyString,
-  PtolemyValue
-}
+import io.idml.{IdmlArray, IdmlBool, IdmlDouble, IdmlInt, IdmlNothing, IdmlNull, IdmlObject, IdmlString, IdmlValue}
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.{JsonSerializer, SerializerProvider}
 
 /** The Jackson serializer for PValues */
-class PValueSerializer extends JsonSerializer[PtolemyValue] {
-  def serialize(value: PtolemyValue, json: JsonGenerator, provider: SerializerProvider) {
+class PValueSerializer extends JsonSerializer[IdmlValue] {
+  def serialize(value: IdmlValue, json: JsonGenerator, provider: SerializerProvider) {
     value match {
-      case n: PtolemyInt    => json.writeNumber(n.value)
-      case n: PtolemyDouble => json.writeNumber(n.value)
-      case n: PtolemyString => json.writeString(n.value)
-      case n: PtolemyBool   => json.writeBoolean(n.value)
+      case n: IdmlInt    => json.writeNumber(n.value)
+      case n: IdmlDouble => json.writeNumber(n.value)
+      case n: IdmlString => json.writeString(n.value)
+      case n: IdmlBool   => json.writeBoolean(n.value)
 
-      case n: PtolemyArray =>
+      case n: IdmlArray =>
         json.writeStartArray()
-        n.items filterNot (_.isInstanceOf[PtolemyNothing]) foreach json.writeObject
+        n.items filterNot (_.isInstanceOf[IdmlNothing]) foreach json.writeObject
         json.writeEndArray()
 
-      case n: PtolemyObject =>
+      case n: IdmlObject =>
         json.writeStartObject()
-        n.fields filterNot (_._2.isInstanceOf[PtolemyNothing]) foreach {
+        n.fields filterNot (_._2.isInstanceOf[IdmlNothing]) foreach {
           case (k, v) =>
             json.writeObjectField(k, v)
         }
         json.writeEndObject()
 
-      case _: PtolemyNothing => ()
-      case PtolemyNull       => json.writeNull()
+      case _: IdmlNothing => ()
+      case IdmlNull       => json.writeNull()
     }
   }
 
-  override def isEmpty(value: PtolemyValue): Boolean =
-    value.isInstanceOf[PtolemyNothing]
+  override def isEmpty(value: IdmlValue): Boolean =
+    value.isInstanceOf[IdmlNothing]
 }

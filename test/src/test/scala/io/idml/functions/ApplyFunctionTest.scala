@@ -2,7 +2,7 @@ package io.idml.functions
 
 import io.idml.datanodes.{PArray, PInt, PObject}
 import io.idml.ast.{Block, Document}
-import io.idml.{NoFields, PtolemyContext, UnknownBlockException}
+import io.idml.{IdmlContext, NoFields, UnknownBlockException}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{FunSuite, MustMatchers}
@@ -15,14 +15,14 @@ class ApplyFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
   }
 
   test("Block fails on invocation when given a missing block") {
-    val ctx = mock[PtolemyContext]
+    val ctx = mock[IdmlContext]
     when(ctx.doc).thenReturn(Document.empty)
     intercept[UnknownBlockException](ApplyFunction("missing_block").invoke(ctx))
   }
 
   test("Don't call the function or touch the cursor if the current value is missing") {
     val doc   = mock[Document]
-    val ctx   = mock[PtolemyContext]
+    val ctx   = mock[IdmlContext]
     val block = mock[Block]
     when(ctx.doc).thenReturn(doc)
     when(ctx.cursor).thenReturn(NoFields)
@@ -33,7 +33,7 @@ class ApplyFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
 
   test("Invoke the named block if the block is present") {
     val doc   = mock[Document]
-    val ctx   = mock[PtolemyContext]
+    val ctx   = mock[IdmlContext]
     val block = mock[Block]
     when(ctx.doc).thenReturn(doc)
     when(doc.blocks).thenReturn(Map("main" -> block))
@@ -42,7 +42,7 @@ class ApplyFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
   }
 
   test("Configure the context with a new output object") {
-    val ctx = mock[PtolemyContext]
+    val ctx = mock[IdmlContext]
     when(ctx.doc).thenReturn(Document.empty)
     ApplyFunction("main").invoke(ctx)
     verify(ctx).output_=(PObject())
@@ -53,7 +53,7 @@ class ApplyFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
   }
 
   test("Preserve the original output object") {
-    val ctx      = mock[PtolemyContext]
+    val ctx      = mock[IdmlContext]
     val expected = ctx.output
     when(ctx.doc).thenReturn(Document.empty)
     ApplyFunction("main").invoke(ctx)
@@ -66,7 +66,7 @@ class ApplyFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
 
   test("Invoke the named block on each item in an array") {
     val doc   = mock[Document]
-    val ctx   = mock[PtolemyContext]
+    val ctx   = mock[IdmlContext]
     val block = mock[Block]
     when(ctx.doc).thenReturn(doc)
     when(ctx.cursor).thenReturn(PArray(PInt(10), PInt(11), PInt(12)))

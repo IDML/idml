@@ -2,7 +2,7 @@ package io.idml.tutor
 
 import cats.effect.Sync
 import fansi._
-import io.idml.{Ptolemy, PtolemyValue}
+import io.idml.{Idml, IdmlValue}
 import cats._
 import cats.data.EitherT
 import cats.implicits._

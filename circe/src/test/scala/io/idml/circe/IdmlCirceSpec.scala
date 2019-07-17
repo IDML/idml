@@ -9,7 +9,7 @@ class IdmlCirceSpec extends WordSpec with MustMatchers {
 
   "IdmlCirce" should {
     "work" in {
-      PtolemyCirce.parse("""{"a":[1,2,3,"hello"]}""") must equal(
+      IdmlCirce.parse("""{"a":[1,2,3,"hello"]}""") must equal(
         PObject(
           "a" -> PArray(
             PInt(1),

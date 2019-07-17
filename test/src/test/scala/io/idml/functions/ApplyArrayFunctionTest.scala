@@ -2,7 +2,7 @@ package io.idml.functions
 
 import io.idml.datanodes.{PArray, PInt, PObject}
 import io.idml.ast.{Block, Document}
-import io.idml.{PtolemyContext, UnknownBlockException}
+import io.idml.{IdmlContext, UnknownBlockException}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{FunSuite, MustMatchers}
@@ -15,14 +15,14 @@ class ApplyArrayFunctionTest extends FunSuite with MustMatchers with MockitoSuga
   }
 
   test("Block fails on invocation when given a missing block") {
-    val ctx = mock[PtolemyContext]
+    val ctx = mock[IdmlContext]
     when(ctx.doc).thenReturn(Document.empty)
     intercept[UnknownBlockException](ApplyArrayFunction("missing_block").invoke(ctx))
   }
 
   test("Invoke the named block if the block is present") {
     val doc   = mock[Document]
-    val ctx   = mock[PtolemyContext]
+    val ctx   = mock[IdmlContext]
     val block = mock[Block]
     when(ctx.doc).thenReturn(doc)
     when(ctx.cursor).thenReturn(PArray())
@@ -32,7 +32,7 @@ class ApplyArrayFunctionTest extends FunSuite with MustMatchers with MockitoSuga
   }
 
   test("Configure the context with a new output object") {
-    val ctx = mock[PtolemyContext]
+    val ctx = mock[IdmlContext]
     when(ctx.doc).thenReturn(Document.empty)
     when(ctx.cursor).thenReturn(PArray())
     ApplyArrayFunction("main").invoke(ctx)
@@ -44,7 +44,7 @@ class ApplyArrayFunctionTest extends FunSuite with MustMatchers with MockitoSuga
   }
 
   test("Preserve the original output object") {
-    val ctx      = mock[PtolemyContext]
+    val ctx      = mock[IdmlContext]
     val expected = ctx.output
     when(ctx.doc).thenReturn(Document.empty)
     ApplyArrayFunction("main").invoke(ctx)
@@ -57,7 +57,7 @@ class ApplyArrayFunctionTest extends FunSuite with MustMatchers with MockitoSuga
 
   test("Invoke the named block on each item in an array") {
     val doc   = mock[Document]
-    val ctx   = mock[PtolemyContext]
+    val ctx   = mock[IdmlContext]
     val block = mock[Block]
     when(ctx.doc).thenReturn(doc)
     when(ctx.cursor).thenReturn(PArray(PInt(10), PInt(11), PInt(12)))

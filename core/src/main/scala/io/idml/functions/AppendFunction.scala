@@ -1,20 +1,20 @@
 package io.idml.functions
 
 import io.idml.datanodes.PArray
-import io.idml.{InvalidCaller, PtolemyArray, PtolemyNothing, PtolemyValue}
+import io.idml.{IdmlArray, IdmlNothing, IdmlValue, InvalidCaller}
 import io.idml.ast.Pipeline
 
 /** Append an argument to the calling array if it evaluated successfully */
-case class AppendFunction(arg: Pipeline) extends PtolemyFunction1 {
+case class AppendFunction(arg: Pipeline) extends IdmlFunction1 {
   override def name: String = "append"
 
-  override def apply(cursor: PtolemyValue, input: PtolemyValue): PtolemyValue = {
+  override def apply(cursor: IdmlValue, input: IdmlValue): IdmlValue = {
     cursor match {
-      case nothing: PtolemyNothing =>
+      case nothing: IdmlNothing =>
         nothing
-      case arr: PtolemyArray =>
+      case arr: IdmlArray =>
         input match {
-          case nothing: PtolemyNothing =>
+          case nothing: IdmlNothing =>
             // Do nothing to the cursor
             arr
           case _ =>

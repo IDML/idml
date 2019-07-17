@@ -7,38 +7,38 @@ import scala.collection.JavaConverters._
 class UnmappedFieldsFinderItTest extends FunSuite {
 
   val listener = new UnmappedFieldsFinder
-  val ptolemy  = new Ptolemy(new PtolemyConf, listeners = List[PtolemyListener](listener).asJava)
+  val ptolemy  = new Idml(new IdmlConf, listeners = List[IdmlListener](listener).asJava)
 
   test("There are no unmapped fields when the input object is empty") {
-    val ctx   = new PtolemyContext(PObject())
+    val ctx   = new IdmlContext(PObject())
     val chain = ptolemy.newChain(ptolemy.fromString("x = a"))
     chain.run(ctx)
     assert(ctx.output === PObject())
   }
 
   test("If a field is mapped then it doesn't end up in the unmapped field namespace") {
-    val ctx   = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx   = new IdmlContext(PObject("a" -> PTrue))
     val chain = ptolemy.newChain(ptolemy.fromString("x = a"))
     chain.run(ctx)
     assert(ctx.output === PObject("x" -> PTrue))
   }
 
   test("If a field is mapped then it doesn't end up in the unmapped field namespace - depth two") {
-    val ctx   = new PtolemyContext(PObject("a" -> PObject("b" -> PTrue)))
+    val ctx   = new IdmlContext(PObject("a" -> PObject("b" -> PTrue)))
     val chain = ptolemy.newChain(ptolemy.fromString("x.y = a.b"))
     chain.run(ctx)
     assert(ctx.output === PObject("x" -> PObject("y" -> PTrue)))
   }
 
   test("If a field isn't mapped then it should be in the unmapped field namespace") {
-    val ctx   = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx   = new IdmlContext(PObject("a" -> PTrue))
     val chain = ptolemy.newChain(ptolemy.fromString("x = b"))
     chain.run(ctx)
     assert(ctx.output === PObject("unmapped" -> PObject("a" -> PTrue)))
   }
 
   test("If a field isn't mapped then it should be in the unmapped field namespace - depth two") {
-    val ctx   = new PtolemyContext(PObject("a" -> PObject("b" -> PTrue)))
+    val ctx   = new IdmlContext(PObject("a" -> PObject("b" -> PTrue)))
     val chain = ptolemy.newChain(ptolemy.fromString("x.y = b"))
     chain.run(ctx)
     assert(ctx.output === PObject("unmapped" -> PObject("a" -> PObject("b" -> PTrue))))
@@ -47,7 +47,7 @@ class UnmappedFieldsFinderItTest extends FunSuite {
   test("If a field isn't mapped then it should be in the unmapped field namespace - depth two, with overlap") {
     pendingUntilFixed {
       val ctx =
-        new PtolemyContext(PObject("a" -> PObject("b" -> PTrue, "c" -> PFalse)))
+        new IdmlContext(PObject("a" -> PObject("b" -> PTrue, "c" -> PFalse)))
       val chain = ptolemy.newChain(ptolemy.fromString("x.y = a.b"))
       chain.run(ctx)
       assert(ctx.output === PObject("x" -> PObject("y" -> PTrue), "unmapped" -> PObject("a" -> PObject("c" -> PFalse))))
@@ -56,7 +56,7 @@ class UnmappedFieldsFinderItTest extends FunSuite {
 
   test("Fields are treated as mapped if functions are called on them successfully") {
     val ctx =
-      new PtolemyContext(PObject("a" -> PObject("b" -> PString("1234"))))
+      new IdmlContext(PObject("a" -> PObject("b" -> PString("1234"))))
     val chain = ptolemy.newChain(ptolemy.fromString("x.y = a.b.int()"))
     chain.run(ctx)
     assert(
@@ -66,7 +66,7 @@ class UnmappedFieldsFinderItTest extends FunSuite {
   }
 
   test("Fields are not treated as mapped if functions are called on them unsuccessfully") {
-    val ctx   = new PtolemyContext(PObject("a" -> PObject("b" -> PString(":D"))))
+    val ctx   = new IdmlContext(PObject("a" -> PObject("b" -> PString(":D"))))
     val chain = ptolemy.newChain(ptolemy.fromString("x.y = a.b.int()"))
     chain.run(ctx)
     assert(
@@ -76,7 +76,7 @@ class UnmappedFieldsFinderItTest extends FunSuite {
   }
 
   test("Function parameters are treated as mapped, one parameter") {
-    val ctx = new PtolemyContext(PObject("a" -> PObject("b" -> PString("abc %s"), "c" -> PString("123"))))
+    val ctx = new IdmlContext(PObject("a" -> PObject("b" -> PString("abc %s"), "c" -> PString("123"))))
     val chain =
       ptolemy.newChain(ptolemy.fromString("x.y = a.b.format(root.a.c)"))
     chain.run(ctx)
@@ -87,7 +87,7 @@ class UnmappedFieldsFinderItTest extends FunSuite {
   }
 
   test("Function parameters are treated as mapped, two parameters") {
-    val ctx = new PtolemyContext(
+    val ctx = new IdmlContext(
       PObject(
         "a" -> PObject(
           "b" -> PString("%s abc %s"),
@@ -103,7 +103,7 @@ class UnmappedFieldsFinderItTest extends FunSuite {
   }
 
   test("Function parameters are treated as unmapped if the function failed") {
-    val ctx = new PtolemyContext(PObject("a" -> PObject("b" -> PTrue, "c" -> PString("123"))))
+    val ctx = new IdmlContext(PObject("a" -> PObject("b" -> PTrue, "c" -> PString("123"))))
     val chain =
       ptolemy.newChain(ptolemy.fromString("x.y = a.b.format(root.a.c)"))
     chain.run(ctx)
@@ -114,7 +114,7 @@ class UnmappedFieldsFinderItTest extends FunSuite {
   }
 
   test("Function parameters are treated as unmapped if the whole expression failed") {
-    val ctx = new PtolemyContext(PObject("a" -> PObject("b" -> PString("abc %s"), "c" -> PString("123"))))
+    val ctx = new IdmlContext(PObject("a" -> PObject("b" -> PString("abc %s"), "c" -> PString("123"))))
     val chain =
       ptolemy.newChain(ptolemy.fromString("x.y = a.b.format(root.a.c).int()"))
     chain.run(ctx)
@@ -125,14 +125,14 @@ class UnmappedFieldsFinderItTest extends FunSuite {
   }
 
   test("Composite values are treated as mapped, regardless of whether their sub-components are referred to") {
-    val ctx   = new PtolemyContext(PObject("a" -> PObject("b" -> PString("http://localhost/"))))
+    val ctx   = new IdmlContext(PObject("a" -> PObject("b" -> PString("http://localhost/"))))
     val chain = ptolemy.newChain(ptolemy.fromString("x.y = a.b.url().host"))
     chain.run(ctx)
     assert(ctx.output === PObject("x" -> PObject("y" -> PString("localhost"))))
   }
 
   test("Calls without a prefix path don't break the stack: url()") {
-    val ctx   = new PtolemyContext(PObject("a" -> PObject("b" -> PTrue)))
+    val ctx   = new IdmlContext(PObject("a" -> PObject("b" -> PTrue)))
     val chain = ptolemy.newChain(ptolemy.fromString("x.y = url()"))
     chain.run(ctx)
     assert(ctx.output === PObject("unmapped" -> PObject("a" -> PObject("b" -> PTrue))))

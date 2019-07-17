@@ -1,12 +1,12 @@
 package io.idml.jackson
 
-import io.idml.Ptolemy
+import io.idml.Idml
 import org.scalatest.{MustMatchers, WordSpec}
 import JsonAstGenerator._
 import org.json4s._
 
 class JsonAstGeneratorTest extends WordSpec with MustMatchers {
-  val p = new Ptolemy()
+  val p = new Idml()
 
   "JsonAstGenerator" when {
     "fed a simple single level schema with 1 item" should {

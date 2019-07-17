@@ -2,20 +2,20 @@ package io.idml.jackson.difftool
 
 import io.idml.datanodes._
 import io.idml._
-import io.idml.jackson.PtolemyJackson
+import io.idml.jackson.IdmlJackson
 import org.scalatest.FunSuite
 
 class DiffTest extends FunSuite {
 
   /** Used to simplify tests */
-  implicit def strToJson(str: String): PtolemyValue = PtolemyJackson.default.parse(str)
+  implicit def strToJson(str: String): IdmlValue = IdmlJackson.default.parse(str)
 
   /** Used to simplify tests */
-  def diff(left: PtolemyValue, right: PtolemyValue): PtolemyValue =
+  def diff(left: IdmlValue, right: IdmlValue): IdmlValue =
     Diff.createDiff(left, right)
 
   /** Used to simplify tests */
-  def check(left: PtolemyValue, right: PtolemyValue, expected: PtolemyValue): Unit = {
+  def check(left: IdmlValue, right: IdmlValue, expected: IdmlValue): Unit = {
     val result = Diff.compare(left, right)
     assert(result === expected)
     // uncomment me to generate examples

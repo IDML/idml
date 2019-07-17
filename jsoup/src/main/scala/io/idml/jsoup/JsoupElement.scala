@@ -1,7 +1,7 @@
 package io.idml.jsoup
 
 import io.idml.datanodes.PString
-import io.idml.{MissingField, PtolemyArray, PtolemyObject, PtolemyValue}
+import io.idml.{IdmlArray, IdmlObject, IdmlValue, MissingField}
 import org.jsoup.nodes.{Element, TextNode}
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
@@ -12,7 +12,7 @@ import scala.collection.mutable
   *
   * @param element The underlying XML
   */
-class JsoupElement(val element: Element) extends PtolemyArray {
+class JsoupElement(val element: Element) extends IdmlArray {
   // scalastyle:off null
   require(element != null)
   // scalastyle:on null
@@ -21,7 +21,7 @@ class JsoupElement(val element: Element) extends PtolemyArray {
   val tag = PString(element.tagName())
 
   /** Attributes */
-  lazy val attributes: PtolemyObject = new JsoupAttributes(element.attributes())
+  lazy val attributes: IdmlObject = new JsoupAttributes(element.attributes())
 
   /** Children */
   lazy val children = {
@@ -35,7 +35,7 @@ class JsoupElement(val element: Element) extends PtolemyArray {
 
   /** The underlying items array */
   override lazy val items = {
-    val buf = mutable.Buffer[PtolemyValue](tag)
+    val buf = mutable.Buffer[IdmlValue](tag)
     if (attributes.fields.nonEmpty) {
       buf.append(attributes)
     }
@@ -49,7 +49,7 @@ class JsoupElement(val element: Element) extends PtolemyArray {
     * @param name The name of the tag
     * @return A new cursor
     */
-  override def get(name: String): PtolemyValue = {
+  override def get(name: String): IdmlValue = {
     name match {
       case "attribs" => attributes
       case _ =>

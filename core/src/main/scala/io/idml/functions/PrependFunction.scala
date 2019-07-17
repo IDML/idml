@@ -1,20 +1,20 @@
 package io.idml.functions
 
 import io.idml.datanodes.PArray
-import io.idml.{InvalidCaller, PtolemyArray, PtolemyNothing, PtolemyValue}
+import io.idml.{IdmlArray, IdmlNothing, IdmlValue, InvalidCaller}
 import io.idml.ast.Pipeline
 
 /** Prepend an argument to the calling array if it evaluated successfully */
-case class PrependFunction(arg: Pipeline) extends PtolemyFunction1 {
+case class PrependFunction(arg: Pipeline) extends IdmlFunction1 {
   override def name: String = "prepend"
 
-  protected def apply(cursor: PtolemyValue, val1: PtolemyValue): PtolemyValue = {
+  protected def apply(cursor: IdmlValue, val1: IdmlValue): IdmlValue = {
     cursor match {
-      case nothing: PtolemyNothing =>
+      case nothing: IdmlNothing =>
         nothing
-      case arr: PtolemyArray =>
+      case arr: IdmlArray =>
         val1 match {
-          case nothing: PtolemyNothing =>
+          case nothing: IdmlNothing =>
             // Do nothing to the cursor
             arr
           case prependee: Any =>

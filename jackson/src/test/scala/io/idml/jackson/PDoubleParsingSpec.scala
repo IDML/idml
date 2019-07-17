@@ -4,7 +4,7 @@ import io.idml.datanodes.PDouble
 import org.scalatest.{FunSuite, MustMatchers}
 
 class PDoubleParsingSpec extends FunSuite with MustMatchers {
-  import PtolemyJackson.default._
+  import IdmlJackson.default._
 
   // Parsing
   test("parse(float min)")(pending) //(DataNodes.parse(Float.MinValue.toString) must equal(new PDouble(Float.MinValue)))

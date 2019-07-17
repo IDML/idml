@@ -1,16 +1,16 @@
 package io.idml.ast
 
 import io.idml.datanodes.{PArray, PObject, PString}
-import io.idml.{PtolemyContext, PtolemyObject, PtolemyValue}
+import io.idml.{IdmlContext, IdmlObject, IdmlValue}
 
 import scala.collection.mutable
 
 /** The top level exec node. The only requirement is that it can be invoked */
 trait Node {
-  def invoke(ctx: PtolemyContext)
+  def invoke(ctx: IdmlContext)
 
   /** Call invoke in a closed context. Useful for pipls  */
-  def eval(ctx: PtolemyContext): PtolemyValue = {
+  def eval(ctx: IdmlContext): IdmlValue = {
     val tmp = ctx.cursor
     invoke(ctx)
     val res = ctx.cursor
@@ -19,7 +19,7 @@ trait Node {
   }
 
   /** Call invoke with a custom cursor. Useful inside preds */
-  def eval(ctx: PtolemyContext, cursor: PtolemyValue): PtolemyValue = {
+  def eval(ctx: IdmlContext, cursor: IdmlValue): IdmlValue = {
     val tmp = ctx.cursor
     ctx.cursor = cursor
     invoke(ctx)
@@ -33,7 +33,7 @@ trait Node {
 case class Document(blocks: Map[String, Block]) extends Node {
   val main = blocks.getOrElse(Document.Main, throw new IllegalArgumentException("missing main"))
 
-  override def invoke(ctx: PtolemyContext) {
+  override def invoke(ctx: IdmlContext) {
     main.invoke(ctx)
   }
 }
@@ -48,7 +48,7 @@ object Document {
 
 /** A reusable code block */
 case class Block(name: String, rules: List[Rule]) extends Node {
-  def invoke(ctx: PtolemyContext) {
+  def invoke(ctx: IdmlContext) {
     rules foreach (_.invoke(ctx))
   }
 }
@@ -57,7 +57,7 @@ case class Block(name: String, rules: List[Rule]) extends Node {
 trait Rule extends Node {
 
   /** Navigate to the next node in the tree  */
-  protected def navigateToNext(current: PtolemyObject, key: String): PtolemyObject =
+  protected def navigateToNext(current: IdmlObject, key: String): IdmlObject =
     current.fields.get(key) match {
       case None =>
         // This object doesn't exist, let's create it
@@ -81,15 +81,15 @@ trait Rule extends Node {
 trait Expression extends Node
 
 /** Execute a literal expression */
-case class Literal(value: PtolemyValue) extends Node {
-  def invoke(ctx: PtolemyContext) {
+case class Literal(value: IdmlValue) extends Node {
+  def invoke(ctx: IdmlContext) {
     ctx.cursor = value
   }
 }
 
 /** Navigate to an object field */
 case class Field(name: String) extends Expression {
-  def invoke(ctx: PtolemyContext) {
+  def invoke(ctx: IdmlContext) {
     ctx.enterPath(this)
     ctx.cursor = ctx.cursor.get(name)
     ctx.exitPath(this)
@@ -98,40 +98,40 @@ case class Field(name: String) extends Expression {
 
 /** Expressions like **.x mean "find 'x' at any depth" */
 case object Any extends Expression {
-  def invoke(ctx: PtolemyContext) {
+  def invoke(ctx: IdmlContext) {
     ???
   }
 }
 
 /** Expressions like [n, m] slice an array */
 case class Slice(from: Option[Int], to: Option[Int]) extends Expression {
-  def invoke(ctx: PtolemyContext) {
+  def invoke(ctx: IdmlContext) {
     ctx.cursor = ctx.cursor.slice(from, to)
   }
 }
 
 /** Expressions like [n] retrieve a single item from an array */
 case class Index(index: Int) extends Expression {
-  def invoke(ctx: PtolemyContext) {
+  def invoke(ctx: IdmlContext) {
     ctx.cursor = ctx.cursor.get(index)
   }
 }
 
 case class AstArray(pipls: List[Node]) extends Expression {
-  override def invoke(ctx: PtolemyContext): Unit = {
+  override def invoke(ctx: IdmlContext): Unit = {
     ctx.cursor = PArray(pipls.map(_.eval(ctx)).toBuffer)
   }
 }
 
 case class AstObject(piplmap: Map[PString, Pipeline]) extends Expression {
-  override def invoke(ctx: PtolemyContext): Unit = {
+  override def invoke(ctx: IdmlContext): Unit = {
     ctx.cursor = PObject(piplmap.map { case (k, v) => (k.value, v.eval(ctx)) }.toList: _*)
   }
 }
 
 /** Execute a mathematical expression */
 case class Maths(left: Node, operator: String, right: Node) extends Expression {
-  def invoke(ctx: PtolemyContext): Unit = {
+  def invoke(ctx: IdmlContext): Unit = {
     ctx.enterMaths(this)
     operator match {
       case "/" => ctx.cursor = left.eval(ctx) / right.eval(ctx)

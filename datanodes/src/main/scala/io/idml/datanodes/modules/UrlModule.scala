@@ -4,7 +4,7 @@ import java.net.URL
 
 import com.google.re2j.Pattern
 import io.idml.datanodes.{PArray, PUrl}
-import io.idml.{CastFailed, CastUnsupported, PtolemyNothing, PtolemyString, PtolemyValue}
+import io.idml.{CastFailed, CastUnsupported, IdmlNothing, IdmlString, IdmlValue}
 
 import scala.collection.mutable
 import scala.util.Try
@@ -25,20 +25,20 @@ object UrlModule {
 
 /** Adds URL manipulation behaviour to data nodes */
 trait UrlModule {
-  this: PtolemyValue =>
+  this: IdmlValue =>
 
   import UrlModule._
 
-  def urls(): PtolemyValue = this match {
-    case s: PtolemyString =>
-      new PArray(findAllIn(regex)(s.value).flatMap(u => Try(new PUrl(new URL(u))).toOption).toBuffer[PtolemyValue])
+  def urls(): IdmlValue = this match {
+    case s: IdmlString =>
+      new PArray(findAllIn(regex)(s.value).flatMap(u => Try(new PUrl(new URL(u))).toOption).toBuffer[IdmlValue])
     case _ => CastUnsupported
   }
 
   /** Construct a new URL by parsing a string */
-  def url(): PtolemyValue = this match {
-    case _: PUrl | _: PtolemyNothing => this
-    case n: PtolemyString =>
+  def url(): IdmlValue = this match {
+    case _: PUrl | _: IdmlNothing => this
+    case n: IdmlString =>
       Try(new URL(n.value)).map(new PUrl(_)).getOrElse(CastFailed)
     case _ => CastUnsupported
   }

@@ -1,5 +1,5 @@
 package io.idml.geo
 
-import io.idml.PtolemyScalaTestBase
+import io.idml.IdmlScalaTestBase
 
-class GeoFunctionsTest extends PtolemyScalaTestBase("io.idml.geo")
+class GeoFunctionsTest extends IdmlScalaTestBase("io.idml.geo")

@@ -3,27 +3,27 @@ package io.idml.geo
 import java.nio.charset.Charset
 
 import com.google.common.io.Resources
-import io.idml.{PtolemyJson, PtolemyValue}
-import io.idml.ast.{Argument, Pipeline, PtolemyFunction, PtolemyFunctionMetadata}
+import io.idml.{IdmlJson, IdmlValue}
+import io.idml.ast.{Argument, IdmlFunction, IdmlFunctionMetadata, Pipeline}
 import io.idml.functions.FunctionResolver
 
-class DefaultGeoFunctionResolver extends GeoFunctionResolver(PtolemyJson.load())
+class DefaultGeoFunctionResolver extends GeoFunctionResolver(IdmlJson.load())
 
-class GeoFunctionResolver(json: PtolemyJson) extends FunctionResolver {
+class GeoFunctionResolver(json: IdmlJson) extends FunctionResolver {
 
-  lazy val countries: PtolemyValue = json.parse(
+  lazy val countries: IdmlValue = json.parse(
     Resources
       .toString(Resources.getResource("io/idml/geo/Countries.json"), Charset.defaultCharset())
       .ensuring(_ != null)
   )
 
-  lazy val regions: PtolemyValue = json.parse(
+  lazy val regions: IdmlValue = json.parse(
     Resources
       .toString(Resources.getResource("io/idml/geo/Regions.json"), Charset.defaultCharset())
       .ensuring(_ != null)
   )
 
-  override def resolve(name: String, args: List[Argument]): Option[PtolemyFunction] = {
+  override def resolve(name: String, args: List[Argument]): Option[IdmlFunction] = {
     (name, args) match {
       case ("geo", Nil) =>
         Some(GeoFunction)
@@ -38,14 +38,14 @@ class GeoFunctionResolver(json: PtolemyJson) extends FunctionResolver {
       case _ => None
     }
   }
-  override def providedFunctions(): List[PtolemyFunctionMetadata] = List(
-    PtolemyFunctionMetadata("geo", List.empty, "turn this into a geo, by using the lat/long fields"),
-    PtolemyFunctionMetadata("geo", List("lat"         -> "latitude", "long" -> "longitude"), "create a geo object from a lat and a long"),
-    PtolemyFunctionMetadata("country", List("country" -> "country code to look up"), "look up a country code"),
-    PtolemyFunctionMetadata("region", List("region"   -> "region name to look up"), "look up a region"),
-    PtolemyFunctionMetadata("city", List("city"       -> "city name to look up"), "look up a city"),
-    PtolemyFunctionMetadata("admin1", List("admin1"   -> "admin1 name to look up"), "look up an admin1 area"),
-    PtolemyFunctionMetadata("timezone", List.empty, "turn this geo into a timezone, eg. Europe/London")
+  override def providedFunctions(): List[IdmlFunctionMetadata] = List(
+    IdmlFunctionMetadata("geo", List.empty, "turn this into a geo, by using the lat/long fields"),
+    IdmlFunctionMetadata("geo", List("lat"         -> "latitude", "long" -> "longitude"), "create a geo object from a lat and a long"),
+    IdmlFunctionMetadata("country", List("country" -> "country code to look up"), "look up a country code"),
+    IdmlFunctionMetadata("region", List("region"   -> "region name to look up"), "look up a region"),
+    IdmlFunctionMetadata("city", List("city"       -> "city name to look up"), "look up a city"),
+    IdmlFunctionMetadata("admin1", List("admin1"   -> "admin1 name to look up"), "look up an admin1 area"),
+    IdmlFunctionMetadata("timezone", List.empty, "turn this geo into a timezone, eg. Europe/London")
   )
 }
 
@@ -63,13 +63,13 @@ class InnerGeoDatabaseFunctionResolver(driver: String, cityUrl: String, admin1Ur
   val cityFunction   = Option(driver).map(_ => new CityFunction(driver, cityUrl, user, password))
   val admin1Function = Option(driver).map(_ => new Admin1Function(driver, admin1Url, user, password))
 
-  override def providedFunctions(): List[PtolemyFunctionMetadata] =
+  override def providedFunctions(): List[IdmlFunctionMetadata] =
     List(
-      PtolemyFunctionMetadata("city", List("city"     -> "city name to look up"), "look up a city"),
-      PtolemyFunctionMetadata("admin1", List("admin1" -> "admin1 name to look up"), "look up an admin1 area")
+      IdmlFunctionMetadata("city", List("city"     -> "city name to look up"), "look up a city"),
+      IdmlFunctionMetadata("admin1", List("admin1" -> "admin1 name to look up"), "look up an admin1 area")
     )
 
-  override def resolve(name: String, args: List[Argument]): Option[PtolemyFunction] = {
+  override def resolve(name: String, args: List[Argument]): Option[IdmlFunction] = {
     (name, args) match {
       case ("city", (city: Pipeline) :: Nil) =>
         cityFunction.map(_.CityFunction(city))

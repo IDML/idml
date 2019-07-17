@@ -9,44 +9,44 @@ import scala.util.Try
 
 /** Adds string node functions */
 trait StringModule {
-  this: PtolemyValue =>
+  this: IdmlValue =>
 
   /** Transform this node to a string */
-  def string(): PtolemyValue = this match {
-    case _: PtolemyString | _: PtolemyNothing => this
-    case n: PtolemyInt                        => PtolemyValue(n.value.toString)
-    case n: PtolemyDouble                     => PtolemyValue(n.value.toString)
-    case _                                    => CastUnsupported
+  def string(): IdmlValue = this match {
+    case _: IdmlString | _: IdmlNothing => this
+    case n: IdmlInt                     => IdmlValue(n.value.toString)
+    case n: IdmlDouble                  => IdmlValue(n.value.toString)
+    case _                              => CastUnsupported
   }
 
   /** Make a string lowercase */
-  def lowercase(): PtolemyValue = this
+  def lowercase(): IdmlValue = this
 
   /** Make a string uppercase */
-  def uppercase(): PtolemyValue = this
+  def uppercase(): IdmlValue = this
 
-  def capitalize(): PtolemyValue = this
+  def capitalize(): IdmlValue = this
 
-  def strip(): PtolemyValue = this
+  def strip(): IdmlValue = this
 
   /** Format strings */
-  def format(varargs: PtolemyValue*): PtolemyValue = {
+  def format(varargs: IdmlValue*): IdmlValue = {
     try {
       val args = varargs.map {
-        case s: PtolemyString => s.value
-        case i: PtolemyInt    => i.value
-        case d: PtolemyDouble => d.value
-        case b: PtolemyBool   => b.value
-        case e: Any           => e
+        case s: IdmlString => s.value
+        case i: IdmlInt    => i.value
+        case d: IdmlDouble => d.value
+        case b: IdmlBool   => b.value
+        case e: Any        => e
       }
 
       // don't run if anything is missing
-      if (args.exists(_.isInstanceOf[PtolemyNothing])) {
+      if (args.exists(_.isInstanceOf[IdmlNothing])) {
         InvalidParameters
       } else {
         this match {
-          case s: PtolemyString => PString(s.value.format(args: _*))
-          case _                => InvalidCaller
+          case s: IdmlString => PString(s.value.format(args: _*))
+          case _             => InvalidCaller
         }
       }
     } catch {

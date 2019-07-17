@@ -12,9 +12,9 @@ import scala.util.Try
 
 /** Adds maths node functions */
 trait MathsModule {
-  this: PtolemyValue =>
+  this: IdmlValue =>
 
-  private def doRound(sd: PtolemyValue, mode: RoundingMode): PtolemyValue = {
+  private def doRound(sd: IdmlValue, mode: RoundingMode): IdmlValue = {
     (this.toDoubleOption, sd) match {
       case (Some(d), i: PInt) => PDouble(BigDecimal(d.doubleValue()).underlying().setScale(i.value.toInt, mode).doubleValue)
       case (None, _)          => InvalidCaller
@@ -22,7 +22,7 @@ trait MathsModule {
     }
   }
 
-  private def doSigRound(sd: PtolemyValue, mode: RoundingMode): PtolemyValue = {
+  private def doSigRound(sd: IdmlValue, mode: RoundingMode): IdmlValue = {
     (this.toDoubleOption, sd) match {
       case (Some(d), i: PInt) if i.value < 1 => InvalidParameters
       case (Some(d), i: PInt)                => PDouble(BigDecimal(d.doubleValue()).round(new MathContext(i.value.toInt, mode)).doubleValue())
@@ -31,7 +31,7 @@ trait MathsModule {
     }
   }
 
-  private def parseHexInner(signed: Boolean): PtolemyValue = {
+  private def parseHexInner(signed: Boolean): IdmlValue = {
     this match {
       case PString(s) =>
         val array = BaseEncoding.base16().decode(s.toUpperCase)
@@ -49,60 +49,60 @@ trait MathsModule {
                   PString(java.lang.Integer.toUnsignedString(Ints.fromByteArray(array)))
               }
           }
-          .getOrElse(PtolemyNull)
+          .getOrElse(IdmlNull)
       case _ => InvalidCaller
     }
   }
 
-  def parseHex(): PtolemyValue         = parseHexInner(true)
-  def parseHexUnsigned(): PtolemyValue = parseHexInner(false)
+  def parseHex(): IdmlValue         = parseHexInner(true)
+  def parseHexUnsigned(): IdmlValue = parseHexInner(false)
 
-  def round(sd: PtolemyValue): PtolemyValue = doRound(sd, RoundingMode.HALF_UP)
-  def round(): PtolemyValue                 = doRound(PInt(0), RoundingMode.HALF_UP).int()
+  def round(sd: IdmlValue): IdmlValue = doRound(sd, RoundingMode.HALF_UP)
+  def round(): IdmlValue              = doRound(PInt(0), RoundingMode.HALF_UP).int()
 
-  def ceil(sd: PtolemyValue): PtolemyValue = doRound(sd, RoundingMode.CEILING)
-  def ceil(): PtolemyValue                 = doRound(PInt(0), RoundingMode.CEILING).int()
+  def ceil(sd: IdmlValue): IdmlValue = doRound(sd, RoundingMode.CEILING)
+  def ceil(): IdmlValue              = doRound(PInt(0), RoundingMode.CEILING).int()
 
-  def floor(sd: PtolemyValue): PtolemyValue = doRound(sd, RoundingMode.FLOOR)
-  def floor(): PtolemyValue                 = doRound(PInt(0), RoundingMode.FLOOR).int()
+  def floor(sd: IdmlValue): IdmlValue = doRound(sd, RoundingMode.FLOOR)
+  def floor(): IdmlValue              = doRound(PInt(0), RoundingMode.FLOOR).int()
 
-  def sigfig(sd: PtolemyValue): PtolemyValue = doSigRound(sd, RoundingMode.HALF_UP)
+  def sigfig(sd: IdmlValue): IdmlValue = doSigRound(sd, RoundingMode.HALF_UP)
 
-  private def extractDouble(v: PtolemyValue): Option[Double] = v match {
+  private def extractDouble(v: IdmlValue): Option[Double] = v match {
     case PInt(i)    => Some(i.toDouble)
     case PDouble(d) => Some(d)
     case _          => None
   }
 
-  def log(): PtolemyValue = extractDouble(this) match {
+  def log(): IdmlValue = extractDouble(this) match {
     case Some(d) if d <= 0.0 => InvalidCaller
     case Some(d)             => PDouble(java.lang.Math.log(d))
     case None                => InvalidCaller
   }
 
-  def abs(): PtolemyValue = this match {
+  def abs(): IdmlValue = this match {
     case PInt(i)    => PInt(java.lang.Math.abs(i))
     case PDouble(d) => PDouble(java.lang.Math.abs(d))
     case _          => InvalidCaller
   }
 
-  def pow(e: PtolemyValue): PtolemyValue = (extractDouble(this), extractDouble(e)) match {
+  def pow(e: IdmlValue): IdmlValue = (extractDouble(this), extractDouble(e)) match {
     case (Some(l), Some(r)) => PDouble(java.lang.Math.pow(l, r))
     case (None, _)          => InvalidCaller
     case (_, None)          => InvalidParameters
   }
 
-  def exp(): PtolemyValue = extractDouble(this) match {
+  def exp(): IdmlValue = extractDouble(this) match {
     case Some(d) => PDouble(java.lang.Math.exp(d))
     case None    => InvalidCaller
   }
 
-  def sqrt(): PtolemyValue = extractDouble(this) match {
+  def sqrt(): IdmlValue = extractDouble(this) match {
     case Some(d) => PDouble(Math.sqrt(d))
     case None    => InvalidCaller
   }
 
-  def /(target: PtolemyValue): PtolemyValue = {
+  def /(target: IdmlValue): IdmlValue = {
     this match {
       case i: PInt =>
         target match {
@@ -122,7 +122,7 @@ trait MathsModule {
     }
   }
 
-  def *(target: PtolemyValue): PtolemyValue = {
+  def *(target: IdmlValue): IdmlValue = {
     this match {
       case i: PInt =>
         target match {
@@ -140,7 +140,7 @@ trait MathsModule {
     }
   }
 
-  def +(target: PtolemyValue): PtolemyValue = {
+  def +(target: IdmlValue): IdmlValue = {
     this match {
       case i: PInt =>
         target match {
@@ -154,18 +154,18 @@ trait MathsModule {
           case td: PDouble => PDouble(d.value + td.value)
           case _           => InvalidParameters
         }
-      case s: PtolemyString =>
+      case s: IdmlString =>
         target match {
-          case ts: PtolemyString => PString(s.value + ts.value)
-          case ti: PInt          => PString(s.value + ti.value.toString)
-          case td: PDouble       => PString(s.value + td.value.toString)
-          case _                 => InvalidParameters
+          case ts: IdmlString => PString(s.value + ts.value)
+          case ti: PInt       => PString(s.value + ti.value.toString)
+          case td: PDouble    => PString(s.value + td.value.toString)
+          case _              => InvalidParameters
         }
       case _ => InvalidCaller
     }
   }
 
-  def -(target: PtolemyValue): PtolemyValue = {
+  def -(target: IdmlValue): IdmlValue = {
     this match {
       case i: PInt =>
         target match {

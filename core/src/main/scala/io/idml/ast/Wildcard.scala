@@ -1,43 +1,43 @@
 package io.idml.ast
 
 import io.idml.datanodes.{PArray, PObject}
-import io.idml.{NoFields, PtolemyArray, PtolemyContext, PtolemyNothing, PtolemyObject, PtolemyValue}
+import io.idml.{IdmlArray, IdmlContext, IdmlNothing, IdmlObject, IdmlValue, NoFields}
 
 import scala.collection.mutable
 
 /** Perform wildcard operations like a.*.b */
 case class Wildcard(tail: Pipeline) extends Expression {
 
-  def invokeForObject(ctx: PtolemyContext, obj: PtolemyObject) {
-    val res = mutable.SortedMap[String, PtolemyValue]()
+  def invokeForObject(ctx: IdmlContext, obj: IdmlObject) {
+    val res = mutable.SortedMap[String, IdmlValue]()
     obj.fields foreach {
       case (key, value) =>
         ctx.cursor = value
         tail.eval(ctx) match {
-          case n: PtolemyNothing => ()
-          case n: Any            => res(key) = n
+          case n: IdmlNothing => ()
+          case n: Any         => res(key) = n
         }
     }
     ctx.cursor = new PObject(res)
   }
 
-  def invokeForArray(ctx: PtolemyContext, arr: PtolemyArray) {
-    val res = mutable.Buffer[PtolemyValue]()
+  def invokeForArray(ctx: IdmlContext, arr: IdmlArray) {
+    val res = mutable.Buffer[IdmlValue]()
     arr.items foreach { value =>
       ctx.cursor = value
       tail.eval(ctx) match {
-        case n: PtolemyNothing => ()
-        case n: Any            => res.append(n)
+        case n: IdmlNothing => ()
+        case n: Any         => res.append(n)
       }
     }
     ctx.cursor = new PArray(res)
   }
 
-  def invoke(ctx: PtolemyContext) {
+  def invoke(ctx: IdmlContext) {
     ctx.cursor match {
-      case obj: PtolemyObject => invokeForObject(ctx, obj)
-      case arr: PtolemyArray  => invokeForArray(ctx, arr)
-      case _                  => ctx.cursor = NoFields
+      case obj: IdmlObject => invokeForObject(ctx, obj)
+      case arr: IdmlArray  => invokeForArray(ctx, arr)
+      case _               => ctx.cursor = NoFields
     }
   }
 }

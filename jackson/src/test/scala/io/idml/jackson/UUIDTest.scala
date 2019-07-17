@@ -1,6 +1,6 @@
 package io.idml.jackson
 
-import io.idml.{PtolemyContext, PtolemyValue}
+import io.idml.{IdmlContext, IdmlValue}
 import io.idml.datanodes.{PObject, PString}
 import org.scalatest.{FunSuite, MustMatchers}
 
@@ -8,8 +8,8 @@ class UUIDTest extends FunSuite with MustMatchers {
   val funcs = new JacksonFunctions
   import funcs.uuid._
 
-  def v3(pv: PtolemyValue): PtolemyValue = uuid3Function.eval(new PtolemyContext(), pv)
-  def v5(pv: PtolemyValue): PtolemyValue = uuid5Function.eval(new PtolemyContext(), pv)
+  def v3(pv: IdmlValue): IdmlValue = uuid3Function.eval(new IdmlContext(), pv)
+  def v5(pv: IdmlValue): IdmlValue = uuid5Function.eval(new IdmlContext(), pv)
 
   /*
   I generated these using the python uuid3 and uuid5 methods to make sure they're the same

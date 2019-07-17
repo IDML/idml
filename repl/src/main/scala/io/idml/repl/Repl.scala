@@ -7,8 +7,8 @@ import java.util.Properties
 import io.idml.datanodes.PObject
 import io.idml._
 import io.idml.hashing.HashingFunctionResolver
-import io.idml.jackson.PtolemyJackson
-import io.idml.jsoup.{JsoupFunctionResolver, PtolemyJsoup}
+import io.idml.jackson.IdmlJackson
+import io.idml.jsoup.{IdmlJsoup, JsoupFunctionResolver}
 
 import scala.sys.ShutdownHookThread
 import scala.tools.jline.TerminalFactory
@@ -32,15 +32,15 @@ class Repl {
   var mode: String         = "json"
   var doc: Option[PObject] = None
 
-  val ptolemyJson = PtolemyJackson.default
+  val ptolemyJson = IdmlJackson.default
 
   def run(args: Array[String]) = runInner(args)
 
   def runInner(args: Array[String], fr: Option[FunctionResolverService] = None) {
     addShutdownHook()
 
-    val ptolemy = new Ptolemy(
-      new PtolemyConf,
+    val ptolemy = new Idml(
+      new IdmlConf,
       fr.getOrElse(new FunctionResolverService())
     )
 
@@ -126,7 +126,7 @@ class Repl {
                 """.stripMargin)
   }
 
-  def processInput(ptolemy: Ptolemy)(input: String) {
+  def processInput(ptolemy: Idml)(input: String) {
     mode match {
       case "json"   => processJson(input)
       case "idml"   => processIdml(ptolemy)(input)
@@ -147,7 +147,7 @@ class Repl {
     }
   }
 
-  def processIdml(ptolemy: Ptolemy)(input: String) {
+  def processIdml(ptolemy: Idml)(input: String) {
     try {
       val mapping = ptolemy.fromString(input)
       val output  = mapping.run(doc.get)
@@ -158,7 +158,7 @@ class Repl {
     }
   }
 
-  def processSchema(ptolemy: Ptolemy)(input: String) {
+  def processSchema(ptolemy: Idml)(input: String) {
     try {
       var mapping: String = ""
       doc.get.fields.keySet.foreach {

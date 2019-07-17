@@ -2,36 +2,36 @@ package io.idml.functions
 
 import io.idml.datanodes.{PArray, PObject}
 import io.idml._
-import io.idml.ast.{Node, PtolemyFunction}
+import io.idml.ast.{IdmlFunction, Node}
 
 import scala.collection.{immutable, mutable}
 
-case class GroupByFunction(expr: Node) extends PtolemyFunction {
+case class GroupByFunction(expr: Node) extends IdmlFunction {
   def args: immutable.Nil.type = Nil
 
   def name: String = "groupBy"
 
-  protected def extractOpt(ctx: PtolemyContext, item: PtolemyValue): Option[PtolemyValue] = {
+  protected def extractOpt(ctx: IdmlContext, item: IdmlValue): Option[IdmlValue] = {
     ctx.scope = item
     ctx.cursor = item
     expr.invoke(ctx)
-    if (ctx.cursor.isInstanceOf[PtolemyNothing]) {
+    if (ctx.cursor.isInstanceOf[IdmlNothing]) {
       None
     } else {
       Some(ctx.cursor)
     }
   }
 
-  override def invoke(ctx: PtolemyContext): Unit = {
+  override def invoke(ctx: IdmlContext): Unit = {
     // Preserve context
     val oldScope  = ctx.scope
     val oldOutput = ctx.output
 
     // Iterate items in the array
     ctx.cursor match {
-      case nothing: PtolemyNothing =>
+      case nothing: IdmlNothing =>
         nothing
-      case array: PtolemyArray =>
+      case array: IdmlArray =>
         val results = {
           val vs = array.items
             .flatMap(x =>
@@ -41,7 +41,7 @@ case class GroupByFunction(expr: Node) extends PtolemyFunction {
             .groupBy(_._1)
             .mapValues(_.map(_._2))
             .mapValues(PArray(_))
-          PObject(mutable.SortedMap[String, PtolemyValue](vs.toList: _*))
+          PObject(mutable.SortedMap[String, IdmlValue](vs.toList: _*))
         }
         ctx.cursor = results
       case _ =>

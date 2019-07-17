@@ -1,6 +1,6 @@
 package io.idml.datanodes
 
-import io.idml.{PtolemyNull, PtolemyValue}
+import io.idml.{IdmlNull, IdmlValue}
 import org.scalatest._
 import scala.collection.mutable
 
@@ -21,10 +21,10 @@ class PObjectTest extends FunSuite with MustMatchers {
   def withPrimitives =
     new PObject(
       mutable.SortedMap(
-        "s" -> PtolemyValue("abc"),
-        "i" -> PtolemyValue(123),
-        "f" -> PtolemyValue(123.4),
-        "n" -> PtolemyNull
+        "s" -> IdmlValue("abc"),
+        "i" -> IdmlValue(123),
+        "f" -> IdmlValue(123.4),
+        "n" -> IdmlNull
       ))
 
   def withNestedObjects =
@@ -32,10 +32,10 @@ class PObjectTest extends FunSuite with MustMatchers {
       mutable.SortedMap(
         "o" -> new PObject(
           mutable.SortedMap(
-            "s" -> PtolemyValue("abc"),
-            "i" -> PtolemyValue(123),
-            "f" -> PtolemyValue(123.4),
-            "n" -> PtolemyNull
+            "s" -> IdmlValue("abc"),
+            "i" -> IdmlValue(123),
+            "f" -> IdmlValue(123.4),
+            "n" -> IdmlNull
           ))))
 
   def withNestedArrays =
@@ -43,10 +43,10 @@ class PObjectTest extends FunSuite with MustMatchers {
       mutable.SortedMap(
         "a" -> new PArray(
           mutable.ListBuffer(
-            PtolemyValue("abc"),
-            PtolemyValue(123),
-            PtolemyValue(123.4),
-            PtolemyNull
+            IdmlValue("abc"),
+            IdmlValue(123),
+            IdmlValue(123.4),
+            IdmlNull
           ))))
 
   // deepmerge
@@ -59,7 +59,7 @@ class PObjectTest extends FunSuite with MustMatchers {
 
   val one = PInt(1)
   val two = PInt(2)
-  val x   = (p: PtolemyValue) => PObject("x" -> p)
+  val x   = (p: IdmlValue) => PObject("x" -> p)
   test("deepmerge should merge arrays") {
     x(PArray(one, two, one)) deepMerge x(PArray(two, two, one)) must equal(x(PArray(two, two, one)))
   }
