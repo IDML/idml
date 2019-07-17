@@ -98,12 +98,9 @@ object WebsocketServer {
                         val jsons = x.in
                         val p     = x.path.getOrElse("root")
                         val path  = ptolemy.fromString(s"result = $p")
-                        jsons
-                          .map { j =>
-                            parse(PtolemyCirce.compact(path.run(chain.run(j)))).toTry
-                          }
-                          .sequence
-                          .toEither
+                        jsons.map { j =>
+                          Try { path.run(chain.run(j)).asJson }.toEither
+                        }.sequence
                       }.toEither
                         .leftMap(e => List(e.getMessage))
                         .flatMap(_.toTry.toEither.leftMap(e => List(e.getMessage)))
