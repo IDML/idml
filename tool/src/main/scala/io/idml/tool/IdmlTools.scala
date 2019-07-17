@@ -8,10 +8,11 @@ import cats.syntax._
 import cats.data._
 import com.monovore.decline._
 import DeclineHelpers._
-import io.idml.{jackson, _}
+import io.idml._
 import io.idml.utils.DocumentValidator
 import io.idmlrepl.Repl
 import io.idml.hashing.HashingFunctionResolver
+import io.idml.jackson.PtolemyJackson
 import io.idml.jsoup.JsoupFunctionResolver
 import io.idml.server.Server
 import org.slf4j.LoggerFactory
@@ -36,7 +37,7 @@ object IdmlTools {
   val functionResolver: Opts[FunctionResolverService] = (dynamic, plugins).mapN { (d, pf) =>
     val baseFunctionResolver = if (d) { new FunctionResolverService } else {
       new StaticFunctionResolverService(
-        (StaticFunctionResolverService.defaults.asScala ++ List(new JsoupFunctionResolver(), new HashingFunctionResolver())).asJava)
+        (StaticFunctionResolverService.defaults(PtolemyJackson.default).asScala ++ List(new JsoupFunctionResolver(), new HashingFunctionResolver())).asJava)
     }
     pf.fold(baseFunctionResolver) { urls =>
       FunctionResolverService.orElse(baseFunctionResolver, new PluginFunctionResolverService(urls.toList.toArray))
@@ -119,14 +120,14 @@ object IdmlTools {
               .filter(!_.isEmpty)
               .map { s: String =>
                 Try {
-                  chain.run(jackson.PtolemyJson.parse(s))
+                  chain.run(PtolemyJackson.default.parse(s))
                 }
               }
               .foreach {
                 case Success(json) =>
                   config.pretty match {
-                    case true  => println(jackson.PtolemyJson.pretty(json))
-                    case false => println(jackson.PtolemyJson.compact(json))
+                    case true  => println(PtolemyJackson.default.pretty(json))
+                    case false => println(PtolemyJackson.default.compact(json))
                   }
                   Console.flush()
                 case Failure(e) =>

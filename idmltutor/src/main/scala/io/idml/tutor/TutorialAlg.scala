@@ -8,10 +8,9 @@ import cats.effect.implicits._
 import fansi._
 import io.idml.{Ptolemy, PtolemyValue}
 import Colours._
-import io.idml.circe.PtolemyJson
 import io.idml.test.diffable.TestDiff
 import io.circe._, io.circe.syntax._
-import io.idml.circe._
+import io.idml.circe.instances._
 
 class TutorialAlg[F[_]](jline: JLine[F])(implicit F: Sync[F]) {
   def title(s: String): F[Unit] = for {
