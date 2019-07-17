@@ -1,6 +1,7 @@
 package io.idml.geo
 
 import io.idml.Ptolemy
+import io.idml.jackson.PtolemyJackson
 import org.scalatest.FunSuite
 
 class Dev2680Test extends FunSuite {
@@ -34,7 +35,7 @@ class Dev2680Test extends FunSuite {
         """.stripMargin
       )
     )
-    val input = PtolemyJson.parse(
+    val input = PtolemyJackson.default.parse(
       """
         |{
         |  "ollie": {

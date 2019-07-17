@@ -27,6 +27,6 @@
     "name": "groupBy should be able to group on an array",
     "mapping": "output = input.groupBy([this.breed, this.age])",
     "input": {"input": [{"breed": "blue", "age": 3, "name": "Martin"}, {"breed": "tabby", "age": 2, "name": "Marge"}, {"breed": "blue", "age": 3, "name": "Terry"}]},
-    "output": {"output": {"[\\\"blue\\\",3]": [{"breed": "blue", "age": 3, "name": "Martin"}, {"breed": "blue", "age": 3, "name": "Terry"}], "[\\\"tabby\\\",2]": [{"breed": "tabby", "age": 2, "name": "Marge"}]}}
+    "output": {"output": {"[blue,3]": [{"breed": "blue", "age": 3, "name": "Martin"}, {"breed": "blue", "age": 3, "name": "Terry"}], "[tabby,2]": [{"breed": "tabby", "age": 2, "name": "Marge"}]}}
   }
 ]

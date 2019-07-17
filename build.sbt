@@ -80,7 +80,7 @@ lazy val geo = project
     )
   )
 
-lazy val jsoup = project.dependsOn(core).settings(commonSettings)
+lazy val jsoup = project.dependsOn(core).dependsOn(test % "test->test").settings(commonSettings)
 
 lazy val hashing = project.dependsOn(core).settings(commonSettings)
 

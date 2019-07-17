@@ -2,6 +2,7 @@ package io.idml.jsoup
 
 import io.idml.datanodes._
 import io.idml.PtolemyValue
+import io.idml.jackson.PtolemyJackson
 import org.scalatest.FunSuite
 
 /** Integration tests for the PtolemyJsoup library */
@@ -10,7 +11,7 @@ class PtolemyJsoupItTest extends FunSuite {
   val root = PString("#root")
 
   def parse(xml: String): PtolemyValue = {
-    PtolemyJson.parse(PtolemyJson.compact(PtolemyJsoup.parseXml(xml)))
+    PtolemyJackson.default.parse(PtolemyJackson.default.compact(PtolemyJsoup.parseXml(xml)))
   }
 
   test("An 'a' tag") {
