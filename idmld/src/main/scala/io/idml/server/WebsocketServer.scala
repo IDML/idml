@@ -18,6 +18,8 @@ import io.idml.ast.PtolemyFunctionMetadata
 import io.idml.hashing.HashingFunctionResolver
 import io.idml.jsoup.JsoupFunctionResolver
 import io.idml._
+import io.idml.circe.instances._
+import io.idml.circe._
 import fs2._
 import org.http4s.server.websocket.WebSocketBuilder
 import org.http4s.websocket.WebSocketFrame.Text
@@ -32,28 +34,31 @@ object WebsocketServer {
 
   import org.http4s.dsl.io._
   import org.http4s.websocket._
+  import org.http4s.circe.CirceEntityDecoder._
 
-  case class Request(in: List[Json], idml: String, path: Option[String])
+  case class Request(in: List[PtolemyObject], idml: String, path: Option[String])
   case class Response(out: Option[List[Json]], errors: Option[List[String]])
 
-  case class Complete(in: List[Json], idml: String, position: Int)
-  implicit def dec[F[_]: Sync, A](implicit decoder: Decoder[A]): EntityDecoder[F, A] = jsonOf
+  case class Complete(in: List[PtolemyObject], idml: String, position: Int)
 
   val functions =
-    (StaticFunctionResolverService.defaults.asScala ++ List(new JsoupFunctionResolver, new HashingFunctionResolver)).toList.flatMap { f =>
-      f.providedFunctions().filterNot(_.name.startsWith("$"))
-    }
+    (StaticFunctionResolverService.defaults(PtolemyCirce).asScala ++ List(new JsoupFunctionResolver, new HashingFunctionResolver)).toList
+      .flatMap { f =>
+        f.providedFunctions().filterNot(_.name.startsWith("$"))
+      }
 
   val completionPtolemy = new Ptolemy(
     new PtolemyConf(),
     new StaticFunctionResolverService(
-      (StaticFunctionResolverService.defaults.asScala ++ List(new JsoupFunctionResolver, new HashingFunctionResolver, new AnalysisModule)).asJava
+      (StaticFunctionResolverService.defaults(PtolemyCirce).asScala ++ List(new JsoupFunctionResolver,
+                                                                            new HashingFunctionResolver,
+                                                                            new AnalysisModule)).asJava
     )
   )
 
   def service(fr: FunctionResolverService)(implicit ec: ExecutionContext, c: Concurrent[IO]) = {
     val ptolemy = new Ptolemy(new PtolemyConf(), fr)
-    HttpService[IO] {
+    HttpRoutes.of[IO] {
       case GET -> Root / "functions" / partial =>
         Ok(functions.filter(_.name.startsWith(partial)).asJson)
       case req @ POST -> Root / "completion" =>
@@ -61,7 +66,7 @@ object WebsocketServer {
           .as[Complete]
           .map { c =>
             c.in.flatMap { doc =>
-              AutoComplete.complete(completionPtolemy)(jackson.PtolemyJson.parse(doc.noSpaces).asInstanceOf[PtolemyObject], c.idml, c.position)
+              AutoComplete.complete(completionPtolemy)(doc, c.idml, c.position)
             }.asJson
           }
           .flatMap(Ok(_))
@@ -90,12 +95,12 @@ object WebsocketServer {
                       Try {
                         log.info(x.toString)
                         val chain = ptolemy.fromString(x.idml)
-                        val jsons = x.in.map(i => jackson.PtolemyJson.parse(i.toString))
+                        val jsons = x.in
                         val p     = x.path.getOrElse("root")
                         val path  = ptolemy.fromString(s"result = $p")
                         jsons
                           .map { j =>
-                            parse(jackson.PtolemyJson.compact(path.run(chain.run(j)))).toTry
+                            parse(PtolemyCirce.compact(path.run(chain.run(j)))).toTry
                           }
                           .sequence
                           .toEither

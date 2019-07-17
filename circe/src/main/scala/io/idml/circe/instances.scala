@@ -25,11 +25,7 @@ object instances {
     override def onArray(value: Vector[Json]): PtolemyValue = new PArray(
       value.map(_.foldWith(rawIdmlCirceDecoder)).toBuffer
     )
-    override def onObject(value: JsonObject): PtolemyValue = new PObject(
-      value.toIterable.foldLeft(mutable.SortedMap.empty[String, PtolemyValue]) {
-        case (acc, (k, v)) => acc += k -> v.foldWith(rawIdmlCirceDecoder)
-      }
-    )
+    override def onObject(value: JsonObject): PtolemyValue = decodeObject(value)
   }
 
   implicit val decoder: Decoder[PtolemyValue] =
@@ -52,6 +48,18 @@ object instances {
     case _: PtolemyNothing => Json.Null
     case PtolemyNull       => Json.Null
   }
+
+  def decodeObject(value: JsonObject): PtolemyObject =
+    new PObject(
+      value.toIterable.foldLeft(mutable.SortedMap.empty[String, PtolemyValue]) {
+        case (acc, (k, v)) => acc += k -> v.foldWith(rawIdmlCirceDecoder)
+      }
+    )
+
+  implicit val objectDecoder: Decoder[PtolemyObject] =
+    Decoder[Json].emap { j: Json =>
+      Either.fromOption(j.asObject, "Only an Object can be decoded into a PtolemyObject")
+    }.emapTry(o => Try(decodeObject(o)))
 
   implicit val idmlCirceEncoder: Encoder[PtolemyValue] = Encoder.instance(rawIdmlCirceEncoder)
 
