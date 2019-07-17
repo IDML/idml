@@ -119,15 +119,6 @@ lazy val idmltutor = project
     }
   )
 
-lazy val bench = project
-  .dependsOn(core)
-  .dependsOn(circe)
-  .dependsOn(datanodes)
-  .dependsOn(jsoup)
-  .dependsOn(geo)
-  .dependsOn(hashing)
-  .enablePlugins(JmhPlugin)
-
 lazy val tool = project
   .dependsOn(core)
   .dependsOn(jsoup)
