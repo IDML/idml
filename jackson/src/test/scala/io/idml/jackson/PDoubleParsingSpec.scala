@@ -3,7 +3,7 @@ package io.idml.jackson
 import io.idml.datanodes.PDouble
 import org.scalatest.{FunSuite, MustMatchers}
 
-class PDoubleParsingSpec extends FunSuite with MustMatchers{
+class PDoubleParsingSpec extends FunSuite with MustMatchers {
   import PtolemyJackson.default._
 
   // Parsing

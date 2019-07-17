@@ -36,7 +36,7 @@ class ObjectParsingSpec extends FunSuite with MustMatchers {
 
   def pc = compact _ andThen parse
 
-    def withPrimitives =
+  def withPrimitives =
     new PObject(
       mutable.SortedMap(
         "s" -> PtolemyValue("abc"),

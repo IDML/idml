@@ -21,9 +21,7 @@ class ArrayParsingSpec extends FunSuite with MustMatchers {
   test("generate with nested objects")(parse("""[{"s": "abc", "i": 123, "f": 123.4, "n": null}]""") must equal(pc(withNestedObjects)))
   test("generate with nested arrays")(parse("""[["abc", 123, 123.4, null]]""") must equal(pc(withNestedArrays)))
 
-
-
-    def pc = compact _ andThen parse
+  def pc = compact _ andThen parse
 
   def withPrimitives =
     new PArray(

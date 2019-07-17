@@ -5,7 +5,7 @@ import org.scalatest.{FunSuite, MustMatchers}
 
 class NullParsingSpec extends FunSuite with MustMatchers {
   import PtolemyJackson.default._
-    // Parsing
+  // Parsing
   test("parse(null)")(parse("null") must equal(PtolemyNull))
 
   // Generation

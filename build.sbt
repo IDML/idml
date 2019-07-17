@@ -43,7 +43,9 @@ lazy val lang = project.settings(commonSettings)
 
 lazy val datanodes = project.settings(commonSettings)
 
-lazy val circe = project.dependsOn(datanodes).dependsOn(core).settings(commonSettings)
+lazy val jackson: Project = project.dependsOn(core % "compile->compile;test->test").settings(commonSettings)
+
+lazy val circe = project.dependsOn(datanodes).dependsOn(core % "compile->compile;test->test").settings(commonSettings)
 
 lazy val core: Project = project
   .dependsOn(datanodes)
@@ -82,7 +84,6 @@ lazy val jsoup = project.dependsOn(core).settings(commonSettings)
 
 lazy val hashing = project.dependsOn(core).settings(commonSettings)
 
-lazy val jackson: Project = project.dependsOn(core).settings(commonSettings)
 
 lazy val utils = project.dependsOn(core).dependsOn(jsoup).settings(commonSettings)
 

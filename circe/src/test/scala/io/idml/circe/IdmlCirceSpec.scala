@@ -3,13 +3,13 @@ package io.idml.circe
 import io.idml.datanodes._
 import org.scalatest.{MustMatchers, WordSpec}
 import io.circe.syntax._
-import io.idml.circe._
+import io.idml.circe.instances._
 
 class IdmlCirceSpec extends WordSpec with MustMatchers {
 
   "IdmlCirce" should {
     "work" in {
-      PtolemyJson.parseUnsafe("""{"a":[1,2,3,"hello"]}""") must equal(
+      PtolemyCirce.parse("""{"a":[1,2,3,"hello"]}""") must equal(
         PObject(
           "a" -> PArray(
             PInt(1),

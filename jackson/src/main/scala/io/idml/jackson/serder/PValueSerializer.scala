@@ -31,7 +31,8 @@ class PValueSerializer extends JsonSerializer[PtolemyValue] {
       case n: PtolemyObject =>
         json.writeStartObject()
         n.fields filterNot (_._2.isInstanceOf[PtolemyNothing]) foreach {
-          case (k, v) => json.writeObjectField(k, v)
+          case (k, v) =>
+            json.writeObjectField(k, v)
         }
         json.writeEndObject()
 

@@ -4,7 +4,7 @@ import io.idml.PtolemyJson
 import io.idml.datanodes.PString
 import org.scalatest.{FunSuite, MustMatchers}
 
-class StringParsingSpec extends FunSuite with MustMatchers{
+class StringParsingSpec extends FunSuite with MustMatchers {
   import PtolemyJackson.default._
 
   // Parsing

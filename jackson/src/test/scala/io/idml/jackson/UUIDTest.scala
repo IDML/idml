@@ -11,7 +11,6 @@ class UUIDTest extends FunSuite with MustMatchers {
   def v3(pv: PtolemyValue): PtolemyValue = uuid3Function.eval(new PtolemyContext(), pv)
   def v5(pv: PtolemyValue): PtolemyValue = uuid5Function.eval(new PtolemyContext(), pv)
 
-
   /*
   I generated these using the python uuid3 and uuid5 methods to make sure they're the same
    */

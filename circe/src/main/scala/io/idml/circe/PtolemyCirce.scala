@@ -11,7 +11,7 @@ import cats._, cats.implicits._
 
 import io.idml._
 
-class CirceJson extends PtolemyJson {
+class PtolemyCirce extends PtolemyJson {
   import io.idml.circe.instances._
 
   def read(in: String): Either[Throwable, PtolemyValue] = io.circe.parser.decode[PtolemyValue](in).leftMap[Throwable](e => new PtolemyJsonReadingException(e))
@@ -32,4 +32,4 @@ class CirceJson extends PtolemyJson {
   override def pretty(d: PtolemyValue): String = d.asJson.spaces4
 }
 
-object CirceJson extends CirceJson
+object PtolemyCirce extends PtolemyCirce

@@ -18,5 +18,4 @@ class IntParsingSpec extends FunSuite with MustMatchers {
   test("generate(long min)")(Long.MinValue.toString === compact(PInt(Long.MinValue)))
   test("generate(long max)")(Long.MaxValue.toString === compact(PInt(Long.MaxValue)))
 
-
 }
