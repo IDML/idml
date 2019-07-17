@@ -10,7 +10,9 @@ import io.circe._
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.Printer.spaces2
-import io.idml.{FunctionResolverService, PluginFunctionResolverService, Ptolemy, PtolemyConf, PtolemyMapping, StaticFunctionResolverService}
+import io.idml.circe.PtolemyCirce
+import io.idml.circe.instances._
+import io.idml._
 import fs2._
 import Test._
 
@@ -23,7 +25,7 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
   def ptolemy(time: Option[Long]): IO[Ptolemy] = IO {
     val baseFunctionResolver =
       new StaticFunctionResolverService(
-        (new DeterministicTime(time.getOrElse(0L)) :: StaticFunctionResolverService.defaults.asScala.toList).asJava)
+        (new DeterministicTime(time.getOrElse(0L)) :: StaticFunctionResolverService.defaults(PtolemyCirce).asScala.toList).asJava)
     val frs = plugins.fold[FunctionResolverService](
       baseFunctionResolver
     )(
@@ -46,14 +48,16 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
   def runSingle: (Option[Long], String, Json) => IO[Json] =
     run({ (m: PtolemyMapping, j: Json) =>
       IO {
-        PtolemyJson.compact(m.run(PtolemyJson.parse(j.toString)))
-      }.flatMap(parseJ).map(_.foldWith(notNulls))
+        j.as[PtolemyObject].map(m.run).map(_.asJson.foldWith(notNulls)).leftWiden[Throwable]
+      }.rethrow
     })
 
   def runMulti(implicit timer: ContextShift[IO]): (Option[Long], String, List[Json]) => IO[List[Json]] =
     run({ (m: PtolemyMapping, js: List[Json]) =>
       js.parTraverse { j =>
-        IO { PtolemyJson.compact(m.run(PtolemyJson.parse(j.toString))) }.flatMap(parseJ).map(_.foldWith(notNulls))
+        IO {
+          j.as[PtolemyObject].map(m.run).map(_.asJson.foldWith(notNulls)).leftWiden[Throwable]
+        }.rethrow
       }
     })
 

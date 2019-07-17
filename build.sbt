@@ -95,7 +95,7 @@ lazy val idmldoc = project.dependsOn(core).dependsOn(utils).dependsOn(circe).set
 
 lazy val `idmldoc-plugin` = project.dependsOn(idmldoc).settings(commonSettings)
 
-lazy val idmltest = project.dependsOn(core).dependsOn(utils).settings(commonSettings)
+lazy val idmltest = project.dependsOn(core).dependsOn(utils).dependsOn(circe).settings(commonSettings)
 
 lazy val `idmltest-plugin` = project.dependsOn(idmltest).dependsOn(hashing).dependsOn(geo).dependsOn(jsoup).settings(commonSettings)
 
