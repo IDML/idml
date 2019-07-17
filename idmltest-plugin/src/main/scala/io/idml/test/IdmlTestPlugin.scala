@@ -28,8 +28,8 @@ object IdmlTestPlugin extends AutoPlugin {
     (sbt.Test / test) := ((sbt.Test / test) dependsOn idmlTest).value,
     idmlTest := {
       implicit val cs = cats.effect.IO.contextShift(global)
-      val runner = new Runner(true, None, false, global)
-      val folder = idmlTestDirectory.value.toPath
+      val runner      = new Runner(true, None, false, global)
+      val folder      = idmlTestDirectory.value.toPath
       println(s"Executing IDML tests in $folder")
       val tests = Files.walk(folder).iterator().asScala.filter(_.getParent == folder).filter(_.toString.endsWith(".json")).toList
       val run = for {

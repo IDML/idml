@@ -39,7 +39,7 @@ class PDateTest extends FunSuite with MustMatchers {
 
   test("Correctly interpret millisecond timestamps from a string") {
     val nowLong = 1414755054310L
-    val parsed = PString(nowLong.toString)
+    val parsed  = PString(nowLong.toString)
     val actual  = parsed.millis()
     //make sure the parsed value is actually a PString
     assert(classOf[PString] isAssignableFrom parsed.getClass)

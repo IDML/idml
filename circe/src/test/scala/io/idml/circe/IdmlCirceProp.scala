@@ -19,5 +19,5 @@ class IdmlCirceProp extends Properties("IdmlCirce") with ArbitraryInstances {
       }
       .getOrElse(false)
   }
-  */
+ */
 }

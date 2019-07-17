@@ -402,7 +402,7 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
     }
     val singleQuoted = quotedString('\'')
     val doubleQuoted = quotedString('"')
-    val triple = "\"\"\""
+    val triple       = "\"\"\""
     val tripleQuoted = string(triple) *> manyUntil(unicode | anyChar, string(triple)).map(_.mkString(""))
     (singleQuoted | tripleQuoted | doubleQuoted).map(s => PString(s))
   }

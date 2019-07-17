@@ -12,7 +12,8 @@ class DeterministicTimeSpec extends WordSpec with MustMatchers {
     "override now" in {
       val p = new Ptolemy(
         new PtolemyConf(),
-        new StaticFunctionResolverService((new DeterministicTime() :: StaticFunctionResolverService.defaults(PtolemyCirce).asScala.toList).asJava)
+        new StaticFunctionResolverService(
+          (new DeterministicTime() :: StaticFunctionResolverService.defaults(PtolemyCirce).asScala.toList).asJava)
       )
       p.fromString("result = now()").run(PtolemyJson.newObject()) must equal(PObject("result" -> PDate(new DateTime(0, DateTimeZone.UTC))))
     }
@@ -28,7 +29,8 @@ class DeterministicTimeSpec extends WordSpec with MustMatchers {
     "override microtime" in {
       val p = new Ptolemy(
         new PtolemyConf(),
-        new StaticFunctionResolverService((new DeterministicTime() :: StaticFunctionResolverService.defaults(PtolemyCirce).asScala.toList).asJava)
+        new StaticFunctionResolverService(
+          (new DeterministicTime() :: StaticFunctionResolverService.defaults(PtolemyCirce).asScala.toList).asJava)
       )
       p.fromString("result = microtime()").run(PtolemyJson.newObject()) must equal(PObject("result" -> PtolemyValue(0)))
     }

@@ -36,13 +36,13 @@ class RandomModuleJson(json: PtolemyJson) {
 
   def random2Function(a1: Pipeline, a2: Pipeline): PtolemyFunction2 = new PtolemyFunction2 {
     override def apply(cursor: PtolemyValue, min: PtolemyValue, max: PtolemyValue): PtolemyValue = random(cursor, min, max)
-    override val name = "random"
-    override val arg1: Pipeline = a1
-    override val arg2: Pipeline = a2
+    override val name                                                                            = "random"
+    override val arg1: Pipeline                                                                  = a1
+    override val arg2: Pipeline                                                                  = a2
   }
 
   val random0Function: PtolemyFunction0 = new PtolemyFunction0 {
     def apply(cursor: PtolemyValue): PtolemyValue = random(cursor)
-    override val name = "random"
+    override val name                             = "random"
   }
 }

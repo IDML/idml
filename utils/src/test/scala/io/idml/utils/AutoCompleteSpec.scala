@@ -9,10 +9,12 @@ import scala.collection.JavaConverters._
 import org.scalatest.Matchers._
 
 class AutoCompleteSpec extends FlatSpec with MustMatchers {
-  val ptolemy = new Ptolemy(new PtolemyConf(),
-                            new StaticFunctionResolverService(
-                              (StaticFunctionResolverService.defaults(PtolemyJackson.default).asScala ++ List(new AnalysisModule)).asJava
-                            ))
+  val ptolemy = new Ptolemy(
+    new PtolemyConf(),
+    new StaticFunctionResolverService(
+      (StaticFunctionResolverService.defaults(PtolemyJackson.default).asScala ++ List(new AnalysisModule)).asJava
+    )
+  )
 
   "complete" should "complete base level keys" in {
     val in     = PObject("a" -> PInt(1), "b" -> PInt(2))

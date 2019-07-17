@@ -14,16 +14,21 @@ import io.idml._
 class PtolemyCirce extends PtolemyJson {
   import io.idml.circe.instances._
 
-  def read(in: String): Either[Throwable, PtolemyValue] = io.circe.parser.decode[PtolemyValue](in).leftMap[Throwable](e => new PtolemyJsonReadingException(e))
+  def read(in: String): Either[Throwable, PtolemyValue] =
+    io.circe.parser.decode[PtolemyValue](in).leftMap[Throwable](e => new PtolemyJsonReadingException(e))
 
   /** Take a json string and transform it into a DataNode hierarchy */
   override def parse(in: String): PtolemyValue = read(in).toTry.get
 
   /** Take a json string and transform it into a DataNode hierarchy, if it's an object */
-  override def parseObject(in: String): PtolemyObject = read(in).flatMap {
-    case o: PtolemyObject => o.asRight
-    case _ => (new PtolemyJsonObjectException).asLeft
-  }.toTry.get
+  override def parseObject(in: String): PtolemyObject =
+    read(in)
+      .flatMap {
+        case o: PtolemyObject => o.asRight
+        case _                => (new PtolemyJsonObjectException).asLeft
+      }
+      .toTry
+      .get
 
   /** Render a DataNode hierarchy as compacted json */
   override def compact(d: PtolemyValue): String = d.asJson.noSpaces

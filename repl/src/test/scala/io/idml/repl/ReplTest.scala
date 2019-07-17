@@ -71,9 +71,9 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
   }
 
   val ptolemy = new Ptolemy(
-      new PtolemyConf,
-      new FunctionResolverService()
-    )
+    new PtolemyConf,
+    new FunctionResolverService()
+  )
 
   describe("processing input based on string") {
 

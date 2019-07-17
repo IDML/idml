@@ -7,7 +7,6 @@ import scala.collection.mutable
 /** Test the behaviour of the PObject class */
 class PObjectTest extends FunSuite with MustMatchers {
 
-
   // Equality
   test("empty == empty")(empty must equal(empty))
   test("primitives == primitives")(withPrimitives must equal(withPrimitives))

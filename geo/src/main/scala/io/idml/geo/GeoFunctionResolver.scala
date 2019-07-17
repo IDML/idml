@@ -23,7 +23,6 @@ class GeoFunctionResolver(json: PtolemyJson) extends FunctionResolver {
       .ensuring(_ != null)
   )
 
-
   override def resolve(name: String, args: List[Argument]): Option[PtolemyFunction] = {
     (name, args) match {
       case ("geo", Nil) =>

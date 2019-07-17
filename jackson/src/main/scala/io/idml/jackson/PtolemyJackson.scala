@@ -16,12 +16,13 @@ class PtolemyJackson(mapper: ObjectMapper) extends PtolemyJson {
 
   /** Take a json string and transform it into a DataNode hierarchy */
   @throws[PtolemyJsonReadingException]("if the JSON doesn't parse")
-  override def parse(in: String): PtolemyValue = try {
-    mapper.readValue(in, classOf[PtolemyValue])
-  } catch {
-    case e @ (_: JsonParseException | _: JsonMappingException | _: IOException) =>
-      throw new PtolemyJsonReadingException(e)
-  }
+  override def parse(in: String): PtolemyValue =
+    try {
+      mapper.readValue(in, classOf[PtolemyValue])
+    } catch {
+      case e @ (_: JsonParseException | _: JsonMappingException | _: IOException) =>
+        throw new PtolemyJsonReadingException(e)
+    }
 
   /** Take a json string and transform it into a DataNode hierarchy, if it's an object */
   @throws[PtolemyJsonReadingException]("if the JSON doesn't parse")
@@ -30,7 +31,7 @@ class PtolemyJackson(mapper: ObjectMapper) extends PtolemyJson {
     try {
       mapper.readValue(in, classOf[PtolemyObject]) match {
         case o: PtolemyObject => o
-        case _ => throw new PtolemyJsonObjectException()
+        case _                => throw new PtolemyJsonObjectException()
       }
     } catch {
       case e @ (_: JsonParseException | _: JsonMappingException | _: IOException) =>

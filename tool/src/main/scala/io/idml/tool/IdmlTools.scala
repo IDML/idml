@@ -37,7 +37,8 @@ object IdmlTools {
   val functionResolver: Opts[FunctionResolverService] = (dynamic, plugins).mapN { (d, pf) =>
     val baseFunctionResolver = if (d) { new FunctionResolverService } else {
       new StaticFunctionResolverService(
-        (StaticFunctionResolverService.defaults(PtolemyJackson.default).asScala ++ List(new JsoupFunctionResolver(), new HashingFunctionResolver())).asJava)
+        (StaticFunctionResolverService.defaults(PtolemyJackson.default).asScala ++ List(new JsoupFunctionResolver(),
+                                                                                        new HashingFunctionResolver())).asJava)
     }
     pf.fold(baseFunctionResolver) { urls =>
       FunctionResolverService.orElse(baseFunctionResolver, new PluginFunctionResolverService(urls.toList.toArray))

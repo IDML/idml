@@ -6,7 +6,7 @@ import io.idml.functions.json.JsonFunctions
 import org.scalatest.{MustMatchers, WordSpec}
 
 class JsonFunctionSuite(name: String, jf: JsonFunctions) extends WordSpec with MustMatchers {
-   name should {
+  name should {
     "serialize objects" in {
       jf.obj.serialize(PObject("v" -> PInt(123))) must equal(PString("""{"v":123}"""))
     }

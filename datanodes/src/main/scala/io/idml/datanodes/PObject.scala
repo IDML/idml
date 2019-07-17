@@ -15,7 +15,7 @@ object PObject {
   }
 
   def of(kv: java.util.Map[String, PtolemyValue]): PObject = {
-    PObject(mutable.SortedMap(kv.asScala.toList :_*))
+    PObject(mutable.SortedMap(kv.asScala.toList: _*))
   }
 }
 

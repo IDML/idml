@@ -22,5 +22,4 @@ trait ObjectModule {
     case _                => InvalidCaller
   }
 
-
 }

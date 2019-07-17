@@ -57,9 +57,11 @@ object instances {
     )
 
   implicit val objectDecoder: Decoder[PtolemyObject] =
-    Decoder[Json].emap { j: Json =>
-      Either.fromOption(j.asObject, "Only an Object can be decoded into a PtolemyObject")
-    }.emapTry(o => Try(decodeObject(o)))
+    Decoder[Json]
+      .emap { j: Json =>
+        Either.fromOption(j.asObject, "Only an Object can be decoded into a PtolemyObject")
+      }
+      .emapTry(o => Try(decodeObject(o)))
 
   implicit val idmlCirceEncoder: Encoder[PtolemyValue] = Encoder.instance(rawIdmlCirceEncoder)
 
@@ -67,6 +69,5 @@ object instances {
   implicit val ptolemyObjectEncoder: Encoder[PtolemyObject] = idmlCirceEncoder.narrow[PtolemyObject]
   // and for PObject just for ease of use
   implicit val ptolemyPObjectEncoder: Encoder[PObject] = idmlCirceEncoder.narrow[PObject]
-
 
 }

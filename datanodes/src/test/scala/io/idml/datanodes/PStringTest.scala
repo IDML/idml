@@ -38,7 +38,6 @@ class PStringTest extends FunSuite with MustMatchers {
   test("plus int")(new PString("v") + new PInt(42) must equal(new PString("v42")))
   test("plus double")(new PString("D") + new PDouble(3.142) must equal(new PString("D3.142")))
 
-
   // capitalize
   test("capitalize")(new PString("hello world").capitalize() must equal(new PString("Hello World")))
 }

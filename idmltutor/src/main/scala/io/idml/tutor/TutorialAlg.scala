@@ -13,14 +13,16 @@ import io.circe._, io.circe.syntax._
 import io.idml.circe.instances._
 
 class TutorialAlg[F[_]](jline: JLine[F])(implicit F: Sync[F]) {
-  def title(s: String): F[Unit] = for {
-    width <- jline.width()
-    _ <- jline.printAbove(Underlined.On(Utils.center(s, width, s.length)).render)
-  } yield ()
-  def section(s: String): F[Unit] = for {
-    width <- jline.width()
-    _ <- jline.printAbove(Utils.center(s, width, s.length))
-  } yield ()
+  def title(s: String): F[Unit] =
+    for {
+      width <- jline.width()
+      _     <- jline.printAbove(Underlined.On(Utils.center(s, width, s.length)).render)
+    } yield ()
+  def section(s: String): F[Unit] =
+    for {
+      width <- jline.width()
+      _     <- jline.printAbove(Utils.center(s, width, s.length))
+    } yield ()
 
   def content(s: String): F[Unit] = jline.printAbove(s)
 
@@ -30,15 +32,17 @@ class TutorialAlg[F[_]](jline: JLine[F])(implicit F: Sync[F]) {
   def exerciseMulti(body: String, pairs: List[(Json, Json)], multiline: Boolean = false): F[Unit] =
     for {
       ptolemy <- F.delay {
-        new Ptolemy()
+                  new Ptolemy()
+                }
+      pvs = pairs.map {
+        case (k, v) =>
+          (
+            k.as[PtolemyValue].toOption.get,
+            v.as[PtolemyValue].toOption.get
+          )
       }
-      pvs = pairs.map { case (k, v) =>
-        (
-          k.as[PtolemyValue].toOption.get,
-          v.as[PtolemyValue].toOption.get
-        )
-      }
-      rendered = pairs.map { case (k, v) =>
+      rendered = pairs.map {
+        case (k, v) =>
           s"""
             |Input:
             |${grey(k.spaces2)}
@@ -46,51 +50,56 @@ class TutorialAlg[F[_]](jline: JLine[F])(implicit F: Sync[F]) {
             |${grey(v.spaces2)}
           """.stripMargin
       }.mkString
-      _ <- F.unit.whileM_( {
-        for {
-          _ <- EitherT.liftF[F, Boolean, Unit](jline.printAbove(
-            s"""$body
+      _ <- F.unit.whileM_({
+            for {
+              _ <- EitherT.liftF[F, Boolean, Unit](jline.printAbove(s"""$body
               |$rendered
               """.stripMargin))
-          idml <- EitherT.liftF[F, Boolean, String](
-            if (multiline)
-              jline.readMultiline(grey("~> "))
-            else
-              jline.readLine(grey("~> "))
-          )
-          compiled <- F.delay {
-            ptolemy.fromString(idml)
-          }.attemptT.leftSemiflatMap { t =>
-            jline.printAbove(red(s"Error: ${t.getMessage}")).as(true)
-          }
-          outputs <- pvs.traverse { case (input, _) =>
-            F.delay {
-              compiled.run(input)
-            }.attemptT.leftSemiflatMap { t =>
-              jline.printAbove(red(s"Error: ${t.getMessage}")).as(true)
-            }
-          }
-          _ <- outputs.zip(pvs.map(_._2)).traverse { case (output, desiredOutput) =>
-            if (!output.equals(desiredOutput)) {
-              EitherT.left[Unit] {
-                jline.printAbove(
-                  s"""${red("Output differs:")}
+              idml <- EitherT.liftF[F, Boolean, String](
+                       if (multiline)
+                         jline.readMultiline(grey("~> "))
+                       else
+                         jline.readLine(grey("~> "))
+                     )
+              compiled <- F.delay {
+                             ptolemy.fromString(idml)
+                           }
+                           .attemptT
+                           .leftSemiflatMap { t =>
+                             jline.printAbove(red(s"Error: ${t.getMessage}")).as(true)
+                           }
+              outputs <- pvs.traverse {
+                          case (input, _) =>
+                            F.delay {
+                                compiled.run(input)
+                              }
+                              .attemptT
+                              .leftSemiflatMap { t =>
+                                jline.printAbove(red(s"Error: ${t.getMessage}")).as(true)
+                              }
+                        }
+              _ <- outputs.zip(pvs.map(_._2)).traverse {
+                    case (output, desiredOutput) =>
+                      if (!output.equals(desiredOutput)) {
+                        EitherT.left[Unit] {
+                          jline
+                            .printAbove(
+                              s"""${red("Output differs:")}
 
                      |${TestDiff.generateDiff(output.asJson, desiredOutput.asJson)}
-                 """.
-                    stripMargin
-                ).as(true)
-            }
-          } else {
-            EitherT.
-              rightT[F, Boolean](())
-          }
-            }
-          _ <- EitherT.liftF[F, Boolean, Unit](
-            jline.printAbove(green("Correct"))
-          )
-        } yield false
-      }.merge)
+                 """.stripMargin
+                            )
+                            .as(true)
+                        }
+                      } else {
+                        EitherT.rightT[F, Boolean](())
+                      }
+                  }
+              _ <- EitherT.liftF[F, Boolean, Unit](
+                    jline.printAbove(green("Correct"))
+                  )
+            } yield false
+          }.merge)
     } yield ()
 
 }

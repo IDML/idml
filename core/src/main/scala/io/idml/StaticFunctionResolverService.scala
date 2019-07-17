@@ -9,7 +9,8 @@ import io.idml.functions.{BuiltinFunctionResolver, FunctionResolver, PtolemyValu
 import scala.collection.JavaConverters._
 
 object StaticFunctionResolverService {
-  def defaults(json: PtolemyJson): util.List[FunctionResolver] = List(new JsonFunctions(json), new BuiltinFunctionResolver, new PtolemyValueFunctionResolver, new PtolemyValueNaryFunctionResolver).asJava
+  def defaults(json: PtolemyJson): util.List[FunctionResolver] =
+    List(new JsonFunctions(json), new BuiltinFunctionResolver, new PtolemyValueFunctionResolver, new PtolemyValueNaryFunctionResolver).asJava
 }
 
 class StaticFunctionResolverService(rs: java.util.List[FunctionResolver]) extends FunctionResolverService {

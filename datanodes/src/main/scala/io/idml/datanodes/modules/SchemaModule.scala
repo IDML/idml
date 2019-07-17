@@ -2,7 +2,19 @@
 package io.idml.datanodes.modules
 
 import io.idml.datanodes.{PBool, PFalse, PTrue}
-import io.idml.{CastUnsupported, FailedRequirement, PtolemyArray, PtolemyBool, PtolemyDouble, PtolemyInt, PtolemyNothing, PtolemyNull, PtolemyObject, PtolemyString, PtolemyValue}
+import io.idml.{
+  CastUnsupported,
+  FailedRequirement,
+  PtolemyArray,
+  PtolemyBool,
+  PtolemyDouble,
+  PtolemyInt,
+  PtolemyNothing,
+  PtolemyNull,
+  PtolemyObject,
+  PtolemyString,
+  PtolemyValue
+}
 
 /** This trait adds basic schema functions */
 trait SchemaModule {

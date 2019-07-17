@@ -84,7 +84,6 @@ lazy val jsoup = project.dependsOn(core).dependsOn(test % "test->test").settings
 
 lazy val hashing = project.dependsOn(core).settings(commonSettings)
 
-
 lazy val utils = project.dependsOn(core).dependsOn(jsoup).dependsOn(jackson % "test->test").settings(commonSettings)
 
 lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).dependsOn(jackson).settings(commonSettings)
@@ -99,7 +98,14 @@ lazy val idmltest = project.dependsOn(core).dependsOn(utils).dependsOn(circe).se
 
 lazy val `idmltest-plugin` = project.dependsOn(idmltest).dependsOn(hashing).dependsOn(geo).dependsOn(jsoup).settings(commonSettings)
 
-lazy val idmltutor = project.dependsOn(hashing).dependsOn(geo).dependsOn(jsoup).dependsOn(circe).dependsOn(idmltest).settings(commonSettings).settings(
+lazy val idmltutor = project
+  .dependsOn(hashing)
+  .dependsOn(geo)
+  .dependsOn(jsoup)
+  .dependsOn(circe)
+  .dependsOn(idmltest)
+  .settings(commonSettings)
+  .settings(
     assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript)),
     dockerExposedPorts := Seq(8081),
     packageName in Docker := "idml",
@@ -111,7 +117,7 @@ lazy val idmltutor = project.dependsOn(hashing).dependsOn(geo).dependsOn(jsoup).
       case PathList("META-INF", "services", "io.idml.functions.FunctionResolver") => MergeStrategy.concat
       case _                                                                      => MergeStrategy.first
     }
-)
+  )
 
 lazy val bench = project
   .dependsOn(core)

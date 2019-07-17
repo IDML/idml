@@ -56,5 +56,5 @@ trait PtolemyArray extends PtolemyValue with CompositeValue {
     Try(items(wrapIndex(index, items.size))).getOrElse(MissingIndex)
   }
 
-  override def toStringOption: Option[String] = Some("["+items.flatMap(_.toStringOption).mkString(",")+"]")
+  override def toStringOption: Option[String] = Some("[" + items.flatMap(_.toStringOption).mkString(",") + "]")
 }

@@ -10,6 +10,7 @@ import cats.implicits._
   * Interface for any JSON parser which can work with the IDML datanodes hierarchy
   */
 trait PtolemyJson {
+
   /** Take a json string and transform it into a DataNode hierarchy */
   @throws[PtolemyJsonReadingException]("if the JSON doesn't parse")
   def parse(in: String): PtolemyValue
@@ -23,12 +24,13 @@ trait PtolemyJson {
   def parseObject(in: String): PtolemyObject
 
   /* Scala-friendly version of parseObject which uses an Either */
-  def parseObjectEither(in: String): Either[PtolemyJsonException, PtolemyObject] = try {
+  def parseObjectEither(in: String): Either[PtolemyJsonException, PtolemyObject] =
+    try {
       Right(parseObject(in))
-  } catch {
-    case e: PtolemyJsonException =>
-      Left(e)
-  }
+    } catch {
+      case e: PtolemyJsonException =>
+        Left(e)
+    }
 
   /** Render a DataNode hierarchy as compacted json */
   def compact(d: PtolemyValue): String
@@ -39,13 +41,15 @@ trait PtolemyJson {
 
 object PtolemyJson {
   @throws[NoSuchElementException]("if there isn't an available implementation")
-  def load(): PtolemyJson = ServiceLoader.load(classOf[PtolemyJson]).iterator().next()
+  def load(): PtolemyJson  = ServiceLoader.load(classOf[PtolemyJson]).iterator().next()
   def newObject(): PObject = PObject()
 }
 
 sealed trait PtolemyJsonException
 
-class PtolemyJsonReadingException(underlying: Throwable) extends Throwable(s"Unable to parse json: ${underlying.getLocalizedMessage}") with PtolemyJsonException {
+class PtolemyJsonReadingException(underlying: Throwable)
+    extends Throwable(s"Unable to parse json: ${underlying.getLocalizedMessage}")
+    with PtolemyJsonException {
   this.initCause(underlying)
 }
 

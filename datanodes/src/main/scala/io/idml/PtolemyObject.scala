@@ -41,5 +41,5 @@ abstract class PtolemyObject extends PtolemyValue {
   // scalastyle:on method.name
 
   override def toStringOption: Option[String] =
-    Some("{" + fields.flatMap{case (k, v) => v.toStringOption.map(k -> _)}.map{case (k, v) => s""""$k":$v"""}.mkString(",") + "}")
+    Some("{" + fields.flatMap { case (k, v) => v.toStringOption.map(k -> _) }.map { case (k, v) => s""""$k":$v""" }.mkString(",") + "}")
 }

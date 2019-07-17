@@ -14,14 +14,15 @@ class UUIDModuleJson(json: PtolemyJson) extends ObjectModuleJson(json) {
     override protected def apply(cursor: PtolemyValue): PtolemyValue = cursor match {
       case o: PtolemyObject => PString(UUID.nameUUIDFromBytes(serialize(o).toStringOption.get.getBytes(Charset.defaultCharset())).toString)
       case n: PtolemyString => PString(UUID.nameUUIDFromBytes(n.value.getBytes(Charset.defaultCharset())).toString)
-      case _ => CastUnsupported
+      case _                => CastUnsupported
     }
     override def name: String = "uuid3"
   }
 
   val uuid5Function: PtolemyFunction0 = new PtolemyFunction0 {
     override protected def apply(cursor: PtolemyValue): PtolemyValue = cursor match {
-      case o: PtolemyObject => PString(PtolemyUUID.nameUUIDFromBytes5(serialize(o).toStringOption.get.getBytes(Charset.defaultCharset())).toString)
+      case o: PtolemyObject =>
+        PString(PtolemyUUID.nameUUIDFromBytes5(serialize(o).toStringOption.get.getBytes(Charset.defaultCharset())).toString)
       case n: PtolemyString => PString(PtolemyUUID.nameUUIDFromBytes5(n.value.getBytes(Charset.defaultCharset())).toString)
     }
     override def name: String = "uuid5"

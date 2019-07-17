@@ -12,7 +12,7 @@ class ObjectModuleJson(json: PtolemyJson) {
 
   val serializeFunction: PtolemyFunction0 = new PtolemyFunction0 {
     override protected def apply(cursor: PtolemyValue): PtolemyValue = serialize(cursor)
-    override def name: String = "serialize"
+    override def name: String                                        = "serialize"
   }
 
   def parseJson(input: PtolemyValue): PtolemyValue = input match {
