@@ -29,7 +29,7 @@ class PtolemyCirce extends PtolemyJson {
   override def compact(d: PtolemyValue): String = d.asJson.noSpaces
 
   /** Render a DataNode hierarchy as pretty-printed json */
-  override def pretty(d: PtolemyValue): String = d.asJson.spaces4
+  override def pretty(d: PtolemyValue): String = d.asJson.spaces2
 }
 
 object PtolemyCirce extends PtolemyCirce

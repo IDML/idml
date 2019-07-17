@@ -91,7 +91,7 @@ lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).depe
 
 lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils).dependsOn(circe).settings(commonSettings)
 
-lazy val idmldoc = project.dependsOn(core).dependsOn(utils).settings(commonSettings)
+lazy val idmldoc = project.dependsOn(core).dependsOn(utils).dependsOn(circe).settings(commonSettings)
 
 lazy val `idmldoc-plugin` = project.dependsOn(idmldoc).settings(commonSettings)
 

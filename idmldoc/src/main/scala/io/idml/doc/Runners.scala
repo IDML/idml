@@ -5,9 +5,10 @@ import cats.effect.implicits._
 import cats._
 import cats.effect.concurrent.Ref
 import cats.implicits._
+import io.idml.circe.PtolemyCirce
 import io.idml.datanodes.PObject
 import io.idml.doc.Markdown.{Code, Node, Text}
-import io.idml.{jackson, _}
+import io.idml._
 import io.idml.utils.Tracer.Annotator
 
 object Runners {
@@ -28,7 +29,7 @@ object Runners {
   def idmlRunner[F[_]: Monad: Applicative](implicit F: Effect[F]): F[Runner[F]] =
     for {
       ptolemy <- F.delay { new Ptolemy(new PtolemyConf()) }
-      input   <- Ref[F].of(jackson.PtolemyJson.newObject())
+      input   <- Ref[F].of(PtolemyJson.newObject())
       code    <- Ref[F].of(ptolemy.fromString(""))
     } yield
       new Runner[F] {
@@ -37,7 +38,7 @@ object Runners {
             case b @ Code(label, content) =>
               label.split(":").toList match {
                 case "idml" :: "input" :: modes =>
-                  F.delay { jackson.PtolemyJson.parse(content) }.flatMap {
+                  F.delay { PtolemyCirce.parse(content) }.flatMap {
                     case o: PObject => input.set(o)
                     case _          => F.unit
                   } *> F.pure(
@@ -54,14 +55,14 @@ object Runners {
                         (code.get, input.get).tupled.flatMap {
                           case (c, i) =>
                             F.delay {
-                              val a   = new Annotator()
-                              val ctx = new PtolemyContext(i, jackson.PtolemyJson.newObject(), List[PtolemyListener](a))
+                              val a   = new Annotator(PtolemyCirce)
+                              val ctx = new PtolemyContext(i, PtolemyJson.newObject(), List[PtolemyListener](a))
                               c.run(ctx)
                               List(Code("idml", a.render(content)))
                             }
                         }
                       case _ =>
-                        (code.get, input.get).bisequence.map { case (c, i) => jackson.PtolemyJson.pretty(c.run(i)) }.map { output =>
+                        (code.get, input.get).bisequence.map { case (c, i) => PtolemyCirce.pretty(c.run(i)) }.map { output =>
                           List(Code("idml", content), Text("\n"), Code("json", output))
                         }
                     }
