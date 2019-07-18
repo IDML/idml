@@ -15,9 +15,9 @@ case class IdmlContext( /** The mappings document */
                        /** The root of the output object */
                        @BeanProperty var output: IdmlObject,
                        /** The list of listeners that hook in to events around the system */
-                       @BeanProperty var listeners: List[IdmlListener],
+                       var listeners: List[IdmlListener],
                        /** A bag of state that can be used by listeners */
-                       @BeanProperty val state: mutable.Map[Any, Any]) {
+                       val state: mutable.Map[Any, Any]) {
 
   def this(input: IdmlValue, output: IdmlObject, listeners: List[IdmlListener]) {
     this(Document.empty, input, output, listeners, mutable.Map())
@@ -42,6 +42,14 @@ case class IdmlContext( /** The mappings document */
   def setListeners(listeners: java.util.List[IdmlListener]): IdmlContext = {
     this.listeners = listeners.asScala.toList
     this
+  }
+
+  def getListeners(): java.util.List[IdmlListener] = {
+    listeners.asJava
+  }
+
+  def getState(): java.util.Map[Any, Any] = {
+    state.asJava
   }
 
   /** The current right-hand side value as we traverse the input. Effectively "this" for the node methods */
