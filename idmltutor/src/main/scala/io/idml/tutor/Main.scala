@@ -24,7 +24,6 @@ object Main extends IOApp {
         |
         |Please select the option you'd like:
         |  start     - start at chapter 1
-        |  chapter n - start at a specific chapter
         |  quit      - quit
         |
       """.stripMargin)
