@@ -39,9 +39,9 @@ object Tracer {
 
   def annotate(json: IdmlJson)(s: String)(j: String): String = {
     val a   = new Annotator(json)
-    val p   = new Idml(new IdmlConf(), List[IdmlListener](a).asJava)
+    val p   = Idml.createAuto(_.withListener(a).build())
     val ctx = new IdmlContext(json.parse(j), IObject(), List[IdmlListener](a))
-    p.fromString(s).run(ctx).output
+    p.compile(s).run(ctx).output
     a.render(s)
   }
 

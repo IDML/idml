@@ -13,10 +13,10 @@ abstract class Mapping {
 object Mapping {
   import cats._, cats.data._, cats.implicits._
 
-  def fromMultipleMappings(engine: Idml, ms: List[Mapping]): Mapping =
-    fromMultipleMappings(engine, ms.asJava)
+  def fromMultipleMappings(ms: List[Mapping]): Mapping =
+    fromMultipleMappings(ms.asJava)
 
-  def fromMultipleMappings(engine: Idml, ms: java.util.List[Mapping]): Mapping =
+  def fromMultipleMappings(ms: java.util.List[Mapping]): Mapping =
     (ctx: IdmlContext) => {
       val result = ms.asScala.toList.map { m =>
         ctx.output = IObject()

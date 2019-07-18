@@ -1,7 +1,7 @@
 package io.idml.utils
 
 import io.idml.utils.DocumentClassifier.DocumentClassifierVisitor
-import io.idml.{Idml, IdmlConf}
+import io.idml.{FunctionResolverService, Idml, IdmlParser}
 import org.scalatest.{MustMatchers, WordSpec}
 
 /** Verify the DocumentClassifier */
@@ -12,7 +12,7 @@ class DocumentClassifierTest extends WordSpec with MustMatchers {
 
     /** Classify a document string */
     def classify: DocumentType = {
-      val doc = new Idml(new IdmlConf).fromString(in).nodes
+      val doc = new IdmlParser().parse(new FunctionResolverService, in).nodes
       DocumentClassifier.classify(doc)
     }
   }
@@ -22,7 +22,7 @@ class DocumentClassifierTest extends WordSpec with MustMatchers {
 
     /** Classify a document string */
     def classifyAndReturnClassifier: DocumentClassifierVisitor = {
-      val doc     = new Idml(new IdmlConf).fromString(in).nodes
+      val doc     = new IdmlParser().parse(new FunctionResolverService, in).nodes
       val visitor = new DocumentClassifierVisitor()
       visitor.visit(doc)
       visitor

@@ -23,6 +23,7 @@ import io.idml.server.WebsocketServer
 
 import scala.util.{Failure, Success, Try}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.io.Source
 
 object IdmlTools {
   implicit val urlArgument = new Argument[URL] {
@@ -90,16 +91,9 @@ object IdmlTools {
 
       IO {
         val ptolemy = if (config.unmapped) {
-          new Idml(
-            new IdmlConf,
-            List[IdmlListener](new UnmappedFieldsFinder).asJava,
-            fr
-          )
+          new IdmlBuilder(fr).withListener(new UnmappedFieldsFinder).build()
         } else {
-          new Idml(
-            new IdmlConf,
-            fr
-          )
+          new IdmlBuilder(fr).build()
         }
         val (found, missing) = config.files.partition(_.exists())
         missing.isEmpty match {
@@ -109,11 +103,11 @@ object IdmlTools {
             }
             ExitCode.Error
           case true =>
-            val maps  = found.map(f => ptolemy.fromFile(f.getAbsolutePath))
-            val chain = ptolemy.newChain(maps: _*)
+            val maps  = found.map(f => ptolemy.compile(Source.fromFile(f.getAbsolutePath).mkString))
+            val chain = ptolemy.chain(maps: _*)
             if (config.strict) {
               maps.foreach { m =>
-                DocumentValidator.validate(m.nodes)
+                DocumentValidator.validate(m.asInstanceOf[IdmlMapping].nodes)
               }
             }
             scala.io.Source.stdin

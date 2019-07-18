@@ -28,9 +28,9 @@ object Runners {
 
   def idmlRunner[F[_]: Monad: Applicative](implicit F: Effect[F]): F[Runner[F]] =
     for {
-      ptolemy <- F.delay { new Idml(new IdmlConf()) }
-      input   <- Ref[F].of(IdmlJson.newObject())
-      code    <- Ref[F].of(ptolemy.fromString(""))
+      idml  <- F.delay { Idml.createAuto(_.build()) }
+      input <- Ref[F].of(IdmlJson.newObject())
+      code  <- Ref[F].of(idml.compile(""))
     } yield
       new Runner[F] {
         override def run(block: Code): F[List[Node]] = {
@@ -45,7 +45,7 @@ object Runners {
                     if (modes.contains("silent")) List.empty
                     else List(Code("json", content)))
                 case "idml" :: "code" :: modes =>
-                  F.delay { ptolemy.fromString(content) }.flatMap { m =>
+                  F.delay { idml.compile(content) }.flatMap { m =>
                     code.set(m)
                   } *> {
                     modes match {

@@ -70,10 +70,7 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
     }
   }
 
-  val ptolemy = new Idml(
-    new IdmlConf,
-    new FunctionResolverService()
-  )
+  val ptolemy = Idml.createAuto(_.build())
 
   describe("processing input based on string") {
 
@@ -160,15 +157,14 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
     it("should attempt to parse and print the input if valid") {
       repl.processJson(INPUT_JSON)
       repl.processIdml(ptolemy)(INPUT_IDML)
-      val mapping      = ptolemy.fromString(INPUT_IDML)
+      val mapping      = ptolemy.compile(INPUT_IDML)
       val expectedJson = IdmlJackson.default.pretty(mapping.run(repl.doc.get))
 
       verify(repl.out).println(expectedJson)
     }
 
     it("should print an error if an exception is thrown whilst processing") {
-      val ptolemy      = new Idml(new IdmlConf)
-      val mapping      = ptolemy.fromString(INPUT_IDML)
+      val mapping      = ptolemy.compile(INPUT_IDML)
       val expectedJson = IdmlJackson.default.pretty(mapping.run(repl.doc.get))
 
       when(repl.out.println(expectedJson))
@@ -185,9 +181,8 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
   describe("processing of schema input") {
 
     it("should construct a mapping string and attempt to parse then print the input if valid") {
-      val ptolemy = new Idml(new IdmlConf)
       val mapping =
-        ptolemy.fromString(PROCESS_SCHEMA_EXPECTED_MAPPING + INPUT_SCHEMA)
+        ptolemy.compile(PROCESS_SCHEMA_EXPECTED_MAPPING + INPUT_SCHEMA)
 
       val repl = new TestRepl()
       repl.processJson(INPUT_JSON)
@@ -199,9 +194,8 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
     }
 
     it("should print an error if an exception is thrown whilst processing") {
-      val ptolemy = new Idml(new IdmlConf)
       val mapping =
-        ptolemy.fromString(PROCESS_SCHEMA_EXPECTED_MAPPING + INPUT_SCHEMA)
+        ptolemy.compile(PROCESS_SCHEMA_EXPECTED_MAPPING + INPUT_SCHEMA)
 
       val repl = new TestRepl()
       repl.processJson(INPUT_JSON)

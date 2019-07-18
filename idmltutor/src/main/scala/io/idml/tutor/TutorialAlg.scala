@@ -31,9 +31,9 @@ class TutorialAlg[F[_]](jline: JLine[F])(implicit F: Sync[F]) {
     exerciseMulti(body, List((in, out)), multiline)
   def exerciseMulti(body: String, pairs: List[(Json, Json)], multiline: Boolean = false): F[Unit] =
     for {
-      ptolemy <- F.delay {
-                  new Idml()
-                }
+      engine <- F.delay {
+                 Idml.createAuto(_.build())
+               }
       pvs = pairs.map {
         case (k, v) =>
           (
@@ -62,7 +62,7 @@ class TutorialAlg[F[_]](jline: JLine[F])(implicit F: Sync[F]) {
                          jline.readLine(grey("~> "))
                      )
               compiled <- F.delay {
-                             ptolemy.fromString(idml)
+                             engine.compile(idml)
                            }
                            .attemptT
                            .leftSemiflatMap { t =>

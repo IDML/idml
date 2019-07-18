@@ -2,7 +2,7 @@ package io.idml
 
 import scala.collection.JavaConverters._
 
-class IdmlChain(val engine: Idml, val transforms: Mapping*) extends Mapping {
+class IdmlChain(val transforms: Mapping*) extends Mapping {
   require(transforms != Nil, "Expected at least one transform")
 
   /** The first transform in the chain. This is the only one that will access input data */
@@ -12,8 +12,6 @@ class IdmlChain(val engine: Idml, val transforms: Mapping*) extends Mapping {
   protected val tail = transforms.tail
 
   override def run(ctx: IdmlContext): IdmlContext = {
-    ctx.listeners = engine.listeners.asScala.toList
-
     ctx.enterChain()
     head.run(ctx)
 
@@ -27,4 +25,9 @@ class IdmlChain(val engine: Idml, val transforms: Mapping*) extends Mapping {
     ctx
   }
 
+}
+
+object IdmlChain {
+  def of(transforms: java.util.List[Mapping]): IdmlChain =
+    new IdmlChain(transforms.asScala: _*)
 }

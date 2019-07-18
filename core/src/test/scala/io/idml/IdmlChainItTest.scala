@@ -6,10 +6,10 @@ import org.scalatest.FunSuite
 class IdmlChainItTest extends FunSuite {
 
   test("Test mapping chain order works properly") {
-    val ptolemy = new Idml(new IdmlConf)
-    val chain = ptolemy.newChain(
-      ptolemy.fromString("x = a"),
-      ptolemy.fromString("y = x \n z = a")
+    val idml = Idml.createAuto(_.build())
+    val chain = idml.chain(
+      idml.compile("x = a"),
+      idml.compile("y = x \n z = a")
     )
     val output = chain.run(IObject("a" -> ITrue))
 

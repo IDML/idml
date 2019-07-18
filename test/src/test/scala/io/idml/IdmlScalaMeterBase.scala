@@ -42,7 +42,7 @@ class IdmlScalaMeterBase(directory: String,
   /**
     * Execute a parsed mapping as a test
     */
-  protected override def executeMappingTest(name: String, mapping: IdmlMapping, input: IdmlValue, expected: IdmlValue): Unit = {
+  protected override def executeMappingTest(name: String, mapping: Mapping, input: IdmlValue, expected: IdmlValue): Unit = {
     measure method name in {
       using(range) in { i =>
         mapping.run(input)
@@ -53,7 +53,7 @@ class IdmlScalaMeterBase(directory: String,
   /**
     * Execute a parsed chain as a test
     */
-  protected override def executeChainTest(name: String, chain: IdmlChain, input: IdmlValue, expected: IdmlValue): Unit = {
+  protected override def executeChainTest(name: String, chain: Mapping, input: IdmlValue, expected: IdmlValue): Unit = {
     measure method name in {
       using(range) config (
         exec.benchRuns          -> 5,

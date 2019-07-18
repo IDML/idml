@@ -10,16 +10,16 @@ class TracerSpec extends WordSpec with MustMatchers {
 
   "the tracing annotator" should {
     "trace simple IDML" in {
-      val p    = new Idml()
+      val p    = Idml.createAuto(_.build())
       val a    = new Annotator(json)
       val ctx  = new IdmlContext(IdmlJson.newObject(), IdmlJson.newObject(), List[IdmlListener](a))
       val idml = "result = 2 + 2"
-      p.fromString(idml).run(ctx)
+      p.compile(idml).run(ctx)
       a.render(idml) must equal("result = 2 + 2 # 4")
     }
 
     "trace multi line IDML" in {
-      val p   = new Idml()
+      val p   = Idml.createAuto(_.build())
       val a   = new Annotator(json)
       val ctx = new IdmlContext(IdmlJson.newObject(), IdmlJson.newObject(), List[IdmlListener](a))
       val idml =
@@ -27,7 +27,7 @@ class TracerSpec extends WordSpec with MustMatchers {
           |b = 2
           |c = @a + @b
           |e = @d""".stripMargin
-      p.fromString(idml).run(ctx)
+      p.compile(idml).run(ctx)
       a.render(idml) must equal("""a = 1 # 1
           |b = 2 # 2
           |c = @a + @b # 3
@@ -35,7 +35,7 @@ class TracerSpec extends WordSpec with MustMatchers {
     }
 
     "trace multi section IDML" in {
-      val p   = new Idml()
+      val p   = Idml.createAuto(_.build())
       val a   = new Annotator(json)
       val ctx = new IdmlContext(IdmlJson.newObject(), IdmlJson.newObject(), List[IdmlListener](a))
       val idml =
@@ -44,7 +44,7 @@ class TracerSpec extends WordSpec with MustMatchers {
           |
           |[foo]
           |a = 1""".stripMargin
-      p.fromString(idml).run(ctx)
+      p.compile(idml).run(ctx)
       a.render(idml) must equal("""[main]
           |result = apply("foo") # {"a":1}
           |
@@ -53,11 +53,11 @@ class TracerSpec extends WordSpec with MustMatchers {
     }
 
     "cope with input and functions" in {
-      val p    = new Idml()
+      val p    = Idml.createAuto(_.build())
       val a    = new Annotator(json)
       val ctx  = new IdmlContext(json.parse("""{"a": "hello", "b": "world"}"""), IdmlJson.newObject(), List[IdmlListener](a))
       val idml = """result = "%s %s".format(a, b)"""
-      p.fromString(idml).run(ctx)
+      p.compile(idml).run(ctx)
       a.render(idml) must equal("""result = "%s %s".format(a, b) # "hello world"""")
     }
 

@@ -9,12 +9,8 @@ import scala.collection.JavaConverters._
 import org.scalatest.Matchers._
 
 class AutoCompleteSpec extends FlatSpec with MustMatchers {
-  val ptolemy = new Idml(
-    new IdmlConf(),
-    new StaticFunctionResolverService(
-      (StaticFunctionResolverService.defaults(IdmlJackson.default).asScala ++ List(new AnalysisModule)).asJava
-    )
-  )
+  val ptolemy =
+    Idml.createStaticWithDefaults(IdmlJackson.default, _.withResolver(new AnalysisModule).build())
 
   "complete" should "complete base level keys" in {
     val in     = IObject("a" -> IInt(1), "b" -> IInt(2))

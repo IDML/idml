@@ -7,9 +7,9 @@ import org.scalatest.FunSuite
 class Dev2680Test extends FunSuite {
 
   test("DEV-2680: IndexOutOfBoundsException from empty field cleanup in Idml") {
-    val ptolemy = new Idml()
-    val chain = ptolemy.newChain(
-      ptolemy.fromString("""
+    val ptolemy = Idml.createAuto(_.build())
+    val chain = ptolemy.chain(
+      ptolemy.compile("""
           |interaction.subtype = "ollie"
           |interaction.type = "twitter"
           |interaction.content = ollie.text
@@ -19,7 +19,7 @@ class Dev2680Test extends FunSuite {
           |rawlinks = ollie.links
           |raw_links = ollie.links
         """.stripMargin),
-      ptolemy.fromString(
+      ptolemy.compile(
         """
           |behaviour.subtype : string()
           |behaviour.started_at : date()

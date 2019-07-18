@@ -2,19 +2,22 @@ package io.idml
 
 import io.idml.datanodes.IObject
 import io.idml.ast.{Assignment, Document, Field, IdmlFunction, Maths, Pipeline}
+
+import scala.beans.BeanProperty
 import scala.collection.mutable
+import scala.collection.JavaConverters._
 
 /** The interpreter's state object */
-class IdmlContext( /** The mappings document */
-                  var doc: Document,
-                  /** The root of the input object */
-                  var input: IdmlValue,
-                  /** The root of the output object */
-                  var output: IdmlObject,
-                  /** The list of listeners that hook in to events around the system */
-                  var listeners: List[IdmlListener],
-                  /** A bag of state that can be used by listeners */
-                  val state: mutable.Map[Any, Any]) {
+case class IdmlContext( /** The mappings document */
+                       @BeanProperty var doc: Document,
+                       /** The root of the input object */
+                       @BeanProperty var input: IdmlValue,
+                       /** The root of the output object */
+                       @BeanProperty var output: IdmlObject,
+                       /** The list of listeners that hook in to events around the system */
+                       @BeanProperty var listeners: List[IdmlListener],
+                       /** A bag of state that can be used by listeners */
+                       @BeanProperty val state: mutable.Map[Any, Any]) {
 
   def this(input: IdmlValue, output: IdmlObject, listeners: List[IdmlListener]) {
     this(Document.empty, input, output, listeners, mutable.Map())
@@ -34,6 +37,11 @@ class IdmlContext( /** The mappings document */
 
   def this() {
     this(IdmlNull, IObject(), Nil)
+  }
+
+  def setListeners(listeners: java.util.List[IdmlListener]): IdmlContext = {
+    this.listeners = listeners.asScala.toList
+    this
   }
 
   /** The current right-hand side value as we traverse the input. Effectively "this" for the node methods */

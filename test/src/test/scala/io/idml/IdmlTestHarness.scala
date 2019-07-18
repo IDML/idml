@@ -8,6 +8,7 @@ import com.google.common.io.Files
 import io.idml.jackson.IdmlJackson
 
 import scala.collection.JavaConverters._
+import scala.io.Source
 
 /**
   * A class capable of executing ptolemy json tests. It's intended that you'll integrate this with your test framework.
@@ -24,16 +25,11 @@ trait IdmlTestHarness {
     */
   protected val ptolemy: Idml = {
     if (findUnmappedFields) {
-      new Idml(new IdmlConf, List[IdmlListener](new UnmappedFieldsFinder).asJava)
+      Idml.createAuto(_.withListener(new UnmappedFieldsFinder).build())
     } else {
-      new Idml()
+      Idml.createAuto(_.build())
     }
   }
-
-  /**
-    * Resolve resources
-    */
-  protected val resourceResolver: ResourceResolver = new ResourceResolver
 
   /**
     * The default test name
@@ -241,7 +237,7 @@ trait IdmlTestHarness {
     * @param expected The expected output data
     */
   protected def executeChainTest(name: String, mappings: Seq[String], input: IdmlValue, expected: IdmlValue): Unit = {
-    executeChainTest(name, ptolemy.newChain(mappings.map(loadMapping): _*), input, expected)
+    executeChainTest(name, ptolemy.chain(mappings.map(loadMapping): _*), input, expected)
   }
 
   /**
@@ -252,7 +248,7 @@ trait IdmlTestHarness {
     * @param input The input data
     * @param expected The expected output data
     */
-  protected def executeMappingTest(name: String, mapping: IdmlMapping, input: IdmlValue, expected: IdmlValue): Unit = {
+  protected def executeMappingTest(name: String, mapping: Mapping, input: IdmlValue, expected: IdmlValue): Unit = {
     val actual = mapping.run(input)
     if (!expected.isNothingValue) {
       compareResults(expected, actual)
@@ -267,7 +263,7 @@ trait IdmlTestHarness {
     * @param input The input data
     * @param expected The expected output data
     */
-  protected def executeChainTest(name: String, chain: IdmlChain, input: IdmlValue, expected: IdmlValue): Unit = {
+  protected def executeChainTest(name: String, chain: Mapping, input: IdmlValue, expected: IdmlValue): Unit = {
     val actual = chain.run(input)
     if (!expected.isNothingValue) {
       compareResults(expected, actual)
@@ -311,11 +307,11 @@ trait IdmlTestHarness {
     * @param str The mapping.. either "@/a/path" or some idml
     * @return A mapping
     */
-  protected def loadMapping(str: String): IdmlMapping = {
+  protected def loadMapping(str: String): Mapping = {
     if (str.startsWith("@")) {
-      ptolemy.fromResource(str.tail)
+      ptolemy.compile(Source.fromInputStream(getClass.getResourceAsStream(str.tail)).mkString)
     } else {
-      ptolemy.fromString(str)
+      ptolemy.compile(str)
     }
   }
 }

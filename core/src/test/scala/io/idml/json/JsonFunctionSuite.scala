@@ -14,8 +14,8 @@ class JsonFunctionSuite(name: String, jf: JsonFunctions) extends WordSpec with M
       jf.obj.parseJson(IString("""{"v":123}""")) must equal(IObject("v" -> IInt(123)))
     }
     "be loaded automatically" in {
-      val p       = new Idml()
-      val program = p.fromString("""
+      val idml    = Idml.createAuto(_.build())
+      val program = idml.compile("""
           |uuid3 = root.uuid3()
           |uuid5 = root.uuid5()
           |object = js.parseJson()

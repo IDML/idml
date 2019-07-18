@@ -15,7 +15,7 @@ object AutoComplete {
     ctx.state.put(AnalyseFunction.AnalysisState, mutable.Buffer[IdmlValue]())
     ctx.input = doc
     ctx.scope = doc
-    ptolemy.fromString(newdoc).run(ctx)
+    ptolemy.compile(newdoc).run(ctx)
     ctx.state
       .get(AnalyseFunction.AnalysisState)
       .asInstanceOf[Option[mutable.Buffer[IdmlValue]]]

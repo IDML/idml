@@ -2,7 +2,7 @@
 package io.idmlrepl
 
 import java.io.PrintWriter
-import java.util.Properties
+import java.util.{Optional, Properties}
 
 import io.idml.datanodes.IObject
 import io.idml._
@@ -32,17 +32,15 @@ class Repl {
   var mode: String         = "json"
   var doc: Option[IObject] = None
 
-  val ptolemyJson = IdmlJackson.default
+  val idmlJson = IdmlJackson.default
 
   def run(args: Array[String]) = runInner(args)
 
   def runInner(args: Array[String], fr: Option[FunctionResolverService] = None) {
     addShutdownHook()
 
-    val ptolemy = new Idml(
-      new IdmlConf,
-      fr.getOrElse(new FunctionResolverService())
-    )
+    val idml =
+      new IdmlBuilder(Optional.of(fr.getOrElse(new FunctionResolverService))).build()
 
     out.println("""
         |idml %s (%s)
@@ -66,14 +64,14 @@ class Repl {
             case "load" =>
               input = loadFile(input.substring(".load".length).trim)
               if (input.length > 0) {
-                processInput(ptolemy)(input)
+                processInput(idml)(input)
               }
             case _ =>
               out.println("Error: Unknown command [" + tokens(0) + "]")
               ""
           }
         } else {
-          processInput(ptolemy)(input)
+          processInput(idml)(input)
         }
         out.println()
       }
@@ -126,11 +124,11 @@ class Repl {
                 """.stripMargin)
   }
 
-  def processInput(ptolemy: Idml)(input: String) {
+  def processInput(idml: Idml)(input: String) {
     mode match {
       case "json"   => processJson(input)
-      case "idml"   => processIdml(ptolemy)(input)
-      case "schema" => processSchema(ptolemy)(input)
+      case "idml"   => processIdml(idml)(input)
+      case "schema" => processSchema(idml)(input)
       case _        => out.println("Error: Unknown mode [" + mode + "]")
     }
   }
@@ -138,7 +136,7 @@ class Repl {
   def processJson(input: String) {
     // Store and parse the JSON.
     try {
-      doc = Some(ptolemyJson.parse(input).asInstanceOf[IObject])
+      doc = Some(idmlJson.parse(input).asInstanceOf[IObject])
       out.println("JSON accepted")
       mode = "idml"
     } catch {
@@ -147,27 +145,27 @@ class Repl {
     }
   }
 
-  def processIdml(ptolemy: Idml)(input: String) {
+  def processIdml(idml: Idml)(input: String) {
     try {
-      val mapping = ptolemy.fromString(input)
+      val mapping = idml.compile(input)
       val output  = mapping.run(doc.get)
-      out.println(ptolemyJson.pretty(output))
+      out.println(idmlJson.pretty(output))
     } catch {
       case e: Throwable =>
         out.println("Error: " + e.getMessage)
     }
   }
 
-  def processSchema(ptolemy: Idml)(input: String) {
+  def processSchema(idml: Idml)(input: String) {
     try {
       var mapping: String = ""
       doc.get.fields.keySet.foreach {
         case key: String =>
           mapping += key + " = " + key + "\n"
       }
-      val schema = ptolemy.fromString(mapping + input)
+      val schema = idml.compile(mapping + input)
       val output = schema.run(doc.get)
-      out.println(ptolemyJson.pretty(output))
+      out.println(idmlJson.pretty(output))
     } catch {
       case e: Throwable =>
         out.println("Error: " + e.getMessage)

@@ -47,17 +47,13 @@ object WebsocketServer {
         f.providedFunctions().filterNot(_.name.startsWith("$"))
       }
 
-  val completionIdml = new Idml(
-    new IdmlConf(),
-    new StaticFunctionResolverService(
-      (StaticFunctionResolverService.defaults(IdmlCirce).asScala ++ List(new JsoupFunctionResolver,
-                                                                         new HashingFunctionResolver,
-                                                                         new AnalysisModule)).asJava
-    )
-  )
+  val completionIdml =
+    Idml.createStaticWithDefaults(
+      IdmlCirce,
+      _.withResolver(new JsoupFunctionResolver).withResolver(new HashingFunctionResolver).withResolver(new AnalysisModule).build())
 
   def service(fr: FunctionResolverService)(implicit ec: ExecutionContext, c: Concurrent[IO]) = {
-    val ptolemy = new Idml(new IdmlConf(), fr)
+    val idml = new IdmlBuilder(fr).build()
     HttpRoutes.of[IO] {
       case GET -> Root / "functions" / partial =>
         Ok(functions.filter(_.name.startsWith(partial)).asJson)
@@ -94,10 +90,10 @@ object WebsocketServer {
                     .flatMap { x =>
                       Try {
                         log.info(x.toString)
-                        val chain = ptolemy.fromString(x.idml)
+                        val chain = idml.compile(x.idml)
                         val jsons = x.in
                         val p     = x.path.getOrElse("root")
-                        val path  = ptolemy.fromString(s"result = $p")
+                        val path  = idml.compile(s"result = $p")
                         jsons.map { j =>
                           Try { path.run(chain.run(j)).asJson }.toEither
                         }.sequence

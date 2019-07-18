@@ -14,6 +14,8 @@ object IObject {
     IObject(mutable.SortedMap(fields: _*))
   }
 
+  def apply(): IObject = new IObject(mutable.SortedMap.empty)
+
   def of(kv: java.util.Map[String, IdmlValue]): IObject = {
     IObject(mutable.SortedMap(kv.asScala.toList: _*))
   }

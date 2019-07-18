@@ -31,29 +31,28 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
     )(
       urls => FunctionResolverService.orElse(baseFunctionResolver, new PluginFunctionResolverService(urls.toList.toArray)),
     )
-    new Idml(
-      new IdmlConf(),
+    new IdmlBuilder(
       if (dynamic) frs.orElse(new FunctionResolverService())
       else frs
-    )
+    ).build()
   }
 
-  def run[T, O](f: (IdmlMapping, T) => IO[O])(time: Option[Long], code: String, input: T): IO[O] =
+  def run[T, O](f: (Mapping, T) => IO[O])(time: Option[Long], code: String, input: T): IO[O] =
     for {
       p <- ptolemy(time.map(_ * 1000))
-      m <- IO { p.fromString(code) }
+      m <- IO { p.compile(code) }
       r <- f(m, input)
     } yield r
 
   def runSingle: (Option[Long], String, Json) => IO[Json] =
-    run({ (m: IdmlMapping, j: Json) =>
+    run({ (m: Mapping, j: Json) =>
       IO {
         j.as[IdmlObject].map(m.run).map(_.asJson.foldWith(notNulls)).leftWiden[Throwable]
       }.rethrow
     })
 
   def runMulti(implicit timer: ContextShift[IO]): (Option[Long], String, List[Json]) => IO[List[Json]] =
-    run({ (m: IdmlMapping, js: List[Json]) =>
+    run({ (m: Mapping, js: List[Json]) =>
       js.parTraverse { j =>
         IO {
           j.as[IdmlObject].map(m.run).map(_.asJson.foldWith(notNulls)).leftWiden[Throwable]

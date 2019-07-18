@@ -10,57 +10,16 @@ class IdmlTest extends FunSuite with MockitoSugar {
   test("Passes strings to parser") {
     val parser = mock[IdmlParser]
 
+    val funcs = mock[FunctionResolverService]
     val ptolemy = new Idml(
-      mock[IdmlConf],
       parser,
-      mock[FileResolver],
-      mock[ResourceResolver],
-      mock[FunctionResolverService],
+      funcs,
       List.empty[IdmlListener].asJava
     )
 
-    ptolemy.fromString("abc")
+    ptolemy.compile("abc")
 
-    verify(parser).parse(ptolemy, "abc")
+    verify(parser).parse(funcs, "abc")
   }
 
-  test("Resolves and parses files") {
-    val fileResolver = mock[FileResolver]
-    val parser       = mock[IdmlParser]
-
-    when(fileResolver.resolveAndLoad("xyz")).thenReturn("abc")
-
-    val ptolemy = new Idml(
-      mock[IdmlConf],
-      parser,
-      fileResolver,
-      mock[ResourceResolver],
-      mock[FunctionResolverService],
-      List.empty[IdmlListener].asJava
-    )
-
-    ptolemy.fromFile("xyz")
-
-    verify(parser).parse(ptolemy, "abc")
-  }
-
-  test("Resolves and parses resources") {
-    val resourceResolver = mock[ResourceResolver]
-    val parser           = mock[IdmlParser]
-
-    when(resourceResolver.resolveAndLoad("xyz")).thenReturn("abc")
-
-    val ptolemy = new Idml(
-      mock[IdmlConf],
-      parser,
-      mock[FileResolver],
-      resourceResolver,
-      mock[FunctionResolverService],
-      List.empty[IdmlListener].asJava
-    )
-
-    ptolemy.fromResource("xyz")
-
-    verify(parser).parse(ptolemy, "abc")
-  }
 }
