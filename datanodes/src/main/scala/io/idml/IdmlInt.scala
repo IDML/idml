@@ -1,6 +1,6 @@
 package io.idml
 
-import io.idml.datanodes.{PBool, PFalse, PString, PTrue}
+import io.idml.datanodes.{IBool, IFalse, IString, ITrue}
 
 /** The IdmlValue for containing natural numbers */
 trait IdmlInt extends IdmlValue {
@@ -17,9 +17,9 @@ trait IdmlInt extends IdmlValue {
     case _             => false
   }
 
-  override def string(): PString = PString(value.toString)
+  override def string(): IString = IString(value.toString)
 
-  override def bool(): PBool = if (value == 0) PFalse else PTrue
+  override def bool(): IBool = if (value == 0) IFalse else ITrue
 
   override def hashCode(): Int = value.hashCode()
 

@@ -2,7 +2,7 @@ package io.idml
 
 import java.util.ServiceLoader
 
-import io.idml.datanodes.PObject
+import io.idml.datanodes.IObject
 import cats._
 import cats.implicits._
 
@@ -42,7 +42,7 @@ trait IdmlJson {
 object IdmlJson {
   @throws[NoSuchElementException]("if there isn't an available implementation")
   def load(): IdmlJson     = ServiceLoader.load(classOf[IdmlJson]).iterator().next()
-  def newObject(): PObject = PObject()
+  def newObject(): IObject = IObject()
 }
 
 sealed trait IdmlJsonException

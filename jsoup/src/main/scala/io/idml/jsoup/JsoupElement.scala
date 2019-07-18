@@ -1,6 +1,6 @@
 package io.idml.jsoup
 
-import io.idml.datanodes.PString
+import io.idml.datanodes.IString
 import io.idml.{IdmlArray, IdmlObject, IdmlValue, MissingField}
 import org.jsoup.nodes.{Element, TextNode}
 
@@ -18,7 +18,7 @@ class JsoupElement(val element: Element) extends IdmlArray {
   // scalastyle:on null
 
   /** Tag name */
-  val tag = PString(element.tagName())
+  val tag = IString(element.tagName())
 
   /** Attributes */
   lazy val attributes: IdmlObject = new JsoupAttributes(element.attributes())
@@ -26,7 +26,7 @@ class JsoupElement(val element: Element) extends IdmlArray {
   /** Children */
   lazy val children = {
     element.childNodes().asScala.map {
-      case text: TextNode   => PString(text.text())
+      case text: TextNode   => IString(text.text())
       case element: Element => new JsoupElement(element)
       case other: Any =>
         throw new IllegalArgumentException(s"Unsupported: $other")

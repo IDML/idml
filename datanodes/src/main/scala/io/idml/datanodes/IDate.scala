@@ -6,7 +6,7 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormatter
 
 /** */
-case class PDate(dateVal: DateTime, format: DateTimeFormatter = DateModule.DefaultDateFormat) extends IdmlString with CompositeValue {
+case class IDate(dateVal: DateTime, format: DateTimeFormatter = DateModule.DefaultDateFormat) extends IdmlString with CompositeValue {
   def value: String        = dateVal.toString(format)
-  override def int(): PInt = PInt(dateVal.getMillis())
+  override def int(): IInt = IInt(dateVal.getMillis())
 }

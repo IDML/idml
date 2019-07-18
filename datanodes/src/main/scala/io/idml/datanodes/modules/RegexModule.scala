@@ -1,6 +1,6 @@
 package io.idml.datanodes.modules
 
-import io.idml.datanodes.{PArray, PBool, PString}
+import io.idml.datanodes.{IArray, IBool, IString}
 import io.idml.datanodes.regex.PRegexFactory
 import io.idml.{IdmlValue, InvalidCaller, InvalidParameters}
 
@@ -10,16 +10,16 @@ trait RegexModule {
 
   def matches(regex: IdmlValue): IdmlValue = {
     (this, regex) match {
-      case (PString(s), PString(r)) =>
-        PArray(
+      case (IString(s), IString(r)) =>
+        IArray(
           PRegexFactory
             .getRegex(r)
             .matches(s)
             .map { inner =>
-              PArray(inner.map(PString.apply).toBuffer[IdmlValue])
+              IArray(inner.map(IString.apply).toBuffer[IdmlValue])
             }
             .toBuffer[IdmlValue])
-      case (PString(_), _) => InvalidParameters
+      case (IString(_), _) => InvalidParameters
       case _               => InvalidCaller
     }
   }
@@ -27,14 +27,14 @@ trait RegexModule {
   // scalastyle:off method.name
   def `match`(regex: IdmlValue): IdmlValue = {
     this match {
-      case t: PString =>
+      case t: IString =>
         regex match {
-          case s: PString =>
-            PArray(
+          case s: IString =>
+            IArray(
               PRegexFactory
                 .getRegex(s.value)
                 .`match`(t.value)
-                .map { PString }
+                .map { IString }
                 .toBuffer[IdmlValue])
           case _ => InvalidParameters
         }
@@ -45,14 +45,14 @@ trait RegexModule {
 
   def split(delim: IdmlValue): IdmlValue = {
     this match {
-      case t: PString =>
+      case t: IString =>
         delim match {
-          case s: PString =>
-            PArray(
+          case s: IString =>
+            IArray(
               PRegexFactory
                 .getRegex(s.value)
                 .split(t.value)
-                .map { PString }
+                .map { IString }
                 .toBuffer[IdmlValue])
           case _ => InvalidParameters
         }
@@ -62,10 +62,10 @@ trait RegexModule {
 
   def isMatch(regex: IdmlValue): IdmlValue = {
     this match {
-      case t: PString =>
+      case t: IString =>
         regex match {
-          case s: PString =>
-            PBool(PRegexFactory.getRegex(s.value).isMatch(t.value))
+          case s: IString =>
+            IBool(PRegexFactory.getRegex(s.value).isMatch(t.value))
           case _ => InvalidParameters
         }
       case _ => InvalidCaller
@@ -74,12 +74,12 @@ trait RegexModule {
 
   def replace(regex: IdmlValue, replacement: IdmlValue): IdmlValue = {
     this match {
-      case t: PString =>
+      case t: IString =>
         replacement match {
-          case rep: PString =>
+          case rep: IString =>
             regex match {
-              case s: PString =>
-                PString(PRegexFactory.getRegex(s.value).replace(t.value, rep.value))
+              case s: IString =>
+                IString(PRegexFactory.getRegex(s.value).replace(t.value, rep.value))
               case _ => InvalidParameters
             }
           case _ => InvalidParameters

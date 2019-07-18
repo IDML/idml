@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.{PArray, PObject}
+import io.idml.datanodes.{IArray, IObject}
 import io.idml.{IdmlContext, IdmlValue, InvalidCaller}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -9,7 +9,7 @@ import org.scalatest.{FunSuite, MustMatchers}
 /**  */
 class ArrayFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
 
-  val sizeTwoArray = PArray(PObject(), PObject())
+  val sizeTwoArray = IArray(IObject(), IObject())
 
   test("Cursor becomes InvalidCaller if the original cursor wasn't an array") {
     val ctx   = mock[IdmlContext]
@@ -22,9 +22,9 @@ class ArrayFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
   test("Cursor becomes an empty array if the original cursor was an array") {
     val ctx   = mock[IdmlContext]
     val inner = mock[ApplyFunction]
-    when(ctx.cursor).thenReturn(PArray())
+    when(ctx.cursor).thenReturn(IArray())
     ArrayFunction(inner).invoke(ctx)
-    verify(ctx).cursor_=(PArray())
+    verify(ctx).cursor_=(IArray())
   }
 
   test("Cursor becomes a size-two array if the original cursor was size two") {
@@ -32,9 +32,9 @@ class ArrayFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
     val ctx   = mock[IdmlContext]
     val inner = mock[ApplyFunction]
     when(ctx.cursor).thenReturn(sizeTwoArray)
-    when(ctx.output).thenReturn(PObject())
+    when(ctx.output).thenReturn(IObject())
     ArrayFunction(inner).invoke(ctx)
-    verify(ctx, times(2)).cursor_=(PObject())
+    verify(ctx, times(2)).cursor_=(IObject())
     verify(ctx).cursor_=(sizeTwoArray)
   }
 
@@ -42,7 +42,7 @@ class ArrayFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
     val ctx   = mock[IdmlContext]
     val inner = mock[ApplyFunction]
     when(ctx.cursor).thenReturn(sizeTwoArray)
-    when(ctx.output).thenReturn(PObject())
+    when(ctx.output).thenReturn(IObject())
     ArrayFunction(inner).invoke(ctx)
     verify(inner, times(2)).invoke(ctx)
   }
@@ -51,7 +51,7 @@ class ArrayFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
     val ctx      = mock[IdmlContext]
     val inner    = mock[ApplyFunction]
     val expected = ctx.output
-    when(ctx.cursor).thenReturn(PArray.empty)
+    when(ctx.cursor).thenReturn(IArray.empty)
     ArrayFunction(inner).invoke(ctx)
     verify(ctx).output_=(expected)
   }

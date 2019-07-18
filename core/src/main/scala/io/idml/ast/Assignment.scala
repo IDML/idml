@@ -1,6 +1,6 @@
 package io.idml.ast
 
-import io.idml.datanodes.PObject
+import io.idml.datanodes.IObject
 import io.idml.{Deleted, IdmlContext, IdmlNothing, IdmlObject, IdmlValue}
 
 import scala.annotation.tailrec
@@ -20,7 +20,7 @@ case class Assignment(dest: List[String], exps: Pipeline, positions: Option[Posi
       case Deleted =>
         delete(ctx.output, dest)
       case reason: IdmlNothing => ()
-      case value: PObject if dest.isEmpty =>
+      case value: IObject if dest.isEmpty =>
         ctx.output.fields.clear()
         ctx.output.fields ++= value.deepCopy.fields
       case value: Any if dest.isEmpty => ()

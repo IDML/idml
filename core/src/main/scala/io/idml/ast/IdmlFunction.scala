@@ -1,6 +1,6 @@
 package io.idml.ast
 
-import io.idml.datanodes.{PArray, PObject}
+import io.idml.datanodes.{IArray, IObject}
 import io.idml.{IdmlArray, IdmlContext, IdmlValue, UnknownBlockException}
 
 import scala.collection.mutable
@@ -27,18 +27,18 @@ trait IdmlFunction extends Expression {
     val results: mutable.Buffer[IdmlValue] = array.items.map { item =>
       ctx.scope = item
       ctx.cursor = item
-      ctx.output = PObject()
+      ctx.output = IObject()
       block.invoke(ctx)
       ctx.output
     }
-    ctx.cursor = PArray(results)
+    ctx.cursor = IArray(results)
   }
 
   /** Apply a block to a single item */
   protected def applyBlock(ctx: IdmlContext, block: Node, other: IdmlValue): Unit = {
     // Prepare the context to call the block in isolation
     ctx.scope = ctx.cursor
-    ctx.output = PObject()
+    ctx.output = IObject()
     block.invoke(ctx)
     ctx.cursor = ctx.output
   }

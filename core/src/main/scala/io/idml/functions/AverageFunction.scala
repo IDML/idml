@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.PDouble
+import io.idml.datanodes.IDouble
 import io.idml.{IdmlArray, IdmlNothing, IdmlValue, InvalidCaller}
 
 /** Calculate an average value */
@@ -15,7 +15,7 @@ case object AverageFunction extends IdmlFunction0 {
       case array: IdmlArray if array.items.size > 0 =>
         // FIXME: turn Idml into a numeric and replace this with sum()
         val sum = array.items.reduce((l, r) => l.+(r))
-        sum / PDouble(array.items.size)
+        sum / IDouble(array.items.size)
       case other: Any => InvalidCaller
     }
   }

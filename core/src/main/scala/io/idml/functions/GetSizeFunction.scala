@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.PInt
+import io.idml.datanodes.IInt
 import io.idml.{IdmlArray, IdmlContext, IdmlNothing, IdmlString, InvalidCaller}
 import io.idml.ast.IdmlFunction
 
@@ -16,9 +16,9 @@ object GetSizeFunction extends IdmlFunction {
       case nothing: IdmlNothing =>
         nothing
       case array: IdmlArray =>
-        PInt(array.items.size)
+        IInt(array.items.size)
       case string: IdmlString =>
-        PInt(string.value.length)
+        IInt(string.value.length)
       case _ =>
         InvalidCaller
     }

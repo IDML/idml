@@ -1,6 +1,6 @@
 package io.idml
 
-import io.idml.datanodes.PBool
+import io.idml.datanodes.IBool
 
 import scala.collection.mutable
 
@@ -33,7 +33,7 @@ abstract class IdmlObject extends IdmlValue {
   }
 
   /** True if we have no fields */
-  override def isEmpty: PBool = PBool(fields.isEmpty)
+  override def isEmpty: IBool = IBool(fields.isEmpty)
 
   /** No-op as we are already an object */
   // scalastyle:off method.name

@@ -1,12 +1,12 @@
 package io.idml.functions
 
-import io.idml.datanodes.PString
+import io.idml.datanodes.IString
 import io.idml.ast._
 import org.scalatest.FunSuite
 
 class BuiltinFunctionResolverTest extends FunSuite {
 
-  val stringLiteral = ExecNavLiteral(Literal(PString("my_block")))
+  val stringLiteral = ExecNavLiteral(Literal(IString("my_block")))
   val stringPipl    = Pipeline(List(stringLiteral))
   val stringArgs    = List(stringPipl)
 

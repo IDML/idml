@@ -1,7 +1,7 @@
 package io.idml.test
 import io.idml.{IdmlContext, IdmlValue}
 import io.idml.ast.{Argument, IdmlFunction, IdmlFunctionMetadata, Pipeline}
-import io.idml.datanodes.PDate
+import io.idml.datanodes.IDate
 import io.idml.functions.{FunctionResolver, IdmlFunction0}
 import org.joda.time.{DateTime, DateTimeZone}
 
@@ -18,7 +18,7 @@ class DeterministicTime(val time: Long = 0) extends FunctionResolver {
 
 object DeterministicTime {
   def now(time: Long) = new IdmlFunction0 {
-    override protected def apply(cursor: IdmlValue): IdmlValue = PDate(new DateTime(time, DateTimeZone.UTC))
+    override protected def apply(cursor: IdmlValue): IdmlValue = IDate(new DateTime(time, DateTimeZone.UTC))
     override def name: String                                  = "now"
   }
   def microtime(time: Long) = new IdmlFunction0 {

@@ -28,9 +28,9 @@ class AssignmentTest extends FunSuite with MockitoSugar {
     val pipl   = mock[Pipeline]
     val assign = new Assignment(List("a"), pipl)
     val ctx    = new IdmlContext()
-    when(pipl.invoke(ctx)).thenAnswer(updateCursor(PTrue))
+    when(pipl.invoke(ctx)).thenAnswer(updateCursor(ITrue))
     assign.invoke(ctx)
-    assert(ctx.output === PObject("a" -> PTrue))
+    assert(ctx.output === IObject("a" -> ITrue))
   }
 
   test("Need to move assignments into a new class and have a test for nested updates") {
@@ -47,7 +47,7 @@ class AssignmentTest extends FunSuite with MockitoSugar {
     val ctx    = new IdmlContext()
     when(pipl.invoke(ctx)).thenAnswer(updateCursor(NoFields))
     assign.invoke(ctx)
-    assert(ctx.output === PObject())
+    assert(ctx.output === IObject())
   }
 
   test("Triggers enter and exit events") {

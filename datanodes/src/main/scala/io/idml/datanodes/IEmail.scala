@@ -5,7 +5,7 @@ import javax.mail.internet.InternetAddress
 import io.idml.{IdmlString, IdmlValue, MissingField}
 
 /** Represents a valid Email */
-class PEmail(email: InternetAddress) extends IdmlString with CompositeValue {
+class IEmail(email: InternetAddress) extends IdmlString with CompositeValue {
 
   /** Extract the address component */
   def address: IdmlValue = IdmlValue(addressValue)

@@ -23,11 +23,11 @@ class DiffTest extends FunSuite {
   }
 
   test("isDiff and createDiff relationship - isDiff(createDiff(x)) == true") {
-    assert(Diff.isDiff(Diff.createDiff(PTrue, PFalse)))
+    assert(Diff.isDiff(Diff.createDiff(ITrue, IFalse)))
   }
 
   test("isDiff and createDiff relationship - isDiff(other) == false") {
-    assert(Diff.isDiff(PTrue) === false)
+    assert(Diff.isDiff(ITrue) === false)
   }
 
   test("primitives - true v false") {
@@ -61,35 +61,35 @@ class DiffTest extends FunSuite {
   test("objects and objects - {x: a} vs {}") {
     val left     = "{x: 'a'}"
     val right    = "{}"
-    val expected = PObject("x" -> diff("'a'", MissingField))
+    val expected = IObject("x" -> diff("'a'", MissingField))
     check(left, right, expected)
   }
 
   test("objects and objects - {} vs {x: a}") {
     val left     = "{}"
     val right    = "{x: 'a'}"
-    val expected = PObject("x" -> diff(MissingField, "'a'"))
+    val expected = IObject("x" -> diff(MissingField, "'a'"))
     check(left, right, expected)
   }
 
   test("objects and objects - {x: a} vs {x: b}") {
     val left     = "{x: 'a'}"
     val right    = "{x: 'b'}"
-    val expected = PObject("x" -> diff("'a'", "'b'"))
+    val expected = IObject("x" -> diff("'a'", "'b'"))
     check(left, right, expected)
   }
 
   test("nested objects - {x: {y: A}} vs {x: {y: B}") {
     val left     = "{x: {y: 'a'}}"
     val right    = "{x: {y: 'b'}}"
-    val expected = PObject("x" -> PObject("y" -> diff("'a'", "'b'")))
+    val expected = IObject("x" -> IObject("y" -> diff("'a'", "'b'")))
     check(left, right, expected)
   }
 
   test("nested objects - {x: {y: A}} vs {x: {z: B}} == {x: {y: [__DIFF__, A, _], z: [__DIFF__, _, B}}") {
     val left     = "{x: {y: 'a'}}"
     val right    = "{x: {z: 'b'}}"
-    val expected = PObject("x" -> PObject("y" -> diff("'a'", MissingField), "z" -> diff(MissingField, "'b'")))
+    val expected = IObject("x" -> IObject("y" -> diff("'a'", MissingField), "z" -> diff(MissingField, "'b'")))
     check(left, right, expected)
   }
 
@@ -97,7 +97,7 @@ class DiffTest extends FunSuite {
     val left  = "{x: {y: 'a', z: 'b'}}"
     val right = "{x: {z: 'b'}}"
     val expected =
-      PObject("x" -> PObject("y" -> diff("'a'", MissingField), "z" -> "'b'"))
+      IObject("x" -> IObject("y" -> diff("'a'", MissingField), "z" -> "'b'"))
     check(left, right, expected)
   }
 
@@ -116,88 +116,88 @@ class DiffTest extends FunSuite {
   test("arrays and arrays - [a] vs []") {
     val left     = "['a']"
     val right    = "[]"
-    val expected = PArray(diff("'a'", MissingIndex))
+    val expected = IArray(diff("'a'", MissingIndex))
     check(left, right, expected)
   }
 
   test("arrays and arrays - [] vs [a]") {
-    val left     = PArray()
-    val right    = PArray(PString("a"))
-    val expected = PArray(diff(MissingIndex, PString("a")))
+    val left     = IArray()
+    val right    = IArray(IString("a"))
+    val expected = IArray(diff(MissingIndex, IString("a")))
     check(left, right, expected)
   }
 
   test("arrays and arrays - [a] vs [b]") {
-    val left     = PArray(PString("a"))
-    val right    = PArray(PString("b"))
-    val expected = PArray(diff(PString("a"), PString("b")))
+    val left     = IArray(IString("a"))
+    val right    = IArray(IString("b"))
+    val expected = IArray(diff(IString("a"), IString("b")))
     check(left, right, expected)
   }
 
   test("arrays and arrays - [a] vs [a, b]") {
-    val left     = PArray(PString("a"))
-    val right    = PArray(PString("a"), PString("b"))
-    val expected = PArray(PString("a"), diff(MissingIndex, PString("b")))
+    val left     = IArray(IString("a"))
+    val right    = IArray(IString("a"), IString("b"))
+    val expected = IArray(IString("a"), diff(MissingIndex, IString("b")))
     check(left, right, expected)
   }
 
   test("arrays and arrays - [a, b] vs [a]") {
-    val left     = PArray(PString("a"), PString("b"))
-    val right    = PArray(PString("a"))
-    val expected = PArray(PString("a"), diff(PString("b"), MissingIndex))
+    val left     = IArray(IString("a"), IString("b"))
+    val right    = IArray(IString("a"))
+    val expected = IArray(IString("a"), diff(IString("b"), MissingIndex))
     check(left, right, expected)
   }
 
   test("arrays and arrays - [a, b, c] vs [a, x, c]") {
-    val left  = PArray(PString("a"), PString("b"), PString("c"))
-    val right = PArray(PString("a"), PString("x"), PString("c"))
+    val left  = IArray(IString("a"), IString("b"), IString("c"))
+    val right = IArray(IString("a"), IString("x"), IString("c"))
     val expected =
-      PArray(PString("a"), diff(PString("b"), PString("x")), PString("c"))
+      IArray(IString("a"), diff(IString("b"), IString("x")), IString("c"))
     check(left, right, expected)
   }
 
   test("nested arrays - [[a]] vs [[b]]") {
-    val left     = PArray(PArray(PString("a")))
-    val right    = PArray(PArray(PString("b")))
-    val expected = PArray(PArray(diff(PString("a"), PString("b"))))
+    val left     = IArray(IArray(IString("a")))
+    val right    = IArray(IArray(IString("b")))
+    val expected = IArray(IArray(diff(IString("a"), IString("b"))))
     check(left, right, expected)
   }
 
   test("nested arrays - [[a, b]] vs [[a]]") {
-    val left  = PArray(PArray(PString("a"), PString("b")))
-    val right = PArray(PArray(PString("a")))
+    val left  = IArray(IArray(IString("a"), IString("b")))
+    val right = IArray(IArray(IString("a")))
     val expected =
-      PArray(PArray(PString("a"), diff(PString("b"), MissingIndex)))
+      IArray(IArray(IString("a"), diff(IString("b"), MissingIndex)))
     check(left, right, expected)
   }
 
   test("nested arrays - [[a]] vs [[a, b]]") {
-    val left  = PArray(PArray(PString("a"), PString("b")))
-    val right = PArray(PArray(PString("a")))
+    val left  = IArray(IArray(IString("a"), IString("b")))
+    val right = IArray(IArray(IString("a")))
     val expected =
-      PArray(PArray(PString("a"), diff(PString("b"), MissingIndex)))
+      IArray(IArray(IString("a"), diff(IString("b"), MissingIndex)))
     check(left, right, expected)
   }
 
   test("nested arrays - [[a], [b]] vs [[a], [b, c]]") {
-    val left  = PArray(PArray(PString("a")), PArray(PString("b")))
-    val right = PArray(PArray(PString("a")), PArray(PString("b"), PString("c")))
+    val left  = IArray(IArray(IString("a")), IArray(IString("b")))
+    val right = IArray(IArray(IString("a")), IArray(IString("b"), IString("c")))
     val expected =
-      PArray(PArray(PString("a")), PArray(PString("b"), diff(MissingIndex, PString("c"))))
+      IArray(IArray(IString("a")), IArray(IString("b"), diff(MissingIndex, IString("c"))))
     check(left, right, expected)
   }
 
   test("objects in arrays - [{x: a}] vs [{x: b}]") {
-    val left     = PArray(PObject("x" -> PString("a")))
-    val right    = PArray(PObject("x" -> PString("b")))
-    val expected = PArray(PObject("x" -> diff(PString("a"), PString("b"))))
+    val left     = IArray(IObject("x" -> IString("a")))
+    val right    = IArray(IObject("x" -> IString("b")))
+    val expected = IArray(IObject("x" -> diff(IString("a"), IString("b"))))
     check(left, right, expected)
   }
 
   test("arrays in objects - {x: [a]} vs {x: [b]}") {
-    val left     = PObject("x" -> PArray(PString("a")))
-    val right    = PObject("x" -> PArray(PString("b")))
-    val expected = PObject("x" -> PArray(diff(PString("a"), PString("b"))))
+    val left     = IObject("x" -> IArray(IString("a")))
+    val right    = IObject("x" -> IArray(IString("b")))
+    val expected = IObject("x" -> IArray(diff(IString("a"), IString("b"))))
     check(left, right, expected)
   }
 

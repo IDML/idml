@@ -1,12 +1,12 @@
 package io.idml
 
-import io.idml.datanodes.PObject
+import io.idml.datanodes.IObject
 import io.idml.ast.Document
 import scala.collection.JavaConverters._
 
 abstract class Mapping {
   def run(ctx: IdmlContext): IdmlContext
-  def run(input: IdmlValue): IdmlObject                     = run(new IdmlContext(input, PObject())).output
+  def run(input: IdmlValue): IdmlObject                     = run(new IdmlContext(input, IObject())).output
   def run(input: IdmlValue, output: IdmlObject): IdmlObject = run(new IdmlContext(input, output)).output
 }
 
@@ -19,11 +19,11 @@ object Mapping {
   def fromMultipleMappings(engine: Idml, ms: java.util.List[Mapping]): Mapping =
     (ctx: IdmlContext) => {
       val result = ms.asScala.toList.map { m =>
-        ctx.output = PObject()
+        ctx.output = IObject()
         m.run(ctx)
-        ctx.output.asInstanceOf[PObject]
+        ctx.output.asInstanceOf[IObject]
       }
-      ctx.output = NonEmptyList.fromList(result).map(_.reduceLeft(_ deepMerge _)).getOrElse(PObject())
+      ctx.output = NonEmptyList.fromList(result).map(_.reduceLeft(_ deepMerge _)).getOrElse(IObject())
       ctx
     }
 }

@@ -18,11 +18,11 @@ object instances {
 
   lazy val rawIdmlCirceDecoder: Folder[IdmlValue] = new Folder[IdmlValue] {
     override def onNull: IdmlValue                    = IdmlNull
-    override def onBoolean(value: Boolean): IdmlValue = PBool(value)
+    override def onBoolean(value: Boolean): IdmlValue = IBool(value)
     override def onNumber(value: JsonNumber): IdmlValue =
-      value.toLong.fold[IdmlValue](PDouble(value.toDouble))(l => PInt(l))
-    override def onString(value: String): IdmlValue = PString(value)
-    override def onArray(value: Vector[Json]): IdmlValue = new PArray(
+      value.toLong.fold[IdmlValue](IDouble(value.toDouble))(l => IInt(l))
+    override def onString(value: String): IdmlValue = IString(value)
+    override def onArray(value: Vector[Json]): IdmlValue = new IArray(
       value.map(_.foldWith(rawIdmlCirceDecoder)).toBuffer
     )
     override def onObject(value: JsonObject): IdmlValue = decodeObject(value)
@@ -50,7 +50,7 @@ object instances {
   }
 
   def decodeObject(value: JsonObject): IdmlObject =
-    new PObject(
+    new IObject(
       value.toIterable.foldLeft(mutable.SortedMap.empty[String, IdmlValue]) {
         case (acc, (k, v)) => acc += k -> v.foldWith(rawIdmlCirceDecoder)
       }
@@ -68,6 +68,6 @@ object instances {
   // and for IdmlObject
   implicit val ptolemyObjectEncoder: Encoder[IdmlObject] = idmlCirceEncoder.narrow[IdmlObject]
   // and for PObject just for ease of use
-  implicit val ptolemyPObjectEncoder: Encoder[PObject] = idmlCirceEncoder.narrow[PObject]
+  implicit val ptolemyPObjectEncoder: Encoder[IObject] = idmlCirceEncoder.narrow[IObject]
 
 }

@@ -9,10 +9,10 @@ import scala.collection.mutable
 trait ArrayModule {
   this: IdmlValue =>
 
-  def wrapArray(): PArray = PArray(this)
+  def wrapArray(): IArray = IArray(this)
 
   def combinations(size: IdmlValue): IdmlValue = (this, size) match {
-    case (a: IdmlArray, s: IdmlInt) => PArray(a.items.combinations(s.value.toInt).map(xs => PArray(xs)).toBuffer[IdmlValue])
+    case (a: IdmlArray, s: IdmlInt) => IArray(a.items.combinations(s.value.toInt).map(xs => IArray(xs)).toBuffer[IdmlValue])
     case (a: IdmlArray, _)          => InvalidParameters
     case _                          => InvalidCaller
   }
@@ -24,12 +24,12 @@ trait ArrayModule {
   }
 
   def unique(): IdmlValue = this match {
-    case a: IdmlArray => PArray(a.items.distinct)
+    case a: IdmlArray => IArray(a.items.distinct)
     case _            => InvalidCaller
   }
 
   def sort(): IdmlValue = this match {
-    case a: IdmlArray => PArray(a.items.sorted)
+    case a: IdmlArray => IArray(a.items.sorted)
     case _            => InvalidCaller
   }
 
@@ -44,14 +44,14 @@ trait ArrayModule {
   }
 
   private def extractDouble(v: IdmlValue): Option[Double] = v match {
-    case PInt(i)    => Some(i.toDouble)
-    case PDouble(d) => Some(d)
+    case IInt(i)    => Some(i.toDouble)
+    case IDouble(d) => Some(d)
     case _          => None
   }
 
   def average(): IdmlValue = this match {
     case a: IdmlArray if a.size == 0 => InvalidCaller
-    case a: IdmlArray                => PDouble(a.items.flatMap(extractDouble).sum / a.items.size)
+    case a: IdmlArray                => IDouble(a.items.flatMap(extractDouble).sum / a.items.size)
     case _                           => InvalidCaller
   }
 
@@ -59,7 +59,7 @@ trait ArrayModule {
     case a: IdmlArray if a.size == 0 => InvalidCaller
     case a: IdmlArray => {
       a.items.flatMap(x => extractDouble(x).map((x, _))).sortBy(_._2) match {
-        case as if as.size % 2 == 0 => PDouble((as(as.size / 2)._2 + as((as.size / 2) - 1)._2) / 2)
+        case as if as.size % 2 == 0 => IDouble((as(as.size / 2)._2 + as((as.size / 2) - 1)._2) / 2)
         case as if as.size % 2 != 0 => as(Math.floor(as.size / 2).toInt)._1
       }
     }
@@ -72,7 +72,7 @@ trait ArrayModule {
       val items       = a.items.flatMap(extractDouble)
       val mean        = items.sum / items.size
       val differences = items.map(x => Math.pow(x - mean, 2))
-      PDouble(differences.sum / differences.size)
+      IDouble(differences.sum / differences.size)
     }
     case _ => InvalidCaller
   }
@@ -83,24 +83,24 @@ trait ArrayModule {
       val items       = a.items.flatMap(extractDouble)
       val mean        = items.sum / items.size
       val differences = items.map(x => Math.pow(x - mean, 2))
-      PDouble(Math.sqrt(differences.sum / differences.size))
+      IDouble(Math.sqrt(differences.sum / differences.size))
     }
     case _ => InvalidCaller
   }
 
   def softmax(): IdmlValue = this match {
-    case a: IdmlArray if a.size == 0 => PArray(mutable.Buffer.empty[IdmlValue])
+    case a: IdmlArray if a.size == 0 => IArray(mutable.Buffer.empty[IdmlValue])
     case a: IdmlArray => {
       val as    = a.items.flatMap(extractDouble).map(x => Math.exp(x))
       val asSum = as.sum
-      PArray(as.map(x => x / asSum).map(PDouble(_)).toBuffer[IdmlValue])
+      IArray(as.map(x => x / asSum).map(IDouble(_)).toBuffer[IdmlValue])
     }
     case _ => InvalidCaller
   }
 
   def flatten(): IdmlValue = this match {
     case a: IdmlArray =>
-      PArray(a.items.flatMap { i =>
+      IArray(a.items.flatMap { i =>
         i match {
           case arr: IdmlArray =>
             arr.items
@@ -112,7 +112,7 @@ trait ArrayModule {
   }
 
   def flatten(depth: IdmlValue): IdmlValue = (this, depth) match {
-    case (a: IdmlValue, i: PInt) =>
+    case (a: IdmlValue, i: IInt) =>
       (1L to i.value.toLong).foldLeft(a) { (x, y) =>
         x.flatten()
       }
@@ -121,7 +121,7 @@ trait ArrayModule {
 
   def zip(other: IdmlValue): IdmlValue = (this, other) match {
     case (a: IdmlArray, b: IdmlArray) =>
-      PArray(a.items.zip(b.items).map { case (l, r) => PArray(l, r) }.toBuffer[IdmlValue])
+      IArray(a.items.zip(b.items).map { case (l, r) => IArray(l, r) }.toBuffer[IdmlValue])
     case (_: IdmlArray, _) =>
       InvalidParameters
     case (_, _: IdmlArray) =>
@@ -132,7 +132,7 @@ trait ArrayModule {
 
   def enumerate(): IdmlValue = this match {
     case (a: IdmlArray) =>
-      PArray(a.items.zipWithIndex.map { case (item, idx) => PArray(IdmlValue(idx), item) }.toBuffer[IdmlValue])
+      IArray(a.items.zipWithIndex.map { case (item, idx) => IArray(IdmlValue(idx), item) }.toBuffer[IdmlValue])
     case _ =>
       InvalidCaller
   }
@@ -141,17 +141,17 @@ trait ArrayModule {
 
   def combineAll(): IdmlValue = this match {
     case ar: IdmlArray =>
-      PArray(ar.items.filter(i => !i.isNothingValue)) match {
+      IArray(ar.items.filter(i => !i.isNothingValue)) match {
         case a: IdmlArray if a.items.forall(_.isArray.value) =>
-          PArray(a.items.asInstanceOf[mutable.Buffer[IdmlArray]].map(_.items).flatten)
+          IArray(a.items.asInstanceOf[mutable.Buffer[IdmlArray]].map(_.items).flatten)
         case a: IdmlArray if a.items.forall(_.isObject.value) =>
-          a.items.asInstanceOf[mutable.Buffer[IdmlObject]].foldLeft(PObject()) { case (o, i) => PObject(o.fields ++ i.fields) }
+          a.items.asInstanceOf[mutable.Buffer[IdmlObject]].foldLeft(IObject()) { case (o, i) => IObject(o.fields ++ i.fields) }
         case a: IdmlArray if a.items.forall(_.isString.value) =>
-          PString(a.items.asInstanceOf[mutable.Buffer[IdmlString]].map(_.value).toList.combineAll)
+          IString(a.items.asInstanceOf[mutable.Buffer[IdmlString]].map(_.value).toList.combineAll)
         case a: IdmlArray if a.items.forall(_.isInt.value) =>
-          PInt(a.items.asInstanceOf[mutable.Buffer[IdmlInt]].map(_.value).toList.combineAll)
+          IInt(a.items.asInstanceOf[mutable.Buffer[IdmlInt]].map(_.value).toList.combineAll)
         case a: IdmlArray if a.items.forall(_.isFloat.value) =>
-          PDouble(a.items.asInstanceOf[mutable.Buffer[IdmlDouble]].map(_.value).toList.combineAll)
+          IDouble(a.items.asInstanceOf[mutable.Buffer[IdmlDouble]].map(_.value).toList.combineAll)
         case _ => InvalidCaller
       }
     case _ => InvalidCaller

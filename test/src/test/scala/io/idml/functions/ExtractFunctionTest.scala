@@ -16,30 +16,30 @@ class ExtractFunctionTest extends FunSuite {
   }
 
   test("extract returns invalid caller if something that isn't an array is used") {
-    val ctx = new IdmlContext(PString("abc"))
+    val ctx = new IdmlContext(IString("abc"))
     extract.invoke(ctx)
     assert(ctx.cursor === InvalidCaller)
   }
 
   test("extract applies function to each element in an array") {
     val ctx =
-      new IdmlContext(PArray(PObject("a" -> PTrue), PObject("a" -> PFalse)))
+      new IdmlContext(IArray(IObject("a" -> ITrue), IObject("a" -> IFalse)))
     extract.invoke(ctx)
-    assert(ctx.cursor === PArray(PTrue, PFalse))
+    assert(ctx.cursor === IArray(ITrue, IFalse))
   }
 
   test("extract returns nothing if no results are returned") {
     val ctx =
-      new IdmlContext(PArray(PObject("b" -> PTrue), PObject("b" -> PFalse)))
+      new IdmlContext(IArray(IObject("b" -> ITrue), IObject("b" -> IFalse)))
     extract.invoke(ctx)
     assert(ctx.cursor === NoFields)
   }
 
   test("extract filters out missing fields") {
     val ctx =
-      new IdmlContext(PArray(PObject("b" -> PTrue), PObject("a" -> PFalse)))
+      new IdmlContext(IArray(IObject("b" -> ITrue), IObject("a" -> IFalse)))
     extract.invoke(ctx)
-    assert(ctx.cursor === PArray(PFalse))
+    assert(ctx.cursor === IArray(IFalse))
   }
 
 }

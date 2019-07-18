@@ -1,6 +1,6 @@
 package io.idml.jsoup
 
-import io.idml.datanodes.PString
+import io.idml.datanodes.IString
 import io.idml.MissingField
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Attributes
@@ -23,8 +23,8 @@ class JsoupAttributesTest extends FunSuite with MustMatchers {
   test("fields() returns a map") {
     new JsoupAttributes("<a b=\"123\" c=\"456\">abc</a>").fields must equal(
       Map(
-        "b" -> PString("123"),
-        "c" -> PString("456")
+        "b" -> IString("123"),
+        "c" -> IString("456")
       ))
   }
 
@@ -33,6 +33,6 @@ class JsoupAttributesTest extends FunSuite with MustMatchers {
   }
 
   test("get(attrib) returns attrib") {
-    new JsoupAttributes("<a b=\"123\" c=\"456\">abc</a>").get("c") must equal(PString("456"))
+    new JsoupAttributes("<a b=\"123\" c=\"456\">abc</a>").get("c") must equal(IString("456"))
   }
 }

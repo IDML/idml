@@ -1,6 +1,6 @@
 package io.idml.ast
 
-import io.idml.datanodes.PArray
+import io.idml.datanodes.IArray
 import io.idml.{Filtered, IdmlArray, IdmlContext, IdmlNothing, IdmlString, IdmlValue}
 
 /** Top level class for implementing predicates */
@@ -29,7 +29,7 @@ case class Filter(pred: Predicate) extends Expression {
     if (results.isEmpty) {
       ctx.cursor = Filtered
     } else {
-      ctx.cursor = PArray(results)
+      ctx.cursor = IArray(results)
     }
   }
 

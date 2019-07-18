@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.{PArray, PInt, PObject}
+import io.idml.datanodes.{IArray, IInt, IObject}
 import io.idml.ast.{Block, Document}
 import io.idml.{IdmlContext, NoFields, UnknownBlockException}
 import org.mockito.Mockito._
@@ -45,7 +45,7 @@ class ApplyFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
     val ctx = mock[IdmlContext]
     when(ctx.doc).thenReturn(Document.empty)
     ApplyFunction("main").invoke(ctx)
-    verify(ctx).output_=(PObject())
+    verify(ctx).output_=(IObject())
   }
 
   test("Preserve the original scope") {
@@ -69,12 +69,12 @@ class ApplyFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
     val ctx   = mock[IdmlContext]
     val block = mock[Block]
     when(ctx.doc).thenReturn(doc)
-    when(ctx.cursor).thenReturn(PArray(PInt(10), PInt(11), PInt(12)))
+    when(ctx.cursor).thenReturn(IArray(IInt(10), IInt(11), IInt(12)))
     when(doc.blocks).thenReturn(Map("main" -> block))
     ApplyFunction("main").invoke(ctx)
-    verify(ctx).cursor_=(PInt(10))
-    verify(ctx).cursor_=(PInt(11))
-    verify(ctx).cursor_=(PInt(12))
+    verify(ctx).cursor_=(IInt(10))
+    verify(ctx).cursor_=(IInt(11))
+    verify(ctx).cursor_=(IInt(12))
     verify(block, times(3)).invoke(ctx)
   }
 

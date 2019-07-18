@@ -22,22 +22,22 @@ trait IdmlString extends IdmlValue {
 
   /** Try to parse this string as a float */
   override def float(): IdmlValue with Product with Serializable = {
-    Try(value.toDouble).map(new PDouble(_)).getOrElse(CastFailed)
+    Try(value.toDouble).map(new IDouble(_)).getOrElse(CastFailed)
   }
 
   /** Try to parse this string as an int */
   override def int(): IdmlValue with Product with Serializable = {
-    Try(value.toLong).map(new PInt(_)).getOrElse(CastFailed)
+    Try(value.toLong).map(new IInt(_)).getOrElse(CastFailed)
   }
 
   override def bool(): IdmlValue with Product with Serializable = {
     value.toLowerCase match {
-      case "true"  => PTrue
-      case "false" => PFalse
-      case "yes"   => PTrue
-      case "no"    => PFalse
-      case "1"     => PTrue
-      case "0"     => PFalse
+      case "true"  => ITrue
+      case "false" => IFalse
+      case "yes"   => ITrue
+      case "no"    => IFalse
+      case "1"     => ITrue
+      case "0"     => IFalse
       case _       => CastFailed
     }
   }
@@ -59,9 +59,9 @@ trait IdmlString extends IdmlValue {
   override def toStringOption: Some[String] = Some(value)
 
   /** Empty if equal to "" */
-  override def isEmpty: PBool = PBool(value.isEmpty)
+  override def isEmpty: IBool = IBool(value.isEmpty)
 
   override def slice(from: Option[Int], to: Option[Int]): IdmlString = {
-    new PString(this.value.slice(from.getOrElse(0), to.getOrElse(this.value.length)))
+    new IString(this.value.slice(from.getOrElse(0), to.getOrElse(this.value.length)))
   }
 }

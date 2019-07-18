@@ -1,6 +1,6 @@
 package io.idml.ast
 
-import io.idml.datanodes.{PArray, PObject}
+import io.idml.datanodes.{IArray, IObject}
 import io.idml.{IdmlArray, IdmlContext, IdmlNothing, IdmlObject, IdmlValue, NoFields}
 
 import scala.collection.mutable
@@ -18,7 +18,7 @@ case class Wildcard(tail: Pipeline) extends Expression {
           case n: Any         => res(key) = n
         }
     }
-    ctx.cursor = new PObject(res)
+    ctx.cursor = new IObject(res)
   }
 
   def invokeForArray(ctx: IdmlContext, arr: IdmlArray) {
@@ -30,7 +30,7 @@ case class Wildcard(tail: Pipeline) extends Expression {
         case n: Any         => res.append(n)
       }
     }
-    ctx.cursor = new PArray(res)
+    ctx.cursor = new IArray(res)
   }
 
   def invoke(ctx: IdmlContext) {

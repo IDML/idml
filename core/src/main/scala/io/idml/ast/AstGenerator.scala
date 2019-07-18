@@ -374,7 +374,7 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
   }
 
   /* This is the atto stringLiteral but modified a bit */
-  val stringParser: Parser[PString] = {
+  val stringParser: Parser[IString] = {
     import atto._, Atto._, cats._, cats.implicits._
 
     // Unicode escaped characters
@@ -404,11 +404,11 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
     val doubleQuoted = quotedString('"')
     val triple       = "\"\"\""
     val tripleQuoted = string(triple) *> manyUntil(unicode | anyChar, string(triple)).map(_.mkString(""))
-    (singleQuoted | tripleQuoted | doubleQuoted).map(s => PString(s))
+    (singleQuoted | tripleQuoted | doubleQuoted).map(s => IString(s))
   }
 
   /** Decode a string from its parsed form */
-  def decodeString(in: String): PString = {
+  def decodeString(in: String): IString = {
     import atto._, Atto._, cats._, cats.implicits._
     stringParser.parseOnly(in).done.either.leftMap(e => new Throwable(s"Couldn't parse string literal: $e")).toTry.get
   }
@@ -419,8 +419,8 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
       val int = ctx.Int().getText.toInt
       // Negate the int if we had a minus sign in front
       ctx.Minus() match {
-        case null => Literal(new PInt(int))
-        case _    => Literal(new PInt(0 - int))
+        case null => Literal(new IInt(int))
+        case _    => Literal(new IInt(0 - int))
       }
     } else if (ctx.String() != null) {
       val str = decodeString(ctx.String().getText)
@@ -429,13 +429,13 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
       val float = ctx.Float().getText.toDouble
       // Negate the float if we had a minus sign in front
       ctx.Minus() match {
-        case null => Literal(new PDouble(float))
-        case _    => Literal(new PDouble(0 - float))
+        case null => Literal(new IDouble(float))
+        case _    => Literal(new IDouble(0 - float))
       }
     } else if (ctx.Boolean() != null) {
       ctx.Boolean().toString() match {
-        case "true"  => Literal(PTrue)
-        case "false" => Literal(PFalse)
+        case "true"  => Literal(ITrue)
+        case "false" => Literal(IFalse)
         case _       => throw new IllegalStateException()
       }
     } else {

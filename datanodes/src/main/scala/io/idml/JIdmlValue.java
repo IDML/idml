@@ -13,21 +13,21 @@ import java.util.Map;
  */
 public class JIdmlValue {
     public static IdmlValue of(int i) {
-        return new PInt(i);
+        return new IInt(i);
     }
     public static IdmlValue of(double d) {
-        return new PDouble(d);
+        return new IDouble(d);
     }
     public static IdmlValue of(long l) {
-        return new PInt(l);
+        return new IInt(l);
     }
     public static IdmlValue of(boolean b) {
-        return new PBool(b);
+        return new IBool(b);
     }
     public static IdmlValue of(IdmlValue... v) {
-        return PArray.of(v);
+        return IArray.of(v);
     }
     public static IdmlValue of(Map<String, IdmlValue> kv) {
-        return PObject.of(kv);
+        return IObject.of(kv);
     }
 }

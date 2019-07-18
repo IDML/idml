@@ -1,6 +1,6 @@
 package io.idml
 
-import io.idml.datanodes.{PBool, PFalse, PTrue}
+import io.idml.datanodes.{IBool, IFalse, ITrue}
 
 /** The IdmlValue that contains floating point numbers */
 trait IdmlDouble extends IdmlValue {
@@ -17,5 +17,5 @@ trait IdmlDouble extends IdmlValue {
   }
   override def hashCode(): Int = value.hashCode()
 
-  override def bool(): PBool = if (value == 0) PFalse else PTrue
+  override def bool(): IBool = if (value == 0) IFalse else ITrue
 }

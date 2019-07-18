@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.PArray
+import io.idml.datanodes.IArray
 import io.idml.{IdmlArray, IdmlContext, IdmlNothing, IdmlValue, InvalidCaller, NoFields}
 import io.idml.ast.{IdmlFunction, Node}
 
@@ -36,7 +36,7 @@ case class ExtractFunction(expr: Node) extends IdmlFunction {
         val results: mutable.Buffer[IdmlValue] =
           array.items.flatMap(extractOpt(ctx, _))
         if (results.nonEmpty) {
-          ctx.cursor = PArray(results)
+          ctx.cursor = IArray(results)
         } else {
           ctx.cursor = NoFields
         }

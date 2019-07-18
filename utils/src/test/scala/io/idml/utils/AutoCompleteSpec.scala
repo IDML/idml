@@ -1,5 +1,5 @@
 package io.idml.utils
-import io.idml.datanodes.{PArray, PInt, PObject, PString}
+import io.idml.datanodes.{IArray, IInt, IObject, IString}
 import io.idml.jackson.IdmlJackson
 import io.idml.{jackson, _}
 import org.scalatest.words.ShouldVerb
@@ -17,26 +17,26 @@ class AutoCompleteSpec extends FlatSpec with MustMatchers {
   )
 
   "complete" should "complete base level keys" in {
-    val in     = PObject("a" -> PInt(1), "b" -> PInt(2))
+    val in     = IObject("a" -> IInt(1), "b" -> IInt(2))
     val doc    = "result = root."
     val cursor = doc.length
     AutoComplete.complete(ptolemy)(in, doc, cursor) should contain theSameElementsAs List("a", "b")
   }
   "complete" should "complete base level keys with this" in {
-    val in     = PObject("a" -> PInt(1), "b" -> PInt(2))
+    val in     = IObject("a" -> IInt(1), "b" -> IInt(2))
     val doc    = "result = "
     val cursor = doc.length
     AutoComplete.complete(ptolemy)(in, doc, cursor) should contain theSameElementsAs List("a", "b")
   }
   "complete" should "complete within a map" in {
-    val in = PObject("xs" -> PArray(PObject("a" -> PInt(1)), PObject("b" -> PInt(2))))
+    val in = IObject("xs" -> IArray(IObject("a" -> IInt(1)), IObject("b" -> IInt(2))))
     println(IdmlJackson.default.compact(in))
     val doc    = "result = root.xs.map()"
     val cursor = doc.length - 1
     AutoComplete.complete(ptolemy)(in, doc, cursor) should contain theSameElementsAs List("a", "b")
   }
   "complete" should "complete between blocks" in {
-    val in = PObject("a" -> PObject("b" -> PObject("c" -> PString("d"))))
+    val in = IObject("a" -> IObject("b" -> IObject("c" -> IString("d"))))
     val doc =
       """[main]
         |foo = 42

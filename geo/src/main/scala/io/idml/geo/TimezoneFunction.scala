@@ -7,7 +7,7 @@ import doobie.hikari._
 import doobie.implicits._
 import io.idml._
 import io.idml.ast.Pipeline
-import io.idml.datanodes.{PInt, PObject, PString}
+import io.idml.datanodes.{IInt, IObject, IString}
 import io.idml.functions.IdmlFunction0
 import net.iakovlev.timeshape.TimeZoneEngine
 
@@ -21,7 +21,7 @@ object TimezoneFunction {
   case object TimezoneFunction extends IdmlFunction0 {
     override protected def apply(cursor: IdmlValue): IdmlValue = {
       cursor match {
-        case g: Geo => query(g).map(PString).getOrElse(MissingField)
+        case g: Geo => query(g).map(IString).getOrElse(MissingField)
         case _      => InvalidParameters
       }
     }

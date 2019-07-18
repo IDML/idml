@@ -20,17 +20,17 @@ abstract class IdmlValue
 object IdmlValue {
 
   /** Create a new PInt */
-  def apply(v: Long): IdmlValue = new PInt(v)
+  def apply(v: Long): IdmlValue = new IInt(v)
 
   /** Create a new PDouble */
-  def apply(v: Double): IdmlValue = new PDouble(v)
+  def apply(v: Double): IdmlValue = new IDouble(v)
 
   /** Create a new IdmlValue from a string */
   def apply(v: String): IdmlValue =
-    Option(v).map(new PString(_)).getOrElse(IdmlNull)
+    Option(v).map(new IString(_)).getOrElse(IdmlNull)
 
   /** Create a new PBool */
-  def apply(v: Boolean): IdmlValue = if (v) PTrue else PFalse
+  def apply(v: Boolean): IdmlValue = if (v) ITrue else IFalse
 
   private def sortingClass(p: IdmlValue): Int = p match {
     case IdmlNull       => 1
@@ -73,8 +73,8 @@ object IdmlValue {
             case (x: IdmlString, y: IdmlString) => Ordering[IdmlString].compare(x, y)
             case (x: IdmlBool, y: IdmlBool)     => Ordering[IdmlBool].compare(x, y)
             case (x: IdmlDouble, y: IdmlDouble) => Ordering[IdmlDouble].compare(x, y)
-            case (x: IdmlInt, y: IdmlDouble)    => Ordering[IdmlDouble].compare(new PDouble(x.value.doubleValue()), y)
-            case (x: IdmlDouble, y: IdmlInt)    => Ordering[IdmlDouble].compare(x, new PDouble(y.value.doubleValue()))
+            case (x: IdmlInt, y: IdmlDouble)    => Ordering[IdmlDouble].compare(new IDouble(x.value.doubleValue()), y)
+            case (x: IdmlDouble, y: IdmlInt)    => Ordering[IdmlDouble].compare(x, new IDouble(y.value.doubleValue()))
             case _                              => 0
           }
       }

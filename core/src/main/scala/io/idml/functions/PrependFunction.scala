@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.PArray
+import io.idml.datanodes.IArray
 import io.idml.{IdmlArray, IdmlNothing, IdmlValue, InvalidCaller}
 import io.idml.ast.Pipeline
 
@@ -20,7 +20,7 @@ case class PrependFunction(arg: Pipeline) extends IdmlFunction1 {
           case prependee: Any =>
             arr.deepCopy
             // Create a new array with the original values and a new one on the end
-            PArray(prependee +: arr.items.map(_.deepCopy))
+            IArray(prependee +: arr.items.map(_.deepCopy))
         }
       case other: Any =>
         InvalidCaller

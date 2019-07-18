@@ -3,7 +3,7 @@ package io.idml.datanodes.modules
 import java.net.URL
 
 import com.google.re2j.Pattern
-import io.idml.datanodes.{PArray, PUrl}
+import io.idml.datanodes.{IArray, IUrl}
 import io.idml.{CastFailed, CastUnsupported, IdmlNothing, IdmlString, IdmlValue}
 
 import scala.collection.mutable
@@ -31,15 +31,15 @@ trait UrlModule {
 
   def urls(): IdmlValue = this match {
     case s: IdmlString =>
-      new PArray(findAllIn(regex)(s.value).flatMap(u => Try(new PUrl(new URL(u))).toOption).toBuffer[IdmlValue])
+      new IArray(findAllIn(regex)(s.value).flatMap(u => Try(new IUrl(new URL(u))).toOption).toBuffer[IdmlValue])
     case _ => CastUnsupported
   }
 
   /** Construct a new URL by parsing a string */
   def url(): IdmlValue = this match {
-    case _: PUrl | _: IdmlNothing => this
+    case _: IUrl | _: IdmlNothing => this
     case n: IdmlString =>
-      Try(new URL(n.value)).map(new PUrl(_)).getOrElse(CastFailed)
+      Try(new URL(n.value)).map(new IUrl(_)).getOrElse(CastFailed)
     case _ => CastUnsupported
   }
 

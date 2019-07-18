@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.PString
+import io.idml.datanodes.IString
 import io.idml.ast._
 
 import scala.reflect.runtime.{universe => ru}
@@ -9,9 +9,9 @@ import scala.reflect.runtime.{universe => ru}
 class BuiltinFunctionResolver extends FunctionResolver {
   def resolve(name: String, args: List[Argument]): Option[IdmlFunction] =
     (name, args) match {
-      case ("apply", LiteralValue(PString(blockName)) :: Nil) =>
+      case ("apply", LiteralValue(IString(blockName)) :: Nil) =>
         Some(ApplyFunction(blockName))
-      case ("applyArray", LiteralValue(PString(blockName)) :: Nil) =>
+      case ("applyArray", LiteralValue(IString(blockName)) :: Nil) =>
         Some(ApplyArrayFunction(blockName))
       case ("array", expression :: Nil) =>
         Some(ArrayFunction(expression))
@@ -31,7 +31,7 @@ class BuiltinFunctionResolver extends FunctionResolver {
         Some(GetSizeFunction)
       case ("size", (size: Pipeline) :: Nil) =>
         Some(SetSizeFunction(size))
-      case ("concat", LiteralValue(PString(sep)) :: Nil) =>
+      case ("concat", LiteralValue(IString(sep)) :: Nil) =>
         Some(ConcatFunction(sep))
       case ("unique", expression :: Nil) =>
         Some(UniqueFunction(expression))

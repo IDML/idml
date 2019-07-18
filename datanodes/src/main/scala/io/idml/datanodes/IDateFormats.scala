@@ -3,7 +3,7 @@ package io.idml.datanodes
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatterBuilder, DateTimeParser, ISODateTimeFormat}
 
 /** Date formats */
-object PDateFormats {
+object IDateFormats {
   val minFields = 2
   val maxFields = 4
   val minDigits = 2

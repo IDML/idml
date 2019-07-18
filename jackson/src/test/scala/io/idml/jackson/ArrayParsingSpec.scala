@@ -1,7 +1,7 @@
 package io.idml.jackson
 
 import io.idml.{IdmlNull, IdmlValue}
-import io.idml.datanodes.{PArray, PObject}
+import io.idml.datanodes.{IArray, IObject}
 import org.scalatest.{FunSuite, MustMatchers}
 
 import scala.collection.mutable
@@ -10,13 +10,13 @@ class ArrayParsingSpec extends FunSuite with MustMatchers {
   import IdmlJackson.default._
 
   // parsing
-  test("parse empty")(parse("[]") must equal(PArray()))
+  test("parse empty")(parse("[]") must equal(IArray()))
   test("parse with primitives")(parse("""["abc", 123, 123.4, null]""") must equal(withPrimitives))
   test("parse with nested objects")(parse("""[{"s": "abc", "i": 123, "f": 123.4, "n": null}]""") must equal(withNestedObjects))
   test("parse with nested arrays")(parse("""[["abc", 123, 123.4, null]]""") must equal(withNestedArrays))
 
   // Generation
-  test("generate empty")(parse("[]") must equal(pc(PArray())))
+  test("generate empty")(parse("[]") must equal(pc(IArray())))
   test("generate with primitives")(parse("""["abc", 123, 123.4, null]""") must equal(pc(withPrimitives)))
   test("generate with nested objects")(parse("""[{"s": "abc", "i": 123, "f": 123.4, "n": null}]""") must equal(pc(withNestedObjects)))
   test("generate with nested arrays")(parse("""[["abc", 123, 123.4, null]]""") must equal(pc(withNestedArrays)))
@@ -24,7 +24,7 @@ class ArrayParsingSpec extends FunSuite with MustMatchers {
   def pc = compact _ andThen parse
 
   def withPrimitives =
-    new PArray(
+    new IArray(
       mutable.ListBuffer(
         IdmlValue("abc"),
         IdmlValue(123),
@@ -33,9 +33,9 @@ class ArrayParsingSpec extends FunSuite with MustMatchers {
       ))
 
   def withNestedObjects =
-    new PArray(
+    new IArray(
       mutable.ListBuffer(
-        new PObject(
+        new IObject(
           mutable.SortedMap(
             "s" -> IdmlValue("abc"),
             "i" -> IdmlValue(123),
@@ -43,5 +43,5 @@ class ArrayParsingSpec extends FunSuite with MustMatchers {
             "n" -> IdmlNull
           ))))
 
-  def withNestedArrays = new PArray(mutable.ListBuffer(withPrimitives))
+  def withNestedArrays = new IArray(mutable.ListBuffer(withPrimitives))
 }

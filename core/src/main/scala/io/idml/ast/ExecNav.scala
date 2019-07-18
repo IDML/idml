@@ -1,6 +1,6 @@
 package io.idml.ast
 
-import io.idml.datanodes.PObject
+import io.idml.datanodes.IObject
 import io.idml.{IdmlContext, IdmlObject}
 
 /** Nav expressions set the cursor to a starting value */
@@ -36,6 +36,6 @@ case object ExecNavAbsolute extends ExecNav {
 
 case object ExecNavTemp extends ExecNav {
   def invoke(ctx: IdmlContext): Unit = {
-    ctx.cursor = ctx.state.getOrElseUpdate(Variable.stateKey, PObject()).asInstanceOf[IdmlObject]
+    ctx.cursor = ctx.state.getOrElseUpdate(Variable.stateKey, IObject()).asInstanceOf[IdmlObject]
   }
 }

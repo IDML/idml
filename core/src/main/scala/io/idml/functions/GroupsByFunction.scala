@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.{PArray, PObject}
+import io.idml.datanodes.{IArray, IObject}
 import io.idml._
 import io.idml.ast.{IdmlFunction, Node}
 
@@ -40,8 +40,8 @@ case class GroupsByFunction(expr: Node) extends IdmlFunction {
             })
             .groupBy(_._1)
             .toList
-            .map { case (k, v) => PObject("key" -> k, "values" -> PArray(v.map(_._2))) }
-          PArray(vs.toBuffer[IdmlValue])
+            .map { case (k, v) => IObject("key" -> k, "values" -> IArray(v.map(_._2))) }
+          IArray(vs.toBuffer[IdmlValue])
         }
         ctx.cursor = results
       case _ =>

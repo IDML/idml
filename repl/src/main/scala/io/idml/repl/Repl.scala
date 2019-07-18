@@ -4,7 +4,7 @@ package io.idmlrepl
 import java.io.PrintWriter
 import java.util.Properties
 
-import io.idml.datanodes.PObject
+import io.idml.datanodes.IObject
 import io.idml._
 import io.idml.hashing.HashingFunctionResolver
 import io.idml.jackson.IdmlJackson
@@ -30,7 +30,7 @@ class Repl {
   reader.getTerminal.setEchoEnabled(false)
   val out                  = new PrintWriter(reader.getOutput)
   var mode: String         = "json"
-  var doc: Option[PObject] = None
+  var doc: Option[IObject] = None
 
   val ptolemyJson = IdmlJackson.default
 
@@ -138,7 +138,7 @@ class Repl {
   def processJson(input: String) {
     // Store and parse the JSON.
     try {
-      doc = Some(ptolemyJson.parse(input).asInstanceOf[PObject])
+      doc = Some(ptolemyJson.parse(input).asInstanceOf[IObject])
       out.println("JSON accepted")
       mode = "idml"
     } catch {

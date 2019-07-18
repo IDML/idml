@@ -5,7 +5,7 @@ import java.net.URL
 import io.idml.{IdmlString, IdmlValue, MissingField}
 
 /** Represents a valid URL */
-class PUrl(url: URL) extends IdmlString with CompositeValue {
+class IUrl(url: URL) extends IdmlString with CompositeValue {
 
   /** The URL represented as a string */
   val value: String = url.toString

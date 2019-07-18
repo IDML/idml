@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.PArray
+import io.idml.datanodes.IArray
 import io.idml.ast.{IdmlFunction, Node}
 import io.idml.{IdmlArray, IdmlContext, IdmlValue, InvalidCaller}
 
@@ -28,7 +28,7 @@ case class ArrayFunction(expr: Node) extends IdmlFunction {
           expr.invoke(ctx)
           ctx.cursor
         }
-        ctx.cursor = PArray(results)
+        ctx.cursor = IArray(results)
       case _ =>
         ctx.cursor = InvalidCaller
     }

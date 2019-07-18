@@ -5,7 +5,7 @@ import org.scalatest._
 import scala.collection.mutable
 
 /** Test the behaviour of the PObject class */
-class PObjectTest extends FunSuite with MustMatchers {
+class IObjectTest extends FunSuite with MustMatchers {
 
   // Equality
   test("empty == empty")(empty must equal(empty))
@@ -13,13 +13,13 @@ class PObjectTest extends FunSuite with MustMatchers {
   test("nested objects == nested objects")(withNestedObjects must equal(withNestedObjects))
   test("nested arrays == nested arrays")(withNestedArrays must equal(withNestedArrays))
 
-  test("empty != primitives")(PObject() must not equal withPrimitives)
+  test("empty != primitives")(IObject() must not equal withPrimitives)
   test("primitives != nested arrays")(withPrimitives must not equal withNestedArrays)
   test("nested objects != nested arrays")(withNestedObjects must not equal withNestedArrays)
   test("nested arrays != nested objects")(withNestedArrays must not equal withNestedObjects)
 
   def withPrimitives =
-    new PObject(
+    new IObject(
       mutable.SortedMap(
         "s" -> IdmlValue("abc"),
         "i" -> IdmlValue(123),
@@ -28,9 +28,9 @@ class PObjectTest extends FunSuite with MustMatchers {
       ))
 
   def withNestedObjects =
-    new PObject(
+    new IObject(
       mutable.SortedMap(
-        "o" -> new PObject(
+        "o" -> new IObject(
           mutable.SortedMap(
             "s" -> IdmlValue("abc"),
             "i" -> IdmlValue(123),
@@ -39,9 +39,9 @@ class PObjectTest extends FunSuite with MustMatchers {
           ))))
 
   def withNestedArrays =
-    new PObject(
+    new IObject(
       mutable.SortedMap(
-        "a" -> new PArray(
+        "a" -> new IArray(
           mutable.ListBuffer(
             IdmlValue("abc"),
             IdmlValue(123),
@@ -50,26 +50,26 @@ class PObjectTest extends FunSuite with MustMatchers {
           ))))
 
   // deepmerge
-  val inner1 = PObject("b" -> PInt(2))
-  val inner2 = PObject("c" -> PInt(3))
-  val outer1 = PObject("a" -> inner1)
-  val outer2 = PObject("a" -> inner2)
+  val inner1 = IObject("b" -> IInt(2))
+  val inner2 = IObject("c" -> IInt(3))
+  val outer1 = IObject("a" -> inner1)
+  val outer2 = IObject("a" -> inner2)
 
-  test("deepmerge should merge objects")(outer1.deepMerge(outer2) must equal(PObject("a" -> PObject("b" -> PInt(2), "c" -> PInt(3)))))
+  test("deepmerge should merge objects")(outer1.deepMerge(outer2) must equal(IObject("a" -> IObject("b" -> IInt(2), "c" -> IInt(3)))))
 
-  val one = PInt(1)
-  val two = PInt(2)
-  val x   = (p: IdmlValue) => PObject("x" -> p)
+  val one = IInt(1)
+  val two = IInt(2)
+  val x   = (p: IdmlValue) => IObject("x" -> p)
   test("deepmerge should merge arrays") {
-    x(PArray(one, two, one)) deepMerge x(PArray(two, two, one)) must equal(x(PArray(two, two, one)))
+    x(IArray(one, two, one)) deepMerge x(IArray(two, two, one)) must equal(x(IArray(two, two, one)))
   }
   test("deepmerge should merge arrays where left is longer") {
-    x(PArray(one, two, one, two)) deepMerge x(PArray(two, two, one)) must equal(x(PArray(two, two, one)))
+    x(IArray(one, two, one, two)) deepMerge x(IArray(two, two, one)) must equal(x(IArray(two, two, one)))
   }
   test("deepmerge should merge arrays where right is longer") {
-    x(PArray(one, two, one)) deepMerge x(PArray(two, two, one, one)) must equal(x(PArray(two, two, one, one)))
+    x(IArray(one, two, one)) deepMerge x(IArray(two, two, one, one)) must equal(x(IArray(two, two, one, one)))
   }
   test("deepmerge should merge arrays with objects in") {
-    x(PArray(x(one), x(two), x(one))) deepMerge x(PArray(x(two), x(two), x(one))) must equal(x(PArray(x(two), x(two), x(one))))
+    x(IArray(x(one), x(two), x(one))) deepMerge x(IArray(x(two), x(two), x(one))) must equal(x(IArray(x(two), x(two), x(one))))
   }
 }

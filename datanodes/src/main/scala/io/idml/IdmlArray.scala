@@ -1,6 +1,6 @@
 package io.idml
 
-import io.idml.datanodes.{CompositeValue, PArray, PBool, PInt}
+import io.idml.datanodes.{CompositeValue, IArray, IBool, IInt}
 
 import scala.collection.mutable
 import scala.util.Try
@@ -32,18 +32,18 @@ trait IdmlArray extends IdmlValue with CompositeValue {
   }
 
   /** Is the array empty? */
-  override def isEmpty: PBool = PBool(items.isEmpty)
+  override def isEmpty: IBool = IBool(items.isEmpty)
 
   /** Get the number of items in the array */
   def size: Int = items.size
 
   /** Find the index of an item */
   override def indexOf(value: IdmlValue): IdmlValue =
-    PInt(items.indexOf(value))
+    IInt(items.indexOf(value))
 
   /** Get items within an index range slice slice */
   override def slice(from: Option[Int], to: Option[Int]): IdmlArray = {
-    new PArray(items.slice(from.getOrElse(0), to.getOrElse(items.size)))
+    new IArray(items.slice(from.getOrElse(0), to.getOrElse(items.size)))
   }
 
   /** It's possible to get an item by its index */

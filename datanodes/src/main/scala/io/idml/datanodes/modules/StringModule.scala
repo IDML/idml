@@ -1,6 +1,6 @@
 package io.idml.datanodes.modules
 
-import io.idml.datanodes.PString
+import io.idml.datanodes.IString
 import io.idml._
 import com.google.common.base.Charsets
 import com.google.common.hash.Hashing
@@ -45,7 +45,7 @@ trait StringModule {
         InvalidParameters
       } else {
         this match {
-          case s: IdmlString => PString(s.value.format(args: _*))
+          case s: IdmlString => IString(s.value.format(args: _*))
           case _             => InvalidCaller
         }
       }

@@ -1,6 +1,6 @@
 package io.idml.utils
 
-import io.idml.datanodes.PObject
+import io.idml.datanodes.IObject
 import io.idml._
 import io.idml.ast.{Argument, IdmlFunction, IdmlFunctionMetadata, Pipeline}
 import io.idml.functions.FunctionResolver
@@ -22,7 +22,7 @@ object AutoComplete {
       .getOrElse(mutable.Buffer.empty[IdmlValue])
       .toList
       .flatMap {
-        case o: PObject =>
+        case o: IObject =>
           o.fields.keys.toList
         case _ =>
           List.empty

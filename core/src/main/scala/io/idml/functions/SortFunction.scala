@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.PArray
+import io.idml.datanodes.IArray
 import io.idml.ast.{IdmlFunction, Node}
 import io.idml._
 
@@ -35,7 +35,7 @@ case class SortFunction(expr: Node) extends IdmlFunction {
         val results: mutable.Buffer[IdmlValue] =
           array.items.flatMap(x => extractOpt(ctx, x).map(x -> _)).sortBy(_._2).map(_._1)
         if (results.nonEmpty) {
-          ctx.cursor = PArray(results)
+          ctx.cursor = IArray(results)
         } else {
           ctx.cursor = NoFields
         }

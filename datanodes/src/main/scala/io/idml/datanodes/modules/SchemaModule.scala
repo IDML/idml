@@ -1,7 +1,7 @@
 // scalastyle:off number.of.methods
 package io.idml.datanodes.modules
 
-import io.idml.datanodes.{PBool, PFalse, PTrue}
+import io.idml.datanodes.{IBool, IFalse, ITrue}
 import io.idml.{
   CastUnsupported,
   FailedRequirement,
@@ -98,50 +98,50 @@ trait SchemaModule {
   def iterator: Iterator[IdmlValue] = Iterator.empty
 
   /** Is this true? */
-  def isTrue: PBool = PBool(isTrueValue)
+  def isTrue: IBool = IBool(isTrueValue)
 
   /** Is this true? */
-  def isTrueValue: Boolean = this == PTrue
+  def isTrueValue: Boolean = this == ITrue
 
   /** Is this false? */
-  def isFalse: PBool = PBool(isFalseValue)
+  def isFalse: IBool = IBool(isFalseValue)
 
   /** Is this false? */
-  def isFalseValue: Boolean = this == PFalse
+  def isFalseValue: Boolean = this == IFalse
 
   /** Is this value null? */
-  def isNull: PBool = PBool(isNullValue)
+  def isNull: IBool = IBool(isNullValue)
 
   /** Is this value null? */
   def isNullValue: Boolean = this == IdmlNull
 
   /** Is this value nothing? */
-  def isNothing: PBool = PBool(isNothingValue)
+  def isNothing: IBool = IBool(isNothingValue)
 
   /** Is this value nothing? */
   def isNothingValue: Boolean = isInstanceOf[IdmlNothing]
 
   /** Is this a string? */
-  def isString: PBool = PBool(isStringValue)
+  def isString: IBool = IBool(isStringValue)
 
   /** Is this a string? */
   def isStringValue: Boolean = isInstanceOf[IdmlString]
 
   /** Is this an int? */
-  def isInt: PBool = PBool(this.isInstanceOf[IdmlInt])
+  def isInt: IBool = IBool(this.isInstanceOf[IdmlInt])
 
   /** Is this an array? */
-  def isArray: PBool = PBool(this.isInstanceOf[IdmlArray])
+  def isArray: IBool = IBool(this.isInstanceOf[IdmlArray])
 
   /** Is this an object? */
-  def isObject: PBool = PBool(this.isInstanceOf[IdmlObject])
+  def isObject: IBool = IBool(this.isInstanceOf[IdmlObject])
 
   /** Is this a float? */
-  def isFloat: PBool = PBool(this.isInstanceOf[IdmlDouble])
+  def isFloat: IBool = IBool(this.isInstanceOf[IdmlDouble])
 
   /** This is a form of type coercion similar to php's empty(..) function; false, null, missing
     * values, empty arrays and objects all return true for isEmpty */
-  def isEmpty: PBool = PBool(isFalseValue || isNullValue || isNothingValue)
+  def isEmpty: IBool = IBool(isFalseValue || isNullValue || isNothingValue)
 
   /** Annotate any missing fields. This is useful later on for processes like schema matching */
   def required(): IdmlValue = this match {

@@ -1,6 +1,6 @@
 package io.idml
 
-import io.idml.datanodes.PObject
+import io.idml.datanodes.IObject
 import io.idml.ast.{Assignment, Document, Field, IdmlFunction, Maths, Pipeline}
 import scala.collection.mutable
 
@@ -29,11 +29,11 @@ class IdmlContext( /** The mappings document */
   }
 
   def this(input: IdmlValue) {
-    this(input, PObject(), Nil)
+    this(input, IObject(), Nil)
   }
 
   def this() {
-    this(IdmlNull, PObject(), Nil)
+    this(IdmlNull, IObject(), Nil)
   }
 
   /** The current right-hand side value as we traverse the input. Effectively "this" for the node methods */

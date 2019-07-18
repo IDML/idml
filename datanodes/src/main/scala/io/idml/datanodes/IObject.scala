@@ -7,28 +7,28 @@ import scala.util.Try
 import scala.collection.JavaConverters._
 
 /** The empty PObject */
-object PObject {
+object IObject {
 
   /** Create a PObject from a variable number of parameters */
-  def apply(fields: (String, IdmlValue)*): PObject = {
-    PObject(mutable.SortedMap(fields: _*))
+  def apply(fields: (String, IdmlValue)*): IObject = {
+    IObject(mutable.SortedMap(fields: _*))
   }
 
-  def of(kv: java.util.Map[String, IdmlValue]): PObject = {
-    PObject(mutable.SortedMap(kv.asScala.toList: _*))
+  def of(kv: java.util.Map[String, IdmlValue]): IObject = {
+    IObject(mutable.SortedMap(kv.asScala.toList: _*))
   }
 }
 
 /** The default IdmlValue implementation for an object */
-case class PObject(fields: mutable.SortedMap[String, IdmlValue]) extends IdmlObject {
+case class IObject(fields: mutable.SortedMap[String, IdmlValue]) extends IdmlObject {
 
   /** Create a copy of this object that can be safely modified */
-  override def deepCopy: PObject =
-    new PObject(fields.map { case (k, v) => (k, v.deepCopy) })
+  override def deepCopy: IObject =
+    new IObject(fields.map { case (k, v) => (k, v.deepCopy) })
 
   private def internalDeepMerge(a: IdmlValue, b: IdmlValue): IdmlValue = {
     (a, b) match {
-      case (a: PArray, b: PArray) =>
+      case (a: IArray, b: IArray) =>
         val acopy = a.deepCopy
         val bcopy = b.deepCopy
         val results = acopy.items.indices
@@ -39,7 +39,7 @@ case class PObject(fields: mutable.SortedMap[String, IdmlValue]) extends IdmlObj
           }
           .toBuffer[IdmlValue]
         results.appendAll(bcopy.items.slice(acopy.items.size, bcopy.items.size))
-        PArray(results)
+        IArray(results)
       case (a: IdmlObject, b: IdmlObject) =>
         val keys  = a.fields.keySet ++ b.fields.keySet
         val acopy = a.deepCopy.asInstanceOf[IdmlObject]
@@ -54,13 +54,13 @@ case class PObject(fields: mutable.SortedMap[String, IdmlValue]) extends IdmlObj
           case (_, None, None) =>
             throw new Throwable("This can't happen because we only iterated keys that are in both objects")
         }
-        PObject(fs: _*)
+        IObject(fs: _*)
       case (a: IdmlValue, b: IdmlValue) =>
         b
     }
   }
 
-  def deepMerge(other: PObject): PObject = {
-    internalDeepMerge(this, other).asInstanceOf[PObject]
+  def deepMerge(other: IObject): IObject = {
+    internalDeepMerge(this, other).asInstanceOf[IObject]
   }
 }

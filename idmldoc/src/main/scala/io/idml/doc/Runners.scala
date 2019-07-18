@@ -6,7 +6,7 @@ import cats._
 import cats.effect.concurrent.Ref
 import cats.implicits._
 import io.idml.circe.IdmlCirce
-import io.idml.datanodes.PObject
+import io.idml.datanodes.IObject
 import io.idml.doc.Markdown.{Code, Node, Text}
 import io.idml._
 import io.idml.utils.Tracer.Annotator
@@ -39,7 +39,7 @@ object Runners {
               label.split(":").toList match {
                 case "idml" :: "input" :: modes =>
                   F.delay { IdmlCirce.parse(content) }.flatMap {
-                    case o: PObject => input.set(o)
+                    case o: IObject => input.set(o)
                     case _          => F.unit
                   } *> F.pure(
                     if (modes.contains("silent")) List.empty

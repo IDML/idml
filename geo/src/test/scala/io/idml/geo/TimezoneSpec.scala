@@ -1,5 +1,5 @@
 package io.idml.geo
-import io.idml.datanodes.PString
+import io.idml.datanodes.IString
 import org.scalatest.{MustMatchers, WordSpec}
 
 class TimezoneSpec extends WordSpec with MustMatchers {

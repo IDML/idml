@@ -1,6 +1,6 @@
 package io.idml.ast
 
-import io.idml.datanodes.PObject
+import io.idml.datanodes.IObject
 import io.idml.{IdmlContext, IdmlNothing, IdmlObject, IdmlValue}
 
 import scala.annotation.tailrec
@@ -12,7 +12,7 @@ case class Reassignment(dest: List[String], exps: Pipeline) extends Rule {
   /** Make an assignment */
   def invoke(ctx: IdmlContext) {
     val (parent, lastKey, lastValue) = ctx.output match {
-      case obj: PObject => findDestination(obj, dest)
+      case obj: IObject => findDestination(obj, dest)
       case _ =>
         throw new IllegalStateException("Reassignment needs an object scope")
     }

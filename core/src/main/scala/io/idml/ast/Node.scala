@@ -1,6 +1,6 @@
 package io.idml.ast
 
-import io.idml.datanodes.{PArray, PObject, PString}
+import io.idml.datanodes.{IArray, IObject, IString}
 import io.idml.{IdmlContext, IdmlObject, IdmlValue}
 
 import scala.collection.mutable
@@ -61,17 +61,17 @@ trait Rule extends Node {
     current.fields.get(key) match {
       case None =>
         // This object doesn't exist, let's create it
-        val next = PObject()
+        val next = IObject()
         current.fields(key) = next
         next
-      case Some(obj: PObject) =>
+      case Some(obj: IObject) =>
         // We've been here before, return the object
         obj
       case Some(other) =>
         // Question: What's the desired behaviour when we're given a = 1 and then a.b = 1; right now we replace the
         // primitive with an object, effectively throwing away the value but we could just as easily reintroduce it as
         // if the rule was rewritten to a.value = 1 or reject the mapping entirely.
-        val next = PObject()
+        val next = IObject()
         current.fields(key) = next
         next
     }
@@ -119,13 +119,13 @@ case class Index(index: Int) extends Expression {
 
 case class AstArray(pipls: List[Node]) extends Expression {
   override def invoke(ctx: IdmlContext): Unit = {
-    ctx.cursor = PArray(pipls.map(_.eval(ctx)).toBuffer)
+    ctx.cursor = IArray(pipls.map(_.eval(ctx)).toBuffer)
   }
 }
 
-case class AstObject(piplmap: Map[PString, Pipeline]) extends Expression {
+case class AstObject(piplmap: Map[IString, Pipeline]) extends Expression {
   override def invoke(ctx: IdmlContext): Unit = {
-    ctx.cursor = PObject(piplmap.map { case (k, v) => (k.value, v.eval(ctx)) }.toList: _*)
+    ctx.cursor = IObject(piplmap.map { case (k, v) => (k.value, v.eval(ctx)) }.toList: _*)
   }
 }
 

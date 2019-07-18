@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.{JsonSerializer, ObjectMapper, SerializerProvider}
 import io.idml.IdmlMapping
 import io.idml.ast._
-import io.idml.datanodes.{PBool, PDouble, PInt, PString}
+import io.idml.datanodes.{IBool, IDouble, IInt, IString}
 import io.idml.functions.{ArrayFunction, IdmlFunction0, IdmlValueFunction, SetSizeFunction}
 import org.json4s.jackson.Json4sScalaModule
 
@@ -131,13 +131,13 @@ object IdmlAstSerializers {
 
     private def execNavLiteral(jgen: JsonGenerator, enl: ExecNavLiteral): Unit = {
       enl.literal.value match {
-        case i: PInt =>
+        case i: IInt =>
           jgen.writeObject(i.value)
-        case s: PString =>
+        case s: IString =>
           jgen.writeObject(s.value)
-        case b: PBool =>
+        case b: IBool =>
           jgen.writeObject(b.value)
-        case d: PDouble =>
+        case d: IDouble =>
           jgen.writeObject(d.value)
         case _ =>
           throw new scala.Exception("Unsupported literal used inside JSON AST")

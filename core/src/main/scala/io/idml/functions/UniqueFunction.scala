@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.PArray
+import io.idml.datanodes.IArray
 import io.idml.ast.{IdmlFunction, Node}
 import io.idml._
 
@@ -47,7 +47,7 @@ case class UniqueFunction(expr: Node) extends IdmlFunction {
             .reverse
             .toBuffer
         if (results.nonEmpty) {
-          ctx.cursor = PArray(results)
+          ctx.cursor = IArray(results)
         } else {
           ctx.cursor = NoFields
         }

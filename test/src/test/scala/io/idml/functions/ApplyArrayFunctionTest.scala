@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.{PArray, PInt, PObject}
+import io.idml.datanodes.{IArray, IInt, IObject}
 import io.idml.ast.{Block, Document}
 import io.idml.{IdmlContext, UnknownBlockException}
 import org.mockito.Mockito._
@@ -25,7 +25,7 @@ class ApplyArrayFunctionTest extends FunSuite with MustMatchers with MockitoSuga
     val ctx   = mock[IdmlContext]
     val block = mock[Block]
     when(ctx.doc).thenReturn(doc)
-    when(ctx.cursor).thenReturn(PArray())
+    when(ctx.cursor).thenReturn(IArray())
     when(doc.blocks).thenReturn(Map("main" -> block))
     ApplyArrayFunction("main").invoke(ctx)
     verify(block).invoke(ctx)
@@ -34,9 +34,9 @@ class ApplyArrayFunctionTest extends FunSuite with MustMatchers with MockitoSuga
   test("Configure the context with a new output object") {
     val ctx = mock[IdmlContext]
     when(ctx.doc).thenReturn(Document.empty)
-    when(ctx.cursor).thenReturn(PArray())
+    when(ctx.cursor).thenReturn(IArray())
     ApplyArrayFunction("main").invoke(ctx)
-    verify(ctx).output_=(PObject())
+    verify(ctx).output_=(IObject())
   }
 
   test("Preserve the original scope") {
@@ -60,12 +60,12 @@ class ApplyArrayFunctionTest extends FunSuite with MustMatchers with MockitoSuga
     val ctx   = mock[IdmlContext]
     val block = mock[Block]
     when(ctx.doc).thenReturn(doc)
-    when(ctx.cursor).thenReturn(PArray(PInt(10), PInt(11), PInt(12)))
+    when(ctx.cursor).thenReturn(IArray(IInt(10), IInt(11), IInt(12)))
     when(doc.blocks).thenReturn(Map("main" -> block))
-    when(ctx.output).thenReturn(PObject())
+    when(ctx.output).thenReturn(IObject())
     ApplyArrayFunction("main").invoke(ctx)
-    verify(ctx).cursor_=(PObject())
-    verify(ctx, times(2)).output_=(PObject())
+    verify(ctx).cursor_=(IObject())
+    verify(ctx, times(2)).output_=(IObject())
     verify(block).invoke(ctx)
   }
 

@@ -1,6 +1,6 @@
 package io.idml
 
-import io.idml.datanodes.{PInt, PObject, PString}
+import io.idml.datanodes.{IInt, IObject, IString}
 import org.mockito.Answers
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
@@ -50,7 +50,7 @@ class IdmlChainTest extends FunSuite with MockitoSugar with MustMatchers {
   test("chains run in order, operating on the same object") {
     val ptolemy = new Idml()
     val chain   = ptolemy.newChain(List("a = initial + 1", "b = a + 1", "c = b + 1").map(ptolemy.fromString): _*)
-    chain.run(PObject("initial" -> PInt(0))) must equal(PObject("a" -> PInt(1), "b" -> PInt(2), "c" -> PInt(3)))
+    chain.run(IObject("initial" -> IInt(0))) must equal(IObject("a" -> IInt(1), "b" -> IInt(2), "c" -> IInt(3)))
   }
 
 }

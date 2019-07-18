@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.PString
+import io.idml.datanodes.IString
 import io.idml.{IdmlArray, IdmlContext, IdmlNothing, IdmlString, InvalidCaller, InvalidParameters}
 import io.idml.ast.{IdmlFunction, Pipeline}
 
@@ -23,7 +23,7 @@ case class SetSizeFunction(arg: Pipeline) extends IdmlFunction {
           case string: IdmlString if string.value == "" || string.value.length <= maxSize =>
             string
           case string: IdmlString =>
-            PString(string.value.substring(0, maxSize))
+            IString(string.value.substring(0, maxSize))
           case other: Any =>
             InvalidCaller
         }

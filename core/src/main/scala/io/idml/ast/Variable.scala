@@ -1,6 +1,6 @@
 package io.idml.ast
 
-import io.idml.datanodes.PObject
+import io.idml.datanodes.IObject
 import io.idml._
 
 import scala.annotation.tailrec
@@ -15,7 +15,7 @@ case class Variable(dest: List[String], exps: Pipeline) extends Rule {
 
   /** Make a variable assignment */
   def invoke(ctx: IdmlContext) {
-    val variableStorage = ctx.state.getOrElseUpdate(Variable.stateKey, PObject()).asInstanceOf[IdmlObject]
+    val variableStorage = ctx.state.getOrElseUpdate(Variable.stateKey, IObject()).asInstanceOf[IdmlObject]
 
     exps.invoke(ctx)
     ctx.cursor match {

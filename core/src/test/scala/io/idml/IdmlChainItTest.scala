@@ -1,6 +1,6 @@
 package io.idml
 
-import io.idml.datanodes.{PObject, PTrue}
+import io.idml.datanodes.{IObject, ITrue}
 import org.scalatest.FunSuite
 
 class IdmlChainItTest extends FunSuite {
@@ -11,11 +11,11 @@ class IdmlChainItTest extends FunSuite {
       ptolemy.fromString("x = a"),
       ptolemy.fromString("y = x \n z = a")
     )
-    val output = chain.run(PObject("a" -> PTrue))
+    val output = chain.run(IObject("a" -> ITrue))
 
-    assert(output.get("x") === PTrue)
+    assert(output.get("x") === ITrue)
     assert(output.get("z") === MissingField)
-    assert(output.get("y") === PTrue)
+    assert(output.get("y") === ITrue)
   }
 
 }

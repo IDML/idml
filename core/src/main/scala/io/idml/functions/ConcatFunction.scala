@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.{PArray, PDouble, PString}
+import io.idml.datanodes.{IArray, IDouble, IString}
 import io.idml.ast.{IdmlFunction, Pipeline}
 import io.idml._
 
@@ -14,7 +14,7 @@ case class ConcatFunction(sep: String) extends IdmlFunction {
 
   override def invoke(ctx: IdmlContext): Unit = {
     ctx.cursor = ctx.cursor match {
-      case PArray(items) =>
+      case IArray(items) =>
         items
           .foldLeft(Option.empty[String]) {
             case (None, i: IdmlString)    => Some(i.value)
@@ -23,7 +23,7 @@ case class ConcatFunction(sep: String) extends IdmlFunction {
             case (a @ Some(_), _)         => a
             case (None, v: IdmlValue)     => v.toStringOption
           }
-          .map(PString.apply)
+          .map(IString.apply)
           .getOrElse(MissingField)
       case _ => InvalidCaller
     }

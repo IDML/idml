@@ -1,6 +1,6 @@
 package io.idml.jackson.difftool
 
-import io.idml.datanodes.{PArray, PObject, PString}
+import io.idml.datanodes.{IArray, IObject, IString}
 import io.idml.{IdmlArray, IdmlObject, IdmlValue, MissingIndex}
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -19,7 +19,7 @@ import scala.collection.mutable
   */
 object Diff {
 
-  val marker: IdmlValue = PString("__DIFF__")
+  val marker: IdmlValue = IString("__DIFF__")
 
   val mapper: ObjectMapper = new ObjectMapper()
     .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
@@ -31,7 +31,7 @@ object Diff {
     * Determine if a value is a diff
     */
   def isDiff(value: IdmlValue): Boolean = value match {
-    case PArray(Seq(this.marker, left, right)) => true
+    case IArray(Seq(this.marker, left, right)) => true
     case _                                     => false
   }
 
@@ -64,7 +64,7 @@ object Diff {
           }
       }
 
-      PObject(diffs)
+      IObject(diffs)
     }
   }
 
@@ -77,7 +77,7 @@ object Diff {
     } else {
       val diffs =
         left.items.zipAll(right.items, MissingIndex, MissingIndex).map(compare)
-      PArray(diffs)
+      IArray(diffs)
     }
   }
 
@@ -108,7 +108,7 @@ object Diff {
     * Create a diff marker
     */
   def createDiff(left: IdmlValue, right: IdmlValue): IdmlValue = {
-    PArray(marker, left, right)
+    IArray(marker, left, right)
   }
 
   /** Render a DataNode hierarchy as a pretty-printed json dom */

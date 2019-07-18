@@ -1,6 +1,6 @@
 package io.idml.functions
 
-import io.idml.datanodes.PArray
+import io.idml.datanodes.IArray
 import io.idml._
 import io.idml.ast._
 
@@ -35,7 +35,7 @@ case class FilterFunction(expr: Node) extends IdmlFunction {
         val results: mutable.Buffer[IdmlValue] =
           array.items.flatMap(x => filterOpt(ctx, x))
         if (results.nonEmpty) {
-          ctx.cursor = PArray(results)
+          ctx.cursor = IArray(results)
         } else {
           ctx.cursor = NoFields
         }

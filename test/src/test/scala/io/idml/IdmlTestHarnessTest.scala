@@ -40,12 +40,12 @@ class IdmlTestHarnessTest extends FunSuite {
 
   test("does nothing if the input and output match") {
     new TestImpl().executeSuite(
-      PObject(
-        "tests" -> PArray(
-          PObject(
-            "input"   -> PObject("b" -> PTrue),
-            "output"  -> PObject("a" -> PTrue),
-            "mapping" -> PString("a = b")
+      IObject(
+        "tests" -> IArray(
+          IObject(
+            "input"   -> IObject("b" -> ITrue),
+            "output"  -> IObject("a" -> ITrue),
+            "mapping" -> IString("a = b")
           )
         )
       )
@@ -55,12 +55,12 @@ class IdmlTestHarnessTest extends FunSuite {
   test("fails if the input and output do not match") {
     intercept[RuntimeException] {
       new TestImpl().executeSuite(
-        PObject(
-          "tests" -> PArray(
-            PObject(
-              "input"   -> PObject("b" -> PFalse),
-              "output"  -> PObject("a" -> PTrue),
-              "mapping" -> PString("a = b")
+        IObject(
+          "tests" -> IArray(
+            IObject(
+              "input"   -> IObject("b" -> IFalse),
+              "output"  -> IObject("a" -> ITrue),
+              "mapping" -> IString("a = b")
             )
           )
         )
@@ -71,12 +71,12 @@ class IdmlTestHarnessTest extends FunSuite {
   test("fails if there's a parse exception") {
     intercept[DocumentParseException] {
       new TestImpl().executeSuite(
-        PObject(
-          "tests" -> PArray(
-            PObject(
-              "input"   -> PObject("b" -> PTrue),
-              "output"  -> PObject("a" -> PTrue),
-              "mapping" -> PString("syntax error :O")
+        IObject(
+          "tests" -> IArray(
+            IObject(
+              "input"   -> IObject("b" -> ITrue),
+              "output"  -> IObject("a" -> ITrue),
+              "mapping" -> IString("syntax error :O")
             )
           )
         )
@@ -86,12 +86,12 @@ class IdmlTestHarnessTest extends FunSuite {
 
   test("dynamically loads mappings from resources") {
     new TestImpl().executeSuite(
-      PObject(
-        "tests" -> PArray(
-          PObject(
-            "input"   -> PObject("b" -> PTrue),
-            "output"  -> PObject("a" -> PTrue),
-            "mapping" -> PString("@/mock_tests/load_me.ini")
+      IObject(
+        "tests" -> IArray(
+          IObject(
+            "input"   -> IObject("b" -> ITrue),
+            "output"  -> IObject("a" -> ITrue),
+            "mapping" -> IString("@/mock_tests/load_me.ini")
           )
         )
       )

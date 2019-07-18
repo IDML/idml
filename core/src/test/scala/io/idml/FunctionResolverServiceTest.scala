@@ -1,6 +1,6 @@
 package io.idml
 
-import io.idml.datanodes.PString
+import io.idml.datanodes.IString
 import io.idml.ast._
 import io.idml.functions.{ApplyFunction, ArrayFunction, IdmlValueFunction}
 import org.scalatest.FunSuite
@@ -8,7 +8,7 @@ import org.scalatest.FunSuite
 class FunctionResolverServiceTest extends FunSuite {
 
   // FIXME this how we programmatically generate the parameter list in f("main") we need an easier way of doing this!
-  val blockNameLiteral      = Pipeline(List(ExecNavLiteral(Literal(PString("main")))))
+  val blockNameLiteral      = Pipeline(List(ExecNavLiteral(Literal(IString("main")))))
   val pathExpression        = Pipeline(List(ExecNavRelative, Field("p")))
   val twoArgumentExpression = List(blockNameLiteral, blockNameLiteral)
   val threeArgumentExpression =

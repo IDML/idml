@@ -1,7 +1,7 @@
 package io.idml.utils
 import io.idml._
 import io.idml.ast._
-import io.idml.datanodes.PObject
+import io.idml.datanodes.IObject
 
 import scala.collection.mutable
 import scala.collection.JavaConverters._
@@ -40,7 +40,7 @@ object Tracer {
   def annotate(json: IdmlJson)(s: String)(j: String): String = {
     val a   = new Annotator(json)
     val p   = new Idml(new IdmlConf(), List[IdmlListener](a).asJava)
-    val ctx = new IdmlContext(json.parse(j), PObject(), List[IdmlListener](a))
+    val ctx = new IdmlContext(json.parse(j), IObject(), List[IdmlListener](a))
     p.fromString(s).run(ctx).output
     a.render(s)
   }

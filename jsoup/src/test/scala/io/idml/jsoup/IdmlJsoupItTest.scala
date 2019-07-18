@@ -8,70 +8,70 @@ import org.scalatest.FunSuite
 /** Integration tests for the IdmlJsoup library */
 class IdmlJsoupItTest extends FunSuite {
 
-  val root = PString("#root")
+  val root = IString("#root")
 
   def parse(xml: String): IdmlValue = {
     IdmlJackson.default.parse(IdmlJackson.default.compact(IdmlJsoup.parseXml(xml)))
   }
 
   test("An 'a' tag") {
-    assert(parse("<a></a>") === PArray(root, PArray(PString("a"))))
+    assert(parse("<a></a>") === IArray(root, IArray(IString("a"))))
   }
 
   test("A 'b' tag nested inside an 'a' tag") {
     assert(
-      parse("<a><b></b></a>") === PArray(
+      parse("<a><b></b></a>") === IArray(
         root,
-        PArray(
-          PString("a"),
-          PArray(PString("b"))
+        IArray(
+          IString("a"),
+          IArray(IString("b"))
         )
       ))
   }
 
   test("Multiple nested 'a' and 'b' tags") {
     assert(
-      parse("<a><b></b><b></b></a><a><b></b><b></b></a>") === PArray(
+      parse("<a><b></b><b></b></a><a><b></b><b></b></a>") === IArray(
         root,
-        PArray(
-          PString("a"),
-          PArray(PString("b")),
-          PArray(PString("b"))
+        IArray(
+          IString("a"),
+          IArray(IString("b")),
+          IArray(IString("b"))
         ),
-        PArray(
-          PString("a"),
-          PArray(PString("b")),
-          PArray(PString("b"))
+        IArray(
+          IString("a"),
+          IArray(IString("b")),
+          IArray(IString("b"))
         )
       ))
   }
 
   test("A tag with attributes") {
     assert(
-      parse("<a w=\"x\" y=\"z\"></a>") === PArray(
+      parse("<a w=\"x\" y=\"z\"></a>") === IArray(
         root,
-        PArray(PString("a"), PObject("w" -> PString("x"), "y" -> PString("z")))
+        IArray(IString("a"), IObject("w" -> IString("x"), "y" -> IString("z")))
       ))
   }
 
   test("Multiple nested 'a' and 'b' tags with text") {
     assert(
-      parse("<a><b></b>1<b>2</b></a>3<a><b></b>4<b></b></a>5") === PArray(
+      parse("<a><b></b>1<b>2</b></a>3<a><b></b>4<b></b></a>5") === IArray(
         root,
-        PArray(
-          PString("a"),
-          PArray(PString("b")),
-          PString("1"),
-          PArray(PString("b"), PString("2"))
+        IArray(
+          IString("a"),
+          IArray(IString("b")),
+          IString("1"),
+          IArray(IString("b"), IString("2"))
         ),
-        PString("3"),
-        PArray(
-          PString("a"),
-          PArray(PString("b")),
-          PString("4"),
-          PArray(PString("b"))
+        IString("3"),
+        IArray(
+          IString("a"),
+          IArray(IString("b")),
+          IString("4"),
+          IArray(IString("b"))
         ),
-        PString("5")
+        IString("5")
       ))
   }
 

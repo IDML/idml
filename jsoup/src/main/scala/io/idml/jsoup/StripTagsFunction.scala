@@ -1,6 +1,6 @@
 package io.idml.jsoup
 
-import io.idml.datanodes.PString
+import io.idml.datanodes.IString
 import io.idml.{IdmlContext, InvalidCaller}
 import io.idml.ast.{IdmlFunction, Pipeline}
 import org.jsoup.Jsoup
@@ -13,8 +13,8 @@ object StripTagsFunction extends IdmlFunction {
 
   override def invoke(ctx: IdmlContext): Unit = {
     ctx.cursor = ctx.cursor match {
-      case PString(str) =>
-        PString(
+      case IString(str) =>
+        IString(
           Parser.unescapeEntities(
             Jsoup.clean(str, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false)),
             false
