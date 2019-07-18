@@ -70,7 +70,7 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
     }
   }
 
-  val ptolemy = Idml.createAuto(_.build())
+  val ptolemy = Idml.autoBuilder().build()
 
   describe("processing input based on string") {
 

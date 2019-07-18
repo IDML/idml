@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 class UnmappedFieldsFinderItTest extends FunSuite {
 
   val listener = new UnmappedFieldsFinder
-  val idml     = Idml.createAuto(_.withListener(listener).build())
+  val idml     = Idml.autoBuilder().withListener(listener).build()
 
   test("There are no unmapped fields when the input object is empty") {
     val ctx   = new IdmlContext(IObject())

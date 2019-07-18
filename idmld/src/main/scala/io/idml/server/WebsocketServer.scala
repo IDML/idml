@@ -48,9 +48,12 @@ object WebsocketServer {
       }
 
   val completionIdml =
-    Idml.createStaticWithDefaults(
-      IdmlCirce,
-      _.withResolver(new JsoupFunctionResolver).withResolver(new HashingFunctionResolver).withResolver(new AnalysisModule).build())
+    Idml
+      .staticBuilderWithDefaults(IdmlCirce)
+      .withResolver(new JsoupFunctionResolver)
+      .withResolver(new HashingFunctionResolver)
+      .withResolver(new AnalysisModule)
+      .build()
 
   def service(fr: FunctionResolverService)(implicit ec: ExecutionContext, c: Concurrent[IO]) = {
     val idml = new IdmlBuilder(fr).build()

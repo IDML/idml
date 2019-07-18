@@ -10,7 +10,7 @@ class TracerSpec extends WordSpec with MustMatchers {
 
   "the tracing annotator" should {
     "trace simple IDML" in {
-      val p    = Idml.createAuto(_.build())
+      val p    = Idml.autoBuilder().build()
       val a    = new Annotator(json)
       val ctx  = new IdmlContext(IdmlJson.newObject(), IdmlJson.newObject(), List[IdmlListener](a))
       val idml = "result = 2 + 2"
@@ -19,7 +19,7 @@ class TracerSpec extends WordSpec with MustMatchers {
     }
 
     "trace multi line IDML" in {
-      val p   = Idml.createAuto(_.build())
+      val p   = Idml.autoBuilder().build()
       val a   = new Annotator(json)
       val ctx = new IdmlContext(IdmlJson.newObject(), IdmlJson.newObject(), List[IdmlListener](a))
       val idml =
@@ -35,7 +35,7 @@ class TracerSpec extends WordSpec with MustMatchers {
     }
 
     "trace multi section IDML" in {
-      val p   = Idml.createAuto(_.build())
+      val p   = Idml.autoBuilder().build()
       val a   = new Annotator(json)
       val ctx = new IdmlContext(IdmlJson.newObject(), IdmlJson.newObject(), List[IdmlListener](a))
       val idml =
@@ -53,7 +53,7 @@ class TracerSpec extends WordSpec with MustMatchers {
     }
 
     "cope with input and functions" in {
-      val p    = Idml.createAuto(_.build())
+      val p    = Idml.autoBuilder().build()
       val a    = new Annotator(json)
       val ctx  = new IdmlContext(json.parse("""{"a": "hello", "b": "world"}"""), IdmlJson.newObject(), List[IdmlListener](a))
       val idml = """result = "%s %s".format(a, b)"""

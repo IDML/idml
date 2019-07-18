@@ -100,21 +100,16 @@ public class Idml {
     }
 
 
-    /**
-     *
-     * @param f
-     * @return
-     */
-    public static Idml createAuto(Function<AutoIdmlBuilder, Idml> f) {
-        return f.apply(new AutoIdmlBuilder());
+    public static AutoIdmlBuilder autoBuilder()  {
+        return new AutoIdmlBuilder();
     }
 
-    public static Idml createStaticWithDefaults(IdmlJson json, Function<StaticIdmlBuilder, Idml> f) {
-        return f.apply(new StaticIdmlBuilder(json));
+    public static StaticIdmlBuilder staticBuilder() {
+        return new StaticIdmlBuilder();
     }
 
-    public static Idml createStatic(Function<StaticIdmlBuilder, Idml> f) {
-        return f.apply(new StaticIdmlBuilder());
+    public static StaticIdmlBuilder staticBuilderWithDefaults(IdmlJson json) {
+        return new StaticIdmlBuilder(json);
     }
 
 }

@@ -25,9 +25,9 @@ trait IdmlTestHarness {
     */
   protected val ptolemy: Idml = {
     if (findUnmappedFields) {
-      Idml.createAuto(_.withListener(new UnmappedFieldsFinder).build())
+      Idml.autoBuilder().withListener(new UnmappedFieldsFinder).build()
     } else {
-      Idml.createAuto(_.build())
+      Idml.autoBuilder().build()
     }
   }
 

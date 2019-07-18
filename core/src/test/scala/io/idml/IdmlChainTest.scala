@@ -46,7 +46,7 @@ class IdmlChainTest extends FunSuite with MockitoSugar with MustMatchers {
   }
 
   test("chains run in order, operating on the same object") {
-    val idml  = Idml.createAuto(_.build())
+    val idml  = Idml.autoBuilder().build()
     val chain = idml.chain(List("a = initial + 1", "b = a + 1", "c = b + 1").map(idml.compile): _*)
     chain.run(IObject("initial" -> IInt(0))) must equal(IObject("a" -> IInt(1), "b" -> IInt(2), "c" -> IInt(3)))
   }

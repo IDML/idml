@@ -61,6 +61,7 @@ lazy val core: Project = project
 lazy val test = project
   .dependsOn(core)
   .dependsOn(jackson % "compile->test")
+  .dependsOn(circe % "test->compile")
   .settings(commonSettings)
   .settings(
     publishArtifact := false

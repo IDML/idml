@@ -7,7 +7,7 @@ import org.scalatest.FunSuite
 class Dev2680Test extends FunSuite {
 
   test("DEV-2680: IndexOutOfBoundsException from empty field cleanup in Idml") {
-    val ptolemy = Idml.createAuto(_.build())
+    val ptolemy = Idml.autoBuilder().build()
     val chain = ptolemy.chain(
       ptolemy.compile("""
           |interaction.subtype = "ollie"

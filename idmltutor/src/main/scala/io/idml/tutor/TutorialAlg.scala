@@ -32,7 +32,7 @@ class TutorialAlg[F[_]](jline: JLine[F])(implicit F: Sync[F]) {
   def exerciseMulti(body: String, pairs: List[(Json, Json)], multiline: Boolean = false): F[Unit] =
     for {
       engine <- F.delay {
-                 Idml.createAuto(_.build())
+                 Idml.autoBuilder().build()
                }
       pvs = pairs.map {
         case (k, v) =>

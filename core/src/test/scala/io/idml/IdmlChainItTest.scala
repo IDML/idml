@@ -6,7 +6,7 @@ import org.scalatest.FunSuite
 class IdmlChainItTest extends FunSuite {
 
   test("Test mapping chain order works properly") {
-    val idml = Idml.createAuto(_.build())
+    val idml = Idml.autoBuilder().build()
     val chain = idml.chain(
       idml.compile("x = a"),
       idml.compile("y = x \n z = a")

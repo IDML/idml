@@ -28,7 +28,7 @@ object Runners {
 
   def idmlRunner[F[_]: Monad: Applicative](implicit F: Effect[F]): F[Runner[F]] =
     for {
-      idml  <- F.delay { Idml.createAuto(_.build()) }
+      idml  <- F.delay { Idml.autoBuilder().build() }
       input <- Ref[F].of(IdmlJson.newObject())
       code  <- Ref[F].of(idml.compile(""))
     } yield
