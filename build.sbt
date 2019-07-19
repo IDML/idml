@@ -128,6 +128,7 @@ lazy val tool = project
   .dependsOn(idmld)
   .dependsOn(idmltest)
   .dependsOn(hashing)
+  .dependsOn(idmltutor)
   .dependsOn(geo)
   .enablePlugins(DockerPlugin, JavaAppPackaging)
   .settings(commonSettings)

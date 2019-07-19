@@ -21,7 +21,8 @@ object IdmlTool extends IOCommandApp[IO[ExitCode]] {
         IdmlTools.repl,
         IdmlTools.apply,
         IdmlTools.server,
-        io.idml.test.Main.execute()
+        io.idml.test.Main.execute(),
+        io.idml.tutor.Main.execute()
       )
       .map(c => Opts.subcommand(c))
       .reduceK
