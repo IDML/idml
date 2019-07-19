@@ -128,8 +128,6 @@ object IdmlTools {
             compiled <- found.zip(strings).traverse {
                          case (file, s) =>
                            EitherT(IO {
-                             println(file)
-                             println(s)
                              Either
                                .catchOnly[DocumentParseException](engine.compile(s))
                                .leftMap { c =>
