@@ -45,12 +45,11 @@ object IdmlJson {
   def newObject(): IObject = IObject()
 }
 
-sealed trait IdmlJsonException
+sealed abstract class IdmlJsonException(s: String) extends Throwable(s)
 
 class IdmlJsonReadingException(underlying: Throwable)
-    extends Throwable(s"Unable to parse json: ${underlying.getLocalizedMessage}")
-    with IdmlJsonException {
+    extends IdmlJsonException(s"Unable to parse json: ${underlying.getLocalizedMessage}") {
   this.initCause(underlying)
 }
 
-class IdmlJsonObjectException extends Throwable("JSON wasn't an object") with IdmlJsonException
+class IdmlJsonObjectException extends IdmlJsonException("JSON wasn't an object")

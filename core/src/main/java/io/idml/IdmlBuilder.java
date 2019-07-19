@@ -2,6 +2,7 @@ package io.idml;
 
 import io.idml.functions.FunctionResolver;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +56,16 @@ public class IdmlBuilder {
      */
     public IdmlBuilder withListener(IdmlListener listener) {
         listeners.add(listener);
+        return this;
+    }
+
+    /**
+     * Register listeners for extra functionality, usually used for analysis
+     * @param newListeners new listeners to be activated on IDML visitor events
+     * @return the modified builder
+     */
+    public IdmlBuilder withListeners(IdmlListener... newListeners) {
+        listeners.addAll(Arrays.asList(newListeners));
         return this;
     }
 

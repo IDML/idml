@@ -29,7 +29,7 @@ class IdmlJackson(mapper: ObjectMapper) extends IdmlJson {
   @throws[IdmlJsonObjectException]("if it's not an object")
   override def parseObject(in: String): IdmlObject =
     try {
-      mapper.readValue(in, classOf[IdmlObject]) match {
+      mapper.readValue(in, classOf[IdmlValue]) match {
         case o: IdmlObject => o
         case _             => throw new IdmlJsonObjectException()
       }

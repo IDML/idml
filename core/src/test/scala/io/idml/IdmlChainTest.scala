@@ -45,10 +45,27 @@ class IdmlChainTest extends FunSuite with MockitoSugar with MustMatchers {
     verify(second).run(ctx)
   }
 
+  test("Mappings have the run() method called when invoked via the engine") {
+    val first    = mock[IdmlMapping]
+    val second   = mock[IdmlMapping]
+    val ctx      = mock[IdmlContext]
+    val listener = mock[IdmlListener]
+
+    when(ctx.listeners).thenReturn(List(listener))
+
+    val chain = new IdmlChain(first, second)
+    val idml  = Idml.autoBuilder().build()
+    idml.evaluate(chain, ctx)
+
+    verify(first).run(ctx)
+    verify(second).run(ctx)
+  }
+
   test("chains run in order, operating on the same object") {
     val idml  = Idml.autoBuilder().build()
     val chain = idml.chain(List("a = initial + 1", "b = a + 1", "c = b + 1").map(idml.compile): _*)
     chain.run(IObject("initial" -> IInt(0))) must equal(IObject("a" -> IInt(1), "b" -> IInt(2), "c" -> IInt(3)))
+    idml.evaluate(chain, IObject("initial" -> IInt(0))).getOutput must equal(IObject("a" -> IInt(1), "b" -> IInt(2), "c" -> IInt(3)))
   }
 
 }

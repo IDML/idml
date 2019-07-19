@@ -61,12 +61,9 @@ public class Idml {
      * @return the output of running the program
      */
     public IdmlObject run(Mapping mapping, IdmlObject input) {
-        IdmlContext ctx = new IdmlContext();
-        ctx.setInput(input);
+        IdmlContext ctx = new IdmlContext(input, IdmlJson.newObject());
         ctx.setListeners(listeners);
-        ctx.setOutput(IdmlJson.newObject());
-        mapping.run(ctx);
-        return ctx.output();
+        return mapping.run(ctx).output();
     }
 
     /***
@@ -78,12 +75,9 @@ public class Idml {
      * @return
      */
     public IdmlContext evaluate(Mapping mapping, IdmlObject input) {
-        IdmlContext ctx = new IdmlContext();
-        ctx.setInput(input);
+        IdmlContext ctx = new IdmlContext(input, IdmlJson.newObject());
         ctx.setListeners(listeners);
-        ctx.setOutput(IdmlJson.newObject());
-        mapping.run(ctx);
-        return ctx;
+        return mapping.run(ctx);
     }
 
     /**
