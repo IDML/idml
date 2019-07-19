@@ -158,6 +158,7 @@ object IdmlTools {
                   .stdin[IO](2048, global)
                   .through(fs2.text.utf8Decode[IO])
                   .through(fs2.text.lines)
+                  .filter(_.nonEmpty)
                   .evalMap { line =>
                     IO.fromEither(
                       jsonModule.parseObjectEither(line).leftWiden[Throwable]
