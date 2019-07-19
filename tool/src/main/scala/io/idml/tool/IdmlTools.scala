@@ -85,7 +85,10 @@ object IdmlTools {
       val pretty    = Opts.flag("pretty", "Enable pretty printing of output", short = "p").orFalse
       val unmapped  = Opts.flag("unmapped", "This probably doesn't do what you think it does", short = "u").orFalse
       val strict    = Opts.flag("strict", "Enable strict mode", short = "s").orFalse
-      val traceFile = Opts.option[File]("trace", "File to trace into", "t").orNone
+      val traceFile = Opts.option[String]("trace", "File to trace into", "t").orNone.mapValidated {
+        case Some(f) => Validated.fromEither(Either.catchNonFatal(Some(new File(f))).leftMap(e => s"Invalid file: ${e.getLocalizedMessage}")).toValidatedNel
+        case None => Validated.valid[String, Option[File]](None).toValidatedNel
+      }
       val file      = Opts.arguments[File]("mapping file").orEmpty
 
       val log = LoggerFactory.getLogger("idml-tool")
@@ -119,7 +122,6 @@ object IdmlTools {
                         fs2.io.file
                           .readAll[IO](f.toPath, global, 2048)
                           .through(fs2.text.utf8Decode[IO])
-                          .through(fs2.text.lines[IO])
                           .compile
                           .foldMonoid
                       })
