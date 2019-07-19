@@ -1,6 +1,6 @@
 package io.idml.ast
 
-import io.idml.{PtolemyContext, PtolemyValue}
+import io.idml.{IdmlContext, IdmlValue}
 
 /** An executable pipeline of expressions */
 case class Pipeline(exps: List[Expression]) extends Argument {
@@ -25,15 +25,15 @@ case class Pipeline(exps: List[Expression]) extends Argument {
   }
 
   /** Extract the simple literal value of this node. This is a literal value with no transforms */
-  def literal(): Option[PtolemyValue] = {
+  def literal(): Option[IdmlValue] = {
     exps match {
-      case ExecNavLiteral(Literal(value: PtolemyValue)) :: Nil => Some(value)
-      case _                                                   => None
+      case ExecNavLiteral(Literal(value: IdmlValue)) :: Nil => Some(value)
+      case _                                                => None
     }
   }
 
   /** A recursive function that applies the pathTracker visitor functions */
-  def invoke(ctx: PtolemyContext, exps: List[Expression]): Unit = exps match {
+  def invoke(ctx: IdmlContext, exps: List[Expression]): Unit = exps match {
     case Nil => ()
     case exp :: tail =>
       ctx.enterPipl(this)
@@ -45,13 +45,13 @@ case class Pipeline(exps: List[Expression]) extends Argument {
   }
 
   /** Run a pipl */
-  def invoke(ctx: PtolemyContext) {
+  def invoke(ctx: IdmlContext) {
     invoke(ctx, exps)
   }
 }
 
 object LiteralValue {
-  def unapply(pipl: Pipeline): Option[PtolemyValue] = pipl match {
+  def unapply(pipl: Pipeline): Option[IdmlValue] = pipl match {
     case Pipeline(List(ExecNavLiteral(Literal(value)))) => Some(value)
     case _                                              => None
   }

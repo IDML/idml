@@ -1,14 +1,14 @@
 package io.idml.utils
 
 import java.lang.reflect.Method
-import io.idml.PtolemyValue
+import io.idml.IdmlValue
 import com.google.common.reflect.ClassPath
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 
-/** Reports all the functions that are available from PtolemyValue and friends */
+/** Reports all the functions that are available from IdmlValue and friends */
 object FunctionReport extends App {
 
-  val pv = classOf[PtolemyValue]
+  val pv = classOf[IdmlValue]
 
   /** Get all the module classes */
   def getModuleClasses: Iterable[Class[_]] = {
@@ -20,7 +20,7 @@ object FunctionReport extends App {
       .map(_.load())
   }
 
-  /** Ensure every field is a PtolemyValue */
+  /** Ensure every field is a IdmlValue */
   def isEligibleMethod(method: Method): Boolean = {
     pv.isAssignableFrom(method.getReturnType) &&
     method.getParameterTypes.forall(pv.isAssignableFrom)

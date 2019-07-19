@@ -13,76 +13,76 @@ import scala.collection.mutable
 class UnmappedFieldsFinderTest extends FunSuite with MockitoSugar {
 
   test("Companion object throws rt exception if the state is missing") {
-    intercept[RuntimeException](UnmappedFieldsFinder.fromContext(new PtolemyContext()))
+    intercept[RuntimeException](UnmappedFieldsFinder.fromContext(new IdmlContext()))
   }
 
   test("Entering a chain duplicates the input into the unmapped field delta") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
 
     finder.enterChain(ctx)
 
-    assert(finder.state(ctx).unmappedFields === PObject("a" -> PTrue))
+    assert(finder.state(ctx).unmappedFields === IObject("a" -> ITrue))
   }
 
   test("Exiting a chain places the unmapped field delta into the output object if there are unmapped fields") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
 
     finder.enterChain(ctx)
     finder.exitChain(ctx)
 
-    assert(ctx.output === PObject("unmapped" -> PObject("a" -> PTrue)))
+    assert(ctx.output === IObject("unmapped" -> IObject("a" -> ITrue)))
   }
 
   test("Exiting a chain doesn't place the unmapped field delta into the output object if it's empty") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject())
+    val ctx    = new IdmlContext(IObject())
 
     finder.enterChain(ctx)
     finder.exitChain(ctx)
 
-    assert(ctx.output === PObject())
+    assert(ctx.output === IObject())
   }
 
   test("Exiting an assignment that returned nothing clears path parts") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
     ctx.cursor = NoFields
-    finder.state(ctx).unmappedFields = PObject("a" -> PTrue)
+    finder.state(ctx).unmappedFields = IObject("a" -> ITrue)
     finder.state(ctx).pathParts += List("a")
 
     finder.exitAssignment(ctx, mock[Assignment])
 
     assert(finder.state(ctx).pathParts === Nil)
-    assert(finder.state(ctx).unmappedFields === PObject("a" -> PTrue))
+    assert(finder.state(ctx).unmappedFields === IObject("a" -> ITrue))
   }
 
   test("Exiting an assignment that returned something clears path parts and removes them from the unmapped field delta") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
-    finder.state(ctx).unmappedFields = PObject("a" -> PTrue)
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
+    finder.state(ctx).unmappedFields = IObject("a" -> ITrue)
     finder.state(ctx).pathParts += List("a")
 
     finder.exitAssignment(ctx, mock[Assignment])
 
     assert(finder.state(ctx).pathParts === Nil)
-    assert(finder.state(ctx).unmappedFields === PObject())
+    assert(finder.state(ctx).unmappedFields === IObject())
   }
 
   test("Exiting a path part does nothing if the stack is empty") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
-    finder.state(ctx).unmappedFields = PObject("a" -> PTrue)
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
+    finder.state(ctx).unmappedFields = IObject("a" -> ITrue)
 
     finder.exitPath(ctx, mock[Field])
 
-    assert(finder.state(ctx).unmappedFields === PObject("a" -> PTrue))
+    assert(finder.state(ctx).unmappedFields === IObject("a" -> ITrue))
   }
 
   test("Exiting a path part adds the path to the head of the stack if we're not in a composite type") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
     finder
       .state(ctx)
       .pathStack
@@ -95,7 +95,7 @@ class UnmappedFieldsFinderTest extends FunSuite with MockitoSugar {
 
   test("Exiting a path part doesn't add the path to the head of the stack if we're inside a composite type") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
     finder
       .state(ctx)
       .pathStack
@@ -108,7 +108,7 @@ class UnmappedFieldsFinderTest extends FunSuite with MockitoSugar {
 
   test("Entering an absolute path pipeline will add a marker to the stack") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
 
     finder.enterPipl(ctx, Pipeline(List(ExecNavAbsolute)))
 
@@ -118,7 +118,7 @@ class UnmappedFieldsFinderTest extends FunSuite with MockitoSugar {
 
   test("Entering a variable path pipeline will add a marker to the stack") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
 
     finder.enterPipl(ctx, Pipeline(List(ExecNavVariable)))
 
@@ -128,7 +128,7 @@ class UnmappedFieldsFinderTest extends FunSuite with MockitoSugar {
 
   test("Entering a relative path pipeline will add a marker to the stack") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
 
     finder.enterPipl(ctx, Pipeline(List(ExecNavRelative)))
 
@@ -138,7 +138,7 @@ class UnmappedFieldsFinderTest extends FunSuite with MockitoSugar {
 
   test("Entering a relative path pipeline will add a marker to the stack and the isComposite value will cascade if true") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
 
     finder
       .state(ctx)
@@ -153,7 +153,7 @@ class UnmappedFieldsFinderTest extends FunSuite with MockitoSugar {
 
   test("Exiting a relative path accumulates all the path parts from other relative paths in the stack") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
     val state  = finder.state(ctx)
 
     state.pathStack.push(new UnmappedFieldsPath(ExecNavRelative, path = mutable.Queue("a", "b")))
@@ -170,7 +170,7 @@ class UnmappedFieldsFinderTest extends FunSuite with MockitoSugar {
 
   test("Exiting a relative path accumulates all the path parts from other relative paths in the stack and ignores composites") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
     val state  = finder.state(ctx)
 
     state.pathStack.push(new UnmappedFieldsPath(ExecNavRelative, path = mutable.Queue("a", "b")))
@@ -184,7 +184,7 @@ class UnmappedFieldsFinderTest extends FunSuite with MockitoSugar {
 
   test("Exiting an absolute path accumulates all the path parts in the stack") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
     val state  = finder.state(ctx)
 
     state.pathStack.push(new UnmappedFieldsPath(ExecNavAbsolute, path = mutable.Queue("c", "d")))
@@ -198,7 +198,7 @@ class UnmappedFieldsFinderTest extends FunSuite with MockitoSugar {
 
   test("Exiting a variable has no effect") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
     val state  = finder.state(ctx)
 
     state.pathStack.push(new UnmappedFieldsPath(ExecNavVariable, path = mutable.Queue("a", "b")))
@@ -211,9 +211,9 @@ class UnmappedFieldsFinderTest extends FunSuite with MockitoSugar {
 
   test("Exiting a function sets isComposite to true if it's true on the cursor") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
     val state  = finder.state(ctx)
-    ctx.cursor = new PUrl(new URL("http://nowhere.local"))
+    ctx.cursor = new IUrl(new URL("http://nowhere.local"))
       .ensuring(_.isInstanceOf[CompositeValue])
 
     state.pathStack.push(new UnmappedFieldsPath(ExecNavVariable, path = mutable.Queue("a", "b")))
@@ -225,9 +225,9 @@ class UnmappedFieldsFinderTest extends FunSuite with MockitoSugar {
 
   test("Exiting a function doesn't set the isComposite to true if it's false on the cursor") {
     val finder = new UnmappedFieldsFinder()
-    val ctx    = new PtolemyContext(PObject("a" -> PTrue))
+    val ctx    = new IdmlContext(IObject("a" -> ITrue))
     val state  = finder.state(ctx)
-    ctx.cursor = PString("abc").ensuring(!_.isInstanceOf[CompositeValue])
+    ctx.cursor = IString("abc").ensuring(!_.isInstanceOf[CompositeValue])
 
     state.pathStack.push(new UnmappedFieldsPath(ExecNavVariable, path = mutable.Queue("a", "b")))
 

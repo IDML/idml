@@ -1,7 +1,7 @@
 package io.idml.jsoup
 
-import io.idml.datanodes.PString
-import io.idml.{PtolemyObject, PtolemyValue}
+import io.idml.datanodes.IString
+import io.idml.{IdmlObject, IdmlValue}
 import org.jsoup.nodes.{Attribute, Attributes}
 
 import scala.collection.mutable
@@ -13,14 +13,14 @@ import scala.collection.JavaConverters.iterableAsScalaIterableConverter
   *
   * @param attributes The XML elements to wrap
   */
-class JsoupAttributes(val attributes: Attributes) extends PtolemyObject {
+class JsoupAttributes(val attributes: Attributes) extends IdmlObject {
   // scalastyle:off null
   require(attributes != null)
   // scalastyle:on null
 
   /** The underlying field container for this object */
-  override val fields: mutable.Map[String, PtolemyValue] =
-    mutable.Map[String, PtolemyValue](attributes.asScala.map {
-      case attrib: Attribute => attrib.getKey -> PString(attrib.getValue)
+  override val fields: mutable.SortedMap[String, IdmlValue] =
+    mutable.SortedMap[String, IdmlValue](attributes.asScala.map {
+      case attrib: Attribute => attrib.getKey -> IString(attrib.getValue)
     }.toSeq: _*)
 }

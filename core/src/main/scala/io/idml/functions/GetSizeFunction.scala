@@ -1,24 +1,24 @@
 package io.idml.functions
 
-import io.idml.datanodes.PInt
-import io.idml.{InvalidCaller, PtolemyArray, PtolemyContext, PtolemyNothing, PtolemyString}
-import io.idml.ast.PtolemyFunction
+import io.idml.datanodes.IInt
+import io.idml.{IdmlArray, IdmlContext, IdmlNothing, IdmlString, InvalidCaller}
+import io.idml.ast.IdmlFunction
 
 import scala.collection.immutable
 
 /** Get the size of something */
-object GetSizeFunction extends PtolemyFunction {
+object GetSizeFunction extends IdmlFunction {
   override def name: String             = "size"
   override def args: immutable.Nil.type = Nil
 
-  override def invoke(ctx: PtolemyContext): Unit = {
+  override def invoke(ctx: IdmlContext): Unit = {
     ctx.cursor = ctx.cursor match {
-      case nothing: PtolemyNothing =>
+      case nothing: IdmlNothing =>
         nothing
-      case array: PtolemyArray =>
-        PInt(array.items.size)
-      case string: PtolemyString =>
-        PInt(string.value.length)
+      case array: IdmlArray =>
+        IInt(array.items.size)
+      case string: IdmlString =>
+        IInt(string.value.length)
       case _ =>
         InvalidCaller
     }

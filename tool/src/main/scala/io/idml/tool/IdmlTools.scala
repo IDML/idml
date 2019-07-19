@@ -12,6 +12,7 @@ import io.idml._
 import io.idml.utils.DocumentValidator
 import io.idmlrepl.Repl
 import io.idml.hashing.HashingFunctionResolver
+import io.idml.jackson.IdmlJackson
 import io.idml.jsoup.JsoupFunctionResolver
 import io.idml.server.Server
 import org.slf4j.LoggerFactory
@@ -22,6 +23,7 @@ import io.idml.server.WebsocketServer
 
 import scala.util.{Failure, Success, Try}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.io.Source
 
 object IdmlTools {
   implicit val urlArgument = new Argument[URL] {
@@ -36,7 +38,8 @@ object IdmlTools {
   val functionResolver: Opts[FunctionResolverService] = (dynamic, plugins).mapN { (d, pf) =>
     val baseFunctionResolver = if (d) { new FunctionResolverService } else {
       new StaticFunctionResolverService(
-        (StaticFunctionResolverService.defaults.asScala ++ List(new JsoupFunctionResolver(), new HashingFunctionResolver())).asJava)
+        (StaticFunctionResolverService.defaults(IdmlJackson.default).asScala ++ List(new JsoupFunctionResolver(),
+                                                                                     new HashingFunctionResolver())).asJava)
     }
     pf.fold(baseFunctionResolver) { urls =>
       FunctionResolverService.orElse(baseFunctionResolver, new PluginFunctionResolverService(urls.toList.toArray))
@@ -88,16 +91,9 @@ object IdmlTools {
 
       IO {
         val ptolemy = if (config.unmapped) {
-          new Ptolemy(
-            new PtolemyConf,
-            List[PtolemyListener](new UnmappedFieldsFinder).asJava,
-            fr
-          )
+          new IdmlBuilder(fr).withListener(new UnmappedFieldsFinder).build()
         } else {
-          new Ptolemy(
-            new PtolemyConf,
-            fr
-          )
+          new IdmlBuilder(fr).build()
         }
         val (found, missing) = config.files.partition(_.exists())
         missing.isEmpty match {
@@ -107,11 +103,11 @@ object IdmlTools {
             }
             ExitCode.Error
           case true =>
-            val maps  = found.map(f => ptolemy.fromFile(f.getAbsolutePath))
-            val chain = ptolemy.newChain(maps: _*)
+            val maps  = found.map(f => ptolemy.compile(Source.fromFile(f.getAbsolutePath).mkString))
+            val chain = ptolemy.chain(maps: _*)
             if (config.strict) {
               maps.foreach { m =>
-                DocumentValidator.validate(m.nodes)
+                DocumentValidator.validate(m.asInstanceOf[IdmlMapping].nodes)
               }
             }
             scala.io.Source.stdin
@@ -119,14 +115,14 @@ object IdmlTools {
               .filter(!_.isEmpty)
               .map { s: String =>
                 Try {
-                  chain.run(PtolemyJson.parse(s))
+                  chain.run(IdmlJackson.default.parse(s))
                 }
               }
               .foreach {
                 case Success(json) =>
                   config.pretty match {
-                    case true  => println(PtolemyJson.pretty(json))
-                    case false => println(PtolemyJson.compact(json))
+                    case true  => println(IdmlJackson.default.pretty(json))
+                    case false => println(IdmlJackson.default.compact(json))
                   }
                   Console.flush()
                 case Failure(e) =>

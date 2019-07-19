@@ -1,41 +1,41 @@
 package io.idml.datanodes.modules
 
-import io.idml.datanodes.{PArray, PBool, PString}
+import io.idml.datanodes.{IArray, IBool, IString}
 import io.idml.datanodes.regex.PRegexFactory
-import io.idml.{InvalidCaller, InvalidParameters, PtolemyValue}
+import io.idml.{IdmlValue, InvalidCaller, InvalidParameters}
 
 /** Methods for working with regular expressions */
 trait RegexModule {
-  this: PtolemyValue =>
+  this: IdmlValue =>
 
-  def matches(regex: PtolemyValue): PtolemyValue = {
+  def matches(regex: IdmlValue): IdmlValue = {
     (this, regex) match {
-      case (PString(s), PString(r)) =>
-        PArray(
+      case (IString(s), IString(r)) =>
+        IArray(
           PRegexFactory
             .getRegex(r)
             .matches(s)
             .map { inner =>
-              PArray(inner.map(PString.apply).toBuffer[PtolemyValue])
+              IArray(inner.map(IString.apply).toBuffer[IdmlValue])
             }
-            .toBuffer[PtolemyValue])
-      case (PString(_), _) => InvalidParameters
+            .toBuffer[IdmlValue])
+      case (IString(_), _) => InvalidParameters
       case _               => InvalidCaller
     }
   }
 
   // scalastyle:off method.name
-  def `match`(regex: PtolemyValue): PtolemyValue = {
+  def `match`(regex: IdmlValue): IdmlValue = {
     this match {
-      case t: PString =>
+      case t: IString =>
         regex match {
-          case s: PString =>
-            PArray(
+          case s: IString =>
+            IArray(
               PRegexFactory
                 .getRegex(s.value)
                 .`match`(t.value)
-                .map { PString }
-                .toBuffer[PtolemyValue])
+                .map { IString }
+                .toBuffer[IdmlValue])
           case _ => InvalidParameters
         }
       case _ => InvalidCaller
@@ -43,43 +43,43 @@ trait RegexModule {
   }
   // scalastyle:on method.name
 
-  def split(delim: PtolemyValue): PtolemyValue = {
+  def split(delim: IdmlValue): IdmlValue = {
     this match {
-      case t: PString =>
+      case t: IString =>
         delim match {
-          case s: PString =>
-            PArray(
+          case s: IString =>
+            IArray(
               PRegexFactory
                 .getRegex(s.value)
                 .split(t.value)
-                .map { PString }
-                .toBuffer[PtolemyValue])
+                .map { IString }
+                .toBuffer[IdmlValue])
           case _ => InvalidParameters
         }
       case _ => InvalidCaller
     }
   }
 
-  def isMatch(regex: PtolemyValue): PtolemyValue = {
+  def isMatch(regex: IdmlValue): IdmlValue = {
     this match {
-      case t: PString =>
+      case t: IString =>
         regex match {
-          case s: PString =>
-            PBool(PRegexFactory.getRegex(s.value).isMatch(t.value))
+          case s: IString =>
+            IBool(PRegexFactory.getRegex(s.value).isMatch(t.value))
           case _ => InvalidParameters
         }
       case _ => InvalidCaller
     }
   }
 
-  def replace(regex: PtolemyValue, replacement: PtolemyValue): PtolemyValue = {
+  def replace(regex: IdmlValue, replacement: IdmlValue): IdmlValue = {
     this match {
-      case t: PString =>
+      case t: IString =>
         replacement match {
-          case rep: PString =>
+          case rep: IString =>
             regex match {
-              case s: PString =>
-                PString(PRegexFactory.getRegex(s.value).replace(t.value, rep.value))
+              case s: IString =>
+                IString(PRegexFactory.getRegex(s.value).replace(t.value, rep.value))
               case _ => InvalidParameters
             }
           case _ => InvalidParameters

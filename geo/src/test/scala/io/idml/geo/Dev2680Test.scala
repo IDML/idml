@@ -1,14 +1,15 @@
 package io.idml.geo
 
-import io.idml.{Ptolemy, PtolemyJson}
+import io.idml.Idml
+import io.idml.jackson.IdmlJackson
 import org.scalatest.FunSuite
 
 class Dev2680Test extends FunSuite {
 
-  test("DEV-2680: IndexOutOfBoundsException from empty field cleanup in Ptolemy") {
-    val ptolemy = new Ptolemy()
-    val chain = ptolemy.newChain(
-      ptolemy.fromString("""
+  test("DEV-2680: IndexOutOfBoundsException from empty field cleanup in Idml") {
+    val ptolemy = Idml.autoBuilder().build()
+    val chain = ptolemy.chain(
+      ptolemy.compile("""
           |interaction.subtype = "ollie"
           |interaction.type = "twitter"
           |interaction.content = ollie.text
@@ -18,7 +19,7 @@ class Dev2680Test extends FunSuite {
           |rawlinks = ollie.links
           |raw_links = ollie.links
         """.stripMargin),
-      ptolemy.fromString(
+      ptolemy.compile(
         """
           |behaviour.subtype : string()
           |behaviour.started_at : date()
@@ -34,7 +35,7 @@ class Dev2680Test extends FunSuite {
         """.stripMargin
       )
     )
-    val input = PtolemyJson.parse(
+    val input = IdmlJackson.default.parse(
       """
         |{
         |  "ollie": {

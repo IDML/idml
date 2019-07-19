@@ -1,9 +1,9 @@
 package io.idml.geo
 
-import io.idml.datanodes.{PInt, PObject, PString}
+import io.idml.datanodes.{IInt, IObject, IString}
 import io.idml._
 import io.idml.ast.Pipeline
-import io.idml.functions.PtolemyFunction1
+import io.idml.functions.IdmlFunction1
 import cats._, cats.implicits._, cats.syntax._, cats.effect._
 import doobie.implicits._, doobie._
 import doobie.hikari._, doobie.hikari.implicits._
@@ -22,11 +22,11 @@ class Admin1Function(driver: String, url: String, user: String, password: String
     .unsafeRunSync()
 
   case class Admin1(id: Long, name: String, asciiname: String) {
-    def toPValue: PtolemyValue = {
-      PObject(
-        "id"        -> PInt(id),
-        "name"      -> PString(name),
-        "asciiname" -> PString(asciiname),
+    def toPValue: IdmlValue = {
+      IObject(
+        "id"        -> IInt(id),
+        "name"      -> IString(name),
+        "asciiname" -> IString(asciiname),
       )
     }
   }
@@ -34,7 +34,7 @@ class Admin1Function(driver: String, url: String, user: String, password: String
   def find(id: Long): ConnectionIO[Option[Admin1]] =
     sql"select * from Admin1 where id = $id".query[Admin1].option
 
-  def get(id: Long): Option[PtolemyValue] =
+  def get(id: Long): Option[IdmlValue] =
     find(id)
       .transact(xa)
       .attempt
@@ -45,10 +45,10 @@ class Admin1Function(driver: String, url: String, user: String, password: String
       }
       .merge
       .map(_.toPValue)
-  case class Admin1Function(arg: Pipeline) extends PtolemyFunction1 {
-    override protected def apply(cursor: PtolemyValue, country: PtolemyValue): PtolemyValue = {
+  case class Admin1Function(arg: Pipeline) extends IdmlFunction1 {
+    override protected def apply(cursor: IdmlValue, country: IdmlValue): IdmlValue = {
       country match {
-        case i: PInt => get(i.value).getOrElse(MissingField)
+        case i: IInt => get(i.value).getOrElse(MissingField)
         case _       => InvalidParameters
       }
     }

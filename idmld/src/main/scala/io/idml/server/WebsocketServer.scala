@@ -14,10 +14,12 @@ import cats.implicits._
 import cats.data._
 import cats.effect._
 import io.idml.utils.{AnalysisModule, AutoComplete}
-import io.idml.ast.PtolemyFunctionMetadata
+import io.idml.ast.IdmlFunctionMetadata
 import io.idml.hashing.HashingFunctionResolver
 import io.idml.jsoup.JsoupFunctionResolver
 import io.idml._
+import io.idml.circe.instances._
+import io.idml.circe._
 import fs2._
 import org.http4s.server.websocket.WebSocketBuilder
 import org.http4s.websocket.WebSocketFrame.Text
@@ -32,28 +34,30 @@ object WebsocketServer {
 
   import org.http4s.dsl.io._
   import org.http4s.websocket._
+  import org.http4s.circe.CirceEntityDecoder._
 
-  case class Request(in: List[Json], idml: String, path: Option[String])
+  case class Request(in: List[IdmlObject], idml: String, path: Option[String])
   case class Response(out: Option[List[Json]], errors: Option[List[String]])
 
-  case class Complete(in: List[Json], idml: String, position: Int)
-  implicit def dec[F[_]: Sync, A](implicit decoder: Decoder[A]): EntityDecoder[F, A] = jsonOf
+  case class Complete(in: List[IdmlObject], idml: String, position: Int)
 
   val functions =
-    (StaticFunctionResolverService.defaults.asScala ++ List(new JsoupFunctionResolver, new HashingFunctionResolver)).toList.flatMap { f =>
-      f.providedFunctions().filterNot(_.name.startsWith("$"))
-    }
+    (StaticFunctionResolverService.defaults(IdmlCirce).asScala ++ List(new JsoupFunctionResolver, new HashingFunctionResolver)).toList
+      .flatMap { f =>
+        f.providedFunctions().filterNot(_.name.startsWith("$"))
+      }
 
-  val completionPtolemy = new Ptolemy(
-    new PtolemyConf(),
-    new StaticFunctionResolverService(
-      (StaticFunctionResolverService.defaults.asScala ++ List(new JsoupFunctionResolver, new HashingFunctionResolver, new AnalysisModule)).asJava
-    )
-  )
+  val completionIdml =
+    Idml
+      .staticBuilderWithDefaults(IdmlCirce)
+      .withResolver(new JsoupFunctionResolver)
+      .withResolver(new HashingFunctionResolver)
+      .withResolver(new AnalysisModule)
+      .build()
 
   def service(fr: FunctionResolverService)(implicit ec: ExecutionContext, c: Concurrent[IO]) = {
-    val ptolemy = new Ptolemy(new PtolemyConf(), fr)
-    HttpService[IO] {
+    val idml = new IdmlBuilder(fr).build()
+    HttpRoutes.of[IO] {
       case GET -> Root / "functions" / partial =>
         Ok(functions.filter(_.name.startsWith(partial)).asJson)
       case req @ POST -> Root / "completion" =>
@@ -61,7 +65,7 @@ object WebsocketServer {
           .as[Complete]
           .map { c =>
             c.in.flatMap { doc =>
-              AutoComplete.complete(completionPtolemy)(PtolemyJson.parse(doc.noSpaces).asInstanceOf[PtolemyObject], c.idml, c.position)
+              AutoComplete.complete(completionIdml)(doc, c.idml, c.position)
             }.asJson
           }
           .flatMap(Ok(_))
@@ -89,16 +93,13 @@ object WebsocketServer {
                     .flatMap { x =>
                       Try {
                         log.info(x.toString)
-                        val chain = ptolemy.fromString(x.idml)
-                        val jsons = x.in.map(i => PtolemyJson.parse(i.toString))
+                        val chain = idml.compile(x.idml)
+                        val jsons = x.in
                         val p     = x.path.getOrElse("root")
-                        val path  = ptolemy.fromString(s"result = $p")
-                        jsons
-                          .map { j =>
-                            parse(PtolemyJson.compact(path.run(chain.run(j)))).toTry
-                          }
-                          .sequence
-                          .toEither
+                        val path  = idml.compile(s"result = $p")
+                        jsons.map { j =>
+                          Try { path.run(chain.run(j)).asJson }.toEither
+                        }.sequence
                       }.toEither
                         .leftMap(e => List(e.getMessage))
                         .flatMap(_.toTry.toEither.leftMap(e => List(e.getMessage)))

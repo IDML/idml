@@ -1,34 +1,25 @@
 package io.idml.datanodes.modules
 
-import io.idml.datanodes.{PArray, PString}
+import io.idml.datanodes.{IArray, IString}
 import io.idml._
 
 import scala.util.Try
 
 /** Adds object-like behaviour */
 trait ObjectModule {
-  this: PtolemyValue =>
+  this: IdmlValue =>
 
   /** Remove a field by name */
   def remove(path: String) {}
 
-  def serialize(): PtolemyValue = this match {
-    case o: PtolemyObject => PtolemyValue(PtolemyJson.compact(o))
-    case _                => InvalidCaller
+  def values(): IdmlValue = this match {
+    case o: IdmlObject => IArray(o.fields.values.toBuffer)
+    case _             => InvalidCaller
   }
 
-  def values(): PtolemyValue = this match {
-    case o: PtolemyObject => PArray(o.fields.values.toBuffer)
-    case _                => InvalidCaller
+  def keys(): IdmlValue = this match {
+    case o: IdmlObject => IArray(o.fields.keys.map(IString.apply).toBuffer[IdmlValue])
+    case _             => InvalidCaller
   }
 
-  def keys(): PtolemyValue = this match {
-    case o: PtolemyObject => PArray(o.fields.keys.map(PString.apply).toBuffer[PtolemyValue])
-    case _                => InvalidCaller
-  }
-
-  def parseJson(): PtolemyValue = this match {
-    case s: PtolemyString => Try { PtolemyJson.parse(s.value) }.getOrElse(InvalidCaller)
-    case _                => InvalidCaller
-  }
 }

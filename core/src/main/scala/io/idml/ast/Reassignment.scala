@@ -1,7 +1,7 @@
 package io.idml.ast
 
-import io.idml.datanodes.PObject
-import io.idml.{PtolemyContext, PtolemyNothing, PtolemyObject, PtolemyValue}
+import io.idml.datanodes.IObject
+import io.idml.{IdmlContext, IdmlNothing, IdmlObject, IdmlValue}
 
 import scala.annotation.tailrec
 
@@ -10,9 +10,9 @@ case class Reassignment(dest: List[String], exps: Pipeline) extends Rule {
   require(dest.nonEmpty, "Cannot make a reassignment to an empty path")
 
   /** Make an assignment */
-  def invoke(ctx: PtolemyContext) {
+  def invoke(ctx: IdmlContext) {
     val (parent, lastKey, lastValue) = ctx.output match {
-      case obj: PObject => findDestination(obj, dest)
+      case obj: IObject => findDestination(obj, dest)
       case _ =>
         throw new IllegalStateException("Reassignment needs an object scope")
     }
@@ -21,7 +21,7 @@ case class Reassignment(dest: List[String], exps: Pipeline) extends Rule {
     exps.invoke(ctx)
 
     ctx.cursor match {
-      case reason: PtolemyNothing =>
+      case reason: IdmlNothing =>
         deleteEmptyPaths(ctx.output, dest)
       case value: Any =>
         parent.fields(lastKey) = ctx.cursor
@@ -29,7 +29,7 @@ case class Reassignment(dest: List[String], exps: Pipeline) extends Rule {
   }
 
   @tailrec
-  final protected def findDestination(parent: PtolemyObject, path: List[String]): (PtolemyObject, String, PtolemyValue) = path match {
+  final protected def findDestination(parent: IdmlObject, path: List[String]): (IdmlObject, String, IdmlValue) = path match {
     case Nil            => throw new IllegalArgumentException("Empty paths not supported")
     case lastKey :: Nil => (parent, lastKey, parent.get(lastKey))
     case next :: tail   => findDestination(navigateToNext(parent, next), tail)
@@ -40,13 +40,13 @@ case class Reassignment(dest: List[String], exps: Pipeline) extends Rule {
     * @param current top level pobject to navigate from
     * @param path path to navigate down
     */
-  protected def deleteEmptyPaths(current: PtolemyObject, path: List[String]): Unit = path match {
+  protected def deleteEmptyPaths(current: IdmlObject, path: List[String]): Unit = path match {
     case Nil =>
       ()
     case head :: tail =>
       val next = current.get(head)
       next match {
-        case p: PtolemyObject =>
+        case p: IdmlObject =>
           deleteEmptyPaths(p, tail)
           if (p.isEmpty.value) {
             current.remove(head)

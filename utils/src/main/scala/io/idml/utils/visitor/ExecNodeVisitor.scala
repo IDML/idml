@@ -33,7 +33,7 @@ trait ExecNodeVisitor {
   case class ExecPathContext(expr: Field, parent: ExecPiplContext)                extends ExecExprContext
   case class ExecSliceContext(expr: Slice, parent: ExecPiplContext)               extends ExecExprContext
   case class ExecBlockInvokeContext(expr: ApplyFunction, parent: ExecPiplContext) extends ExecExprContext
-  case class ExecFuncContext(expr: PtolemyFunction, parent: ExecPiplContext)      extends ExecExprContext
+  case class ExecFuncContext(expr: IdmlFunction, parent: ExecPiplContext)         extends ExecExprContext
   case class ExecCoalesceContext(expr: Coalesce, parent: ExecPiplContext)         extends ExecExprContext
   case class ExecWildcardContext(expr: Wildcard, parent: ExecPiplContext)         extends ExecExprContext
   case class ExecFilterContext(expr: Filter, parent: ExecPiplContext)             extends ExecExprContext
@@ -89,21 +89,21 @@ trait ExecNodeVisitor {
 
   def createExprContext(expr: Expression, ctx: ExecPiplContext): ExecExprContext = {
     expr match {
-      case Any                   => ExecAnyContext(ctx)
-      case expr: Index           => ExecIndexContext(expr, ctx)
-      case expr: ExecNav         => ExecNavContext(expr, ctx)
-      case expr: Field           => ExecPathContext(expr, ctx)
-      case expr: Slice           => ExecSliceContext(expr, ctx)
-      case expr: ApplyFunction   => ExecBlockInvokeContext(expr, ctx)
-      case expr: PtolemyFunction => ExecFuncContext(expr, ctx)
-      case expr: Coalesce        => ExecCoalesceContext(expr, ctx)
-      case expr: Wildcard        => ExecWildcardContext(expr, ctx)
-      case expr: Filter          => ExecFilterContext(expr, ctx)
-      case expr: Maths           => ExecMathsContext(expr, ctx)
-      case expr: If              => ExecIfContext(expr, ctx)
-      case expr: Match           => ExecMatchContext(expr, ctx)
-      case expr: AstArray        => ExecArrayContext(expr, ctx)
-      case expr: AstObject       => ExecObjectContext(expr, ctx)
+      case Any                 => ExecAnyContext(ctx)
+      case expr: Index         => ExecIndexContext(expr, ctx)
+      case expr: ExecNav       => ExecNavContext(expr, ctx)
+      case expr: Field         => ExecPathContext(expr, ctx)
+      case expr: Slice         => ExecSliceContext(expr, ctx)
+      case expr: ApplyFunction => ExecBlockInvokeContext(expr, ctx)
+      case expr: IdmlFunction  => ExecFuncContext(expr, ctx)
+      case expr: Coalesce      => ExecCoalesceContext(expr, ctx)
+      case expr: Wildcard      => ExecWildcardContext(expr, ctx)
+      case expr: Filter        => ExecFilterContext(expr, ctx)
+      case expr: Maths         => ExecMathsContext(expr, ctx)
+      case expr: If            => ExecIfContext(expr, ctx)
+      case expr: Match         => ExecMatchContext(expr, ctx)
+      case expr: AstArray      => ExecArrayContext(expr, ctx)
+      case expr: AstObject     => ExecObjectContext(expr, ctx)
     }
   }
 

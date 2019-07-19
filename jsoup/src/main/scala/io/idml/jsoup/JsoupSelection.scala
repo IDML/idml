@@ -1,6 +1,6 @@
 package io.idml.jsoup
 
-import io.idml.{MissingField, PtolemyArray, PtolemyValue}
+import io.idml.{IdmlArray, IdmlValue, MissingField}
 import org.jsoup.nodes.Element
 import org.jsoup.parser.Tag
 import org.jsoup.select.Elements
@@ -8,15 +8,15 @@ import org.jsoup.select.Elements
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.collection.mutable
 
-class JsoupSelection(elements: mutable.Buffer[Element]) extends PtolemyArray {
+class JsoupSelection(elements: mutable.Buffer[Element]) extends IdmlArray {
 
   def this(elements: Elements) {
     this(mutable.Buffer(elements.asScala.toSeq: _*))
   }
 
-  def items: mutable.Buffer[PtolemyValue] = elements.map(new JsoupElement(_))
+  def items: mutable.Buffer[IdmlValue] = elements.map(new JsoupElement(_))
 
-  override def get(name: String): PtolemyValue = {
+  override def get(name: String): IdmlValue = {
     name match {
       case "attribs" => ???
       case _ =>

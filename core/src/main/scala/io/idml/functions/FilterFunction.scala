@@ -1,45 +1,45 @@
 package io.idml.functions
 
-import io.idml.datanodes.PArray
+import io.idml.datanodes.IArray
 import io.idml._
 import io.idml.ast._
 
 import scala.collection.{immutable, mutable}
 
-case class FilterFunction(expr: Node) extends PtolemyFunction {
+case class FilterFunction(expr: Node) extends IdmlFunction {
   def args: immutable.Nil.type = Nil
 
   def name: String = "filter"
 
-  protected def filterOpt(ctx: PtolemyContext, item: PtolemyValue): Option[PtolemyValue] = {
+  protected def filterOpt(ctx: IdmlContext, item: IdmlValue): Option[IdmlValue] = {
     ctx.scope = item
     ctx.cursor = item
     expr.invoke(ctx)
-    if (ctx.cursor.isInstanceOf[PtolemyNothing] || ctx.cursor == Filtered || ctx.cursor.toBoolOption.contains(false)) {
+    if (ctx.cursor.isInstanceOf[IdmlNothing] || ctx.cursor == Filtered || ctx.cursor.toBoolOption.contains(false)) {
       None
     } else {
       Some(ctx.cursor)
     }
   }
 
-  override def invoke(ctx: PtolemyContext): Unit = {
+  override def invoke(ctx: IdmlContext): Unit = {
     // Preserve context
     val oldScope  = ctx.scope
     val oldOutput = ctx.output
 
     // Iterate items in the array
     ctx.cursor match {
-      case nothing: PtolemyNothing =>
+      case nothing: IdmlNothing =>
         nothing
-      case array: PtolemyArray =>
-        val results: mutable.Buffer[PtolemyValue] =
+      case array: IdmlArray =>
+        val results: mutable.Buffer[IdmlValue] =
           array.items.flatMap(x => filterOpt(ctx, x))
         if (results.nonEmpty) {
-          ctx.cursor = PArray(results)
+          ctx.cursor = IArray(results)
         } else {
           ctx.cursor = NoFields
         }
-      case v: PtolemyValue =>
+      case v: IdmlValue =>
         ctx.cursor = filterOpt(ctx, v).getOrElse(Filtered)
       case _ =>
         ctx.cursor = InvalidCaller

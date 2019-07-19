@@ -7,151 +7,151 @@ import io.idml._
 import scala.collection.mutable
 
 trait ArrayModule {
-  this: PtolemyValue =>
+  this: IdmlValue =>
 
-  def wrapArray(): PArray = PArray(this)
+  def wrapArray(): IArray = IArray(this)
 
-  def combinations(size: PtolemyValue): PtolemyValue = (this, size) match {
-    case (a: PtolemyArray, s: PtolemyInt) => PArray(a.items.combinations(s.value.toInt).map(xs => PArray(xs)).toBuffer[PtolemyValue])
-    case (a: PtolemyArray, _)             => InvalidParameters
-    case _                                => InvalidCaller
+  def combinations(size: IdmlValue): IdmlValue = (this, size) match {
+    case (a: IdmlArray, s: IdmlInt) => IArray(a.items.combinations(s.value.toInt).map(xs => IArray(xs)).toBuffer[IdmlValue])
+    case (a: IdmlArray, _)          => InvalidParameters
+    case _                          => InvalidCaller
   }
 
-  def empty(): PtolemyValue = this match {
-    case a: PtolemyArray  => a.isEmpty
-    case s: PtolemyString => s.isEmpty
-    case _                => InvalidCaller
+  def empty(): IdmlValue = this match {
+    case a: IdmlArray  => a.isEmpty
+    case s: IdmlString => s.isEmpty
+    case _             => InvalidCaller
   }
 
-  def unique(): PtolemyValue = this match {
-    case a: PtolemyArray => PArray(a.items.distinct)
-    case _               => InvalidCaller
+  def unique(): IdmlValue = this match {
+    case a: IdmlArray => IArray(a.items.distinct)
+    case _            => InvalidCaller
   }
 
-  def sort(): PtolemyValue = this match {
-    case a: PtolemyArray => PArray(a.items.sorted)
-    case _               => InvalidCaller
+  def sort(): IdmlValue = this match {
+    case a: IdmlArray => IArray(a.items.sorted)
+    case _            => InvalidCaller
   }
 
-  def min(): PtolemyValue = this match {
-    case a: PtolemyArray => NonEmptyList.fromList(a.items.sorted.toList).map(_.toList.min).getOrElse(NoFields)
-    case _               => InvalidCaller
+  def min(): IdmlValue = this match {
+    case a: IdmlArray => NonEmptyList.fromList(a.items.sorted.toList).map(_.toList.min).getOrElse(NoFields)
+    case _            => InvalidCaller
   }
 
-  def max(): PtolemyValue = this match {
-    case a: PtolemyArray => NonEmptyList.fromList(a.items.sorted.toList).map(_.toList.max).getOrElse(NoFields)
-    case _               => InvalidCaller
+  def max(): IdmlValue = this match {
+    case a: IdmlArray => NonEmptyList.fromList(a.items.sorted.toList).map(_.toList.max).getOrElse(NoFields)
+    case _            => InvalidCaller
   }
 
-  private def extractDouble(v: PtolemyValue): Option[Double] = v match {
-    case PInt(i)    => Some(i.toDouble)
-    case PDouble(d) => Some(d)
+  private def extractDouble(v: IdmlValue): Option[Double] = v match {
+    case IInt(i)    => Some(i.toDouble)
+    case IDouble(d) => Some(d)
     case _          => None
   }
 
-  def average(): PtolemyValue = this match {
-    case a: PtolemyArray if a.size == 0 => InvalidCaller
-    case a: PtolemyArray                => PDouble(a.items.flatMap(extractDouble).sum / a.items.size)
-    case _                              => InvalidCaller
+  def average(): IdmlValue = this match {
+    case a: IdmlArray if a.size == 0 => InvalidCaller
+    case a: IdmlArray                => IDouble(a.items.flatMap(extractDouble).sum / a.items.size)
+    case _                           => InvalidCaller
   }
 
-  def median(): PtolemyValue = this match {
-    case a: PtolemyArray if a.size == 0 => InvalidCaller
-    case a: PtolemyArray => {
+  def median(): IdmlValue = this match {
+    case a: IdmlArray if a.size == 0 => InvalidCaller
+    case a: IdmlArray => {
       a.items.flatMap(x => extractDouble(x).map((x, _))).sortBy(_._2) match {
-        case as if as.size % 2 == 0 => PDouble((as(as.size / 2)._2 + as((as.size / 2) - 1)._2) / 2)
+        case as if as.size % 2 == 0 => IDouble((as(as.size / 2)._2 + as((as.size / 2) - 1)._2) / 2)
         case as if as.size % 2 != 0 => as(Math.floor(as.size / 2).toInt)._1
       }
     }
     case _ => InvalidCaller
   }
 
-  def variance(): PtolemyValue = this match {
-    case a: PtolemyArray if a.size == 0 => InvalidCaller
-    case a: PtolemyArray => {
+  def variance(): IdmlValue = this match {
+    case a: IdmlArray if a.size == 0 => InvalidCaller
+    case a: IdmlArray => {
       val items       = a.items.flatMap(extractDouble)
       val mean        = items.sum / items.size
       val differences = items.map(x => Math.pow(x - mean, 2))
-      PDouble(differences.sum / differences.size)
+      IDouble(differences.sum / differences.size)
     }
     case _ => InvalidCaller
   }
 
-  def stdDev(): PtolemyValue = this match {
-    case a: PtolemyArray if a.size == 0 => InvalidCaller
-    case a: PtolemyArray => {
+  def stdDev(): IdmlValue = this match {
+    case a: IdmlArray if a.size == 0 => InvalidCaller
+    case a: IdmlArray => {
       val items       = a.items.flatMap(extractDouble)
       val mean        = items.sum / items.size
       val differences = items.map(x => Math.pow(x - mean, 2))
-      PDouble(Math.sqrt(differences.sum / differences.size))
+      IDouble(Math.sqrt(differences.sum / differences.size))
     }
     case _ => InvalidCaller
   }
 
-  def softmax(): PtolemyValue = this match {
-    case a: PtolemyArray if a.size == 0 => PArray(mutable.Buffer.empty[PtolemyValue])
-    case a: PtolemyArray => {
+  def softmax(): IdmlValue = this match {
+    case a: IdmlArray if a.size == 0 => IArray(mutable.Buffer.empty[IdmlValue])
+    case a: IdmlArray => {
       val as    = a.items.flatMap(extractDouble).map(x => Math.exp(x))
       val asSum = as.sum
-      PArray(as.map(x => x / asSum).map(PDouble(_)).toBuffer[PtolemyValue])
+      IArray(as.map(x => x / asSum).map(IDouble(_)).toBuffer[IdmlValue])
     }
     case _ => InvalidCaller
   }
 
-  def flatten(): PtolemyValue = this match {
-    case a: PtolemyArray =>
-      PArray(a.items.flatMap { i =>
+  def flatten(): IdmlValue = this match {
+    case a: IdmlArray =>
+      IArray(a.items.flatMap { i =>
         i match {
-          case arr: PtolemyArray =>
+          case arr: IdmlArray =>
             arr.items
-          case p: PtolemyValue =>
+          case p: IdmlValue =>
             mutable.Buffer(p)
         }
       })
     case _ => InvalidCaller
   }
 
-  def flatten(depth: PtolemyValue): PtolemyValue = (this, depth) match {
-    case (a: PtolemyValue, i: PInt) =>
+  def flatten(depth: IdmlValue): IdmlValue = (this, depth) match {
+    case (a: IdmlValue, i: IInt) =>
       (1L to i.value.toLong).foldLeft(a) { (x, y) =>
         x.flatten()
       }
     case _ => InvalidCaller
   }
 
-  def zip(other: PtolemyValue): PtolemyValue = (this, other) match {
-    case (a: PtolemyArray, b: PtolemyArray) =>
-      PArray(a.items.zip(b.items).map { case (l, r) => PArray(l, r) }.toBuffer[PtolemyValue])
-    case (_: PtolemyArray, _) =>
+  def zip(other: IdmlValue): IdmlValue = (this, other) match {
+    case (a: IdmlArray, b: IdmlArray) =>
+      IArray(a.items.zip(b.items).map { case (l, r) => IArray(l, r) }.toBuffer[IdmlValue])
+    case (_: IdmlArray, _) =>
       InvalidParameters
-    case (_, _: PtolemyArray) =>
+    case (_, _: IdmlArray) =>
       InvalidCaller
     case (_, _) =>
       InvalidCaller
   }
 
-  def enumerate(): PtolemyValue = this match {
-    case (a: PtolemyArray) =>
-      PArray(a.items.zipWithIndex.map { case (item, idx) => PArray(PtolemyValue(idx), item) }.toBuffer[PtolemyValue])
+  def enumerate(): IdmlValue = this match {
+    case (a: IdmlArray) =>
+      IArray(a.items.zipWithIndex.map { case (item, idx) => IArray(IdmlValue(idx), item) }.toBuffer[IdmlValue])
     case _ =>
       InvalidCaller
   }
 
   import cats._, cats.implicits._, cats.syntax._
 
-  def combineAll(): PtolemyValue = this match {
-    case ar: PtolemyArray =>
-      PArray(ar.items.filter(i => !i.isNothingValue)) match {
-        case a: PtolemyArray if a.items.forall(_.isArray.value) =>
-          PArray(a.items.asInstanceOf[mutable.Buffer[PtolemyArray]].map(_.items).flatten)
-        case a: PtolemyArray if a.items.forall(_.isObject.value) =>
-          a.items.asInstanceOf[mutable.Buffer[PtolemyObject]].foldLeft(PObject()) { case (o, i) => PObject(o.fields ++ i.fields) }
-        case a: PtolemyArray if a.items.forall(_.isString.value) =>
-          PString(a.items.asInstanceOf[mutable.Buffer[PtolemyString]].map(_.value).toList.combineAll)
-        case a: PtolemyArray if a.items.forall(_.isInt.value) =>
-          PInt(a.items.asInstanceOf[mutable.Buffer[PtolemyInt]].map(_.value).toList.combineAll)
-        case a: PtolemyArray if a.items.forall(_.isFloat.value) =>
-          PDouble(a.items.asInstanceOf[mutable.Buffer[PtolemyDouble]].map(_.value).toList.combineAll)
+  def combineAll(): IdmlValue = this match {
+    case ar: IdmlArray =>
+      IArray(ar.items.filter(i => !i.isNothingValue)) match {
+        case a: IdmlArray if a.items.forall(_.isArray.value) =>
+          IArray(a.items.asInstanceOf[mutable.Buffer[IdmlArray]].map(_.items).flatten)
+        case a: IdmlArray if a.items.forall(_.isObject.value) =>
+          a.items.asInstanceOf[mutable.Buffer[IdmlObject]].foldLeft(IObject()) { case (o, i) => IObject(o.fields ++ i.fields) }
+        case a: IdmlArray if a.items.forall(_.isString.value) =>
+          IString(a.items.asInstanceOf[mutable.Buffer[IdmlString]].map(_.value).toList.combineAll)
+        case a: IdmlArray if a.items.forall(_.isInt.value) =>
+          IInt(a.items.asInstanceOf[mutable.Buffer[IdmlInt]].map(_.value).toList.combineAll)
+        case a: IdmlArray if a.items.forall(_.isFloat.value) =>
+          IDouble(a.items.asInstanceOf[mutable.Buffer[IdmlDouble]].map(_.value).toList.combineAll)
         case _ => InvalidCaller
       }
     case _ => InvalidCaller

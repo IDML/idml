@@ -7,135 +7,135 @@ import scala.collection.JavaConverters._
 class UnmappedFieldsFinderItTest extends FunSuite {
 
   val listener = new UnmappedFieldsFinder
-  val ptolemy  = new Ptolemy(new PtolemyConf, listeners = List[PtolemyListener](listener).asJava)
+  val idml     = Idml.autoBuilder().withListener(listener).build()
 
   test("There are no unmapped fields when the input object is empty") {
-    val ctx   = new PtolemyContext(PObject())
-    val chain = ptolemy.newChain(ptolemy.fromString("x = a"))
-    chain.run(ctx)
-    assert(ctx.output === PObject())
+    val ctx   = new IdmlContext(IObject())
+    val chain = idml.chain(idml.compile("x = a"))
+    idml.evaluate(chain, ctx)
+    assert(ctx.output === IObject())
   }
 
   test("If a field is mapped then it doesn't end up in the unmapped field namespace") {
-    val ctx   = new PtolemyContext(PObject("a" -> PTrue))
-    val chain = ptolemy.newChain(ptolemy.fromString("x = a"))
-    chain.run(ctx)
-    assert(ctx.output === PObject("x" -> PTrue))
+    val ctx   = new IdmlContext(IObject("a" -> ITrue))
+    val chain = idml.chain(idml.compile("x = a"))
+    idml.evaluate(chain, ctx)
+    assert(ctx.output === IObject("x" -> ITrue))
   }
 
   test("If a field is mapped then it doesn't end up in the unmapped field namespace - depth two") {
-    val ctx   = new PtolemyContext(PObject("a" -> PObject("b" -> PTrue)))
-    val chain = ptolemy.newChain(ptolemy.fromString("x.y = a.b"))
-    chain.run(ctx)
-    assert(ctx.output === PObject("x" -> PObject("y" -> PTrue)))
+    val ctx   = new IdmlContext(IObject("a" -> IObject("b" -> ITrue)))
+    val chain = idml.chain(idml.compile("x.y = a.b"))
+    idml.evaluate(chain, ctx)
+    assert(ctx.output === IObject("x" -> IObject("y" -> ITrue)))
   }
 
   test("If a field isn't mapped then it should be in the unmapped field namespace") {
-    val ctx   = new PtolemyContext(PObject("a" -> PTrue))
-    val chain = ptolemy.newChain(ptolemy.fromString("x = b"))
-    chain.run(ctx)
-    assert(ctx.output === PObject("unmapped" -> PObject("a" -> PTrue)))
+    val ctx   = new IdmlContext(IObject("a" -> ITrue))
+    val chain = idml.chain(idml.compile("x = b"))
+    idml.evaluate(chain, ctx)
+    assert(ctx.output === IObject("unmapped" -> IObject("a" -> ITrue)))
   }
 
   test("If a field isn't mapped then it should be in the unmapped field namespace - depth two") {
-    val ctx   = new PtolemyContext(PObject("a" -> PObject("b" -> PTrue)))
-    val chain = ptolemy.newChain(ptolemy.fromString("x.y = b"))
-    chain.run(ctx)
-    assert(ctx.output === PObject("unmapped" -> PObject("a" -> PObject("b" -> PTrue))))
+    val ctx   = new IdmlContext(IObject("a" -> IObject("b" -> ITrue)))
+    val chain = idml.chain(idml.compile("x.y = b"))
+    idml.evaluate(chain, ctx)
+    assert(ctx.output === IObject("unmapped" -> IObject("a" -> IObject("b" -> ITrue))))
   }
 
   test("If a field isn't mapped then it should be in the unmapped field namespace - depth two, with overlap") {
     pendingUntilFixed {
       val ctx =
-        new PtolemyContext(PObject("a" -> PObject("b" -> PTrue, "c" -> PFalse)))
-      val chain = ptolemy.newChain(ptolemy.fromString("x.y = a.b"))
-      chain.run(ctx)
-      assert(ctx.output === PObject("x" -> PObject("y" -> PTrue), "unmapped" -> PObject("a" -> PObject("c" -> PFalse))))
+        new IdmlContext(IObject("a" -> IObject("b" -> ITrue, "c" -> IFalse)))
+      val chain = idml.chain(idml.compile("x.y = a.b"))
+      idml.evaluate(chain, ctx)
+      assert(ctx.output === IObject("x" -> IObject("y" -> ITrue), "unmapped" -> IObject("a" -> IObject("c" -> IFalse))))
     }
   }
 
   test("Fields are treated as mapped if functions are called on them successfully") {
     val ctx =
-      new PtolemyContext(PObject("a" -> PObject("b" -> PString("1234"))))
-    val chain = ptolemy.newChain(ptolemy.fromString("x.y = a.b.int()"))
-    chain.run(ctx)
+      new IdmlContext(IObject("a" -> IObject("b" -> IString("1234"))))
+    val chain = idml.chain(idml.compile("x.y = a.b.int()"))
+    idml.evaluate(chain, ctx)
     assert(
-      ctx.output === PObject(
-        "x" -> PObject("y" -> PInt(1234))
+      ctx.output === IObject(
+        "x" -> IObject("y" -> IInt(1234))
       ))
   }
 
   test("Fields are not treated as mapped if functions are called on them unsuccessfully") {
-    val ctx   = new PtolemyContext(PObject("a" -> PObject("b" -> PString(":D"))))
-    val chain = ptolemy.newChain(ptolemy.fromString("x.y = a.b.int()"))
-    chain.run(ctx)
+    val ctx   = new IdmlContext(IObject("a" -> IObject("b" -> IString(":D"))))
+    val chain = idml.chain(idml.compile("x.y = a.b.int()"))
+    idml.evaluate(chain, ctx)
     assert(
-      ctx.output === PObject(
-        "unmapped" -> PObject("a" -> PObject("b" -> PString(":D")))
+      ctx.output === IObject(
+        "unmapped" -> IObject("a" -> IObject("b" -> IString(":D")))
       ))
   }
 
   test("Function parameters are treated as mapped, one parameter") {
-    val ctx = new PtolemyContext(PObject("a" -> PObject("b" -> PString("abc %s"), "c" -> PString("123"))))
+    val ctx = new IdmlContext(IObject("a" -> IObject("b" -> IString("abc %s"), "c" -> IString("123"))))
     val chain =
-      ptolemy.newChain(ptolemy.fromString("x.y = a.b.format(root.a.c)"))
-    chain.run(ctx)
+      idml.chain(idml.compile("x.y = a.b.format(root.a.c)"))
+    idml.evaluate(chain, ctx)
     assert(
-      ctx.output === PObject(
-        "x" -> PObject("y" -> PString("abc 123"))
+      ctx.output === IObject(
+        "x" -> IObject("y" -> IString("abc 123"))
       ))
   }
 
   test("Function parameters are treated as mapped, two parameters") {
-    val ctx = new PtolemyContext(
-      PObject(
-        "a" -> PObject(
-          "b" -> PString("%s abc %s"),
-          "c" -> PString("123"),
-          "d" -> PString("def")
+    val ctx = new IdmlContext(
+      IObject(
+        "a" -> IObject(
+          "b" -> IString("%s abc %s"),
+          "c" -> IString("123"),
+          "d" -> IString("def")
         )))
-    val chain = ptolemy.newChain(ptolemy.fromString("x.y = a.b.format(root.a.c, root.a.d)"))
-    chain.run(ctx)
+    val chain = idml.chain(idml.compile("x.y = a.b.format(root.a.c, root.a.d)"))
+    idml.evaluate(chain, ctx)
     assert(
-      ctx.output === PObject(
-        "x" -> PObject("y" -> PString("123 abc def"))
+      ctx.output === IObject(
+        "x" -> IObject("y" -> IString("123 abc def"))
       ))
   }
 
   test("Function parameters are treated as unmapped if the function failed") {
-    val ctx = new PtolemyContext(PObject("a" -> PObject("b" -> PTrue, "c" -> PString("123"))))
+    val ctx = new IdmlContext(IObject("a" -> IObject("b" -> ITrue, "c" -> IString("123"))))
     val chain =
-      ptolemy.newChain(ptolemy.fromString("x.y = a.b.format(root.a.c)"))
-    chain.run(ctx)
+      idml.chain(idml.compile("x.y = a.b.format(root.a.c)"))
+    idml.evaluate(chain, ctx)
     assert(
-      ctx.output === PObject(
-        "unmapped" -> PObject("a" -> PObject("b" -> PTrue, "c" -> PString("123")))
+      ctx.output === IObject(
+        "unmapped" -> IObject("a" -> IObject("b" -> ITrue, "c" -> IString("123")))
       ))
   }
 
   test("Function parameters are treated as unmapped if the whole expression failed") {
-    val ctx = new PtolemyContext(PObject("a" -> PObject("b" -> PString("abc %s"), "c" -> PString("123"))))
+    val ctx = new IdmlContext(IObject("a" -> IObject("b" -> IString("abc %s"), "c" -> IString("123"))))
     val chain =
-      ptolemy.newChain(ptolemy.fromString("x.y = a.b.format(root.a.c).int()"))
-    chain.run(ctx)
+      idml.chain(idml.compile("x.y = a.b.format(root.a.c).int()"))
+    idml.evaluate(chain, ctx)
     assert(
-      ctx.output === PObject(
-        "unmapped" -> PObject("a" -> PObject("b" -> PString("abc %s"), "c" -> PString("123")))
+      ctx.output === IObject(
+        "unmapped" -> IObject("a" -> IObject("b" -> IString("abc %s"), "c" -> IString("123")))
       ))
   }
 
   test("Composite values are treated as mapped, regardless of whether their sub-components are referred to") {
-    val ctx   = new PtolemyContext(PObject("a" -> PObject("b" -> PString("http://localhost/"))))
-    val chain = ptolemy.newChain(ptolemy.fromString("x.y = a.b.url().host"))
-    chain.run(ctx)
-    assert(ctx.output === PObject("x" -> PObject("y" -> PString("localhost"))))
+    val ctx   = new IdmlContext(IObject("a" -> IObject("b" -> IString("http://localhost/"))))
+    val chain = idml.chain(idml.compile("x.y = a.b.url().host"))
+    idml.evaluate(chain, ctx)
+    assert(ctx.output === IObject("x" -> IObject("y" -> IString("localhost"))))
   }
 
   test("Calls without a prefix path don't break the stack: url()") {
-    val ctx   = new PtolemyContext(PObject("a" -> PObject("b" -> PTrue)))
-    val chain = ptolemy.newChain(ptolemy.fromString("x.y = url()"))
-    chain.run(ctx)
-    assert(ctx.output === PObject("unmapped" -> PObject("a" -> PObject("b" -> PTrue))))
+    val ctx   = new IdmlContext(IObject("a" -> IObject("b" -> ITrue)))
+    val chain = idml.chain(idml.compile("x.y = url()"))
+    idml.evaluate(chain, ctx)
+    assert(ctx.output === IObject("unmapped" -> IObject("a" -> IObject("b" -> ITrue))))
   }
 
   test("Calls without a prefix path but with a composite don't break the stack: fn(fn()) => nil") {

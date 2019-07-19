@@ -43,7 +43,11 @@ lazy val lang = project.settings(commonSettings)
 
 lazy val datanodes = project.settings(commonSettings)
 
-lazy val core = project
+lazy val jackson: Project = project.dependsOn(core % "compile->compile;test->test").settings(commonSettings)
+
+lazy val circe = project.dependsOn(datanodes).dependsOn(core % "compile->compile;test->test").settings(commonSettings)
+
+lazy val core: Project = project
   .dependsOn(datanodes)
   .dependsOn(lang)
   .enablePlugins(BuildInfoPlugin)
@@ -54,9 +58,20 @@ lazy val core = project
     buildInfoOptions += BuildInfoOption.BuildTime
   )
 
+lazy val test = project
+  .dependsOn(core)
+  .dependsOn(jackson % "compile->test")
+  .dependsOn(circe % "test->compile")
+  .settings(commonSettings)
+  .settings(
+    publishArtifact := false
+  )
+
 lazy val geo = project
   .dependsOn(core)
   .settings(commonSettings)
+  .dependsOn(jackson % "test->test")
+  .dependsOn(test % "test->test")
   .settings(
     fork in Test := true,
     envVars in Test := Map(
@@ -66,23 +81,44 @@ lazy val geo = project
     )
   )
 
-lazy val jsoup = project.dependsOn(core).settings(commonSettings)
+lazy val jsoup = project.dependsOn(core).dependsOn(test % "test->test").settings(commonSettings)
 
 lazy val hashing = project.dependsOn(core).settings(commonSettings)
 
-lazy val utils = project.dependsOn(core).dependsOn(jsoup).settings(commonSettings)
+lazy val utils = project.dependsOn(core).dependsOn(jsoup).dependsOn(jackson % "test->test").settings(commonSettings)
 
-lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).settings(commonSettings)
+lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).dependsOn(jackson).settings(commonSettings)
 
-lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils).settings(commonSettings)
+lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils).dependsOn(circe).settings(commonSettings)
 
-lazy val idmldoc = project.dependsOn(core).dependsOn(utils).settings(commonSettings)
+lazy val idmldoc = project.dependsOn(core).dependsOn(utils).dependsOn(circe).settings(commonSettings)
 
 lazy val `idmldoc-plugin` = project.dependsOn(idmldoc).settings(commonSettings)
 
-lazy val idmltest = project.dependsOn(core).dependsOn(utils).settings(commonSettings)
+lazy val idmltest = project.dependsOn(core).dependsOn(utils).dependsOn(circe).settings(commonSettings)
 
 lazy val `idmltest-plugin` = project.dependsOn(idmltest).dependsOn(hashing).dependsOn(geo).dependsOn(jsoup).settings(commonSettings)
+
+lazy val idmltutor = project
+  .dependsOn(hashing)
+  .dependsOn(geo)
+  .dependsOn(jsoup)
+  .dependsOn(circe)
+  .dependsOn(idmltest)
+  .settings(commonSettings)
+  .settings(
+    assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(defaultShellScript)),
+    dockerExposedPorts := Seq(8081),
+    packageName in Docker := "idml",
+    dockerUpdateLatest in Docker := true,
+    assembly / assemblyOption := (assembly / assemblyOption).value.copy(prependShellScript = Some(defaultShellScript)),
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", "MANIFEST.MF")                                    => MergeStrategy.discard
+      case PathList("buildinfo/BuildInfo$.class")                                 => MergeStrategy.first
+      case PathList("META-INF", "services", "io.idml.functions.FunctionResolver") => MergeStrategy.concat
+      case _                                                                      => MergeStrategy.first
+    }
+  )
 
 lazy val tool = project
   .dependsOn(core)

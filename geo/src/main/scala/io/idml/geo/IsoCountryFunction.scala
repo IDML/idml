@@ -2,26 +2,16 @@ package io.idml.geo
 
 import java.nio.charset.Charset
 
-import io.idml.{PtolemyJson, PtolemyValue}
+import io.idml.{IdmlJson, IdmlValue}
 import io.idml.ast.Pipeline
-import io.idml.functions.PtolemyFunction1
+import io.idml.functions.IdmlFunction1
 import com.google.common.io.Resources
 
-object IsoCountryFunction {
-  // scalastyle:off null
-  /** The ISO country name data of the form Map[country_code] = country_name */
-  val Countries: PtolemyValue = PtolemyJson.parse(
-    Resources
-      .toString(Resources.getResource("io/idml/geo/Countries.json"), Charset.defaultCharset())
-      .ensuring(_ != null)
-  )
-  // scalastyle:on null
-}
-
 /** Turns iso countries into country names */
-case class IsoCountryFunction(arg: Pipeline) extends PtolemyFunction1 {
-  override protected def apply(cursor: PtolemyValue, country: PtolemyValue): PtolemyValue = {
-    IsoCountryFunction.Countries.get(country)
+class IsoCountryFunction(countries: => IdmlValue, val arg: Pipeline) extends IdmlFunction1 {
+
+  override protected def apply(cursor: IdmlValue, country: IdmlValue): IdmlValue = {
+    countries.get(country)
   }
 
   override def name: String = "country"
