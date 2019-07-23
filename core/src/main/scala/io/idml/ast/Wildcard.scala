@@ -9,7 +9,7 @@ import scala.collection.mutable
 case class Wildcard(tail: Pipeline) extends Expression {
 
   def invokeForObject(ctx: IdmlContext, obj: IdmlObject) {
-    val res = mutable.SortedMap[String, IdmlValue]()
+    val res = mutable.Map[String, IdmlValue]()
     obj.fields foreach {
       case (key, value) =>
         ctx.cursor = value

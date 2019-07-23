@@ -58,7 +58,7 @@ class PValueDeserializer(factory: TypeFactory, klass: Class[_]) extends JsonDese
   }
 
   def fieldNameOrEndObject(jp: JsonParser, ctxt: DeserializationContext): IObject = {
-    val fields = mutable.SortedMap[String, IdmlValue]()
+    val fields = mutable.Map[String, IdmlValue]()
     while (jp.getCurrentToken != JsonToken.END_OBJECT) {
       val name = jp.getCurrentName
       jp.nextToken()

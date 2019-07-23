@@ -41,7 +41,7 @@ case class GroupByFunction(expr: Node) extends IdmlFunction {
             .groupBy(_._1)
             .mapValues(_.map(_._2))
             .mapValues(IArray(_))
-          IObject(mutable.SortedMap[String, IdmlValue](vs.toList: _*))
+          IObject(mutable.Map[String, IdmlValue](vs.toList: _*))
         }
         ctx.cursor = results
       case _ =>

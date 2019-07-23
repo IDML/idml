@@ -7,10 +7,10 @@ import scala.collection.mutable
 /** The IdmlValue that represents objects */
 abstract class IdmlObject extends IdmlValue {
 
-  def formatValue: mutable.SortedMap[String, IdmlValue] = fields
+  def formatValue: mutable.Map[String, IdmlValue] = fields
 
   /** The underlying field container for this object */
-  def fields: mutable.SortedMap[String, IdmlValue]
+  def fields: mutable.Map[String, IdmlValue]
 
   override def equals(o: Any): Boolean = o match {
     case n: IdmlObject => n.fields == fields
@@ -41,5 +41,6 @@ abstract class IdmlObject extends IdmlValue {
   // scalastyle:on method.name
 
   override def toStringOption: Option[String] =
-    Some("{" + fields.flatMap { case (k, v) => v.toStringOption.map(k -> _) }.map { case (k, v) => s""""$k":$v""" }.mkString(",") + "}")
+    Some("{" + fields.toList.sortBy(_._1).flatMap { case (k, v) => v.toStringOption.map(k -> _) }.map { case (k, v) => s""""$k":$v""" }.mkString(",") + "}")
+
 }

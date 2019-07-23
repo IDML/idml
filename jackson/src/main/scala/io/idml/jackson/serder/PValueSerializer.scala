@@ -20,7 +20,7 @@ class PValueSerializer extends JsonSerializer[IdmlValue] {
 
       case n: IdmlObject =>
         json.writeStartObject()
-        n.fields filterNot (_._2.isInstanceOf[IdmlNothing]) foreach {
+        n.fields.filterNot(_._2.isInstanceOf[IdmlNothing]).toList.sortBy(_._1).foreach {
           case (k, v) =>
             json.writeObjectField(k, v)
         }

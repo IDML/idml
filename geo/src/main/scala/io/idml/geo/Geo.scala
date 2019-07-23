@@ -9,7 +9,7 @@ import scala.collection.mutable
 case class Geo(lat: Double, long: Double) extends IdmlObject with CompositeValue {
 
   /** The fields */
-  val fields = mutable.SortedMap(
+  val fields = mutable.Map(
     "latitude"  -> IdmlValue(lat),
     "longitude" -> IdmlValue(long)
   )

@@ -60,7 +60,7 @@ class IArrayTest extends FunSuite with MustMatchers {
     new IArray(
       mutable.ListBuffer(
         new IObject(
-          mutable.SortedMap(
+          mutable.Map(
             "s" -> IdmlValue("abc"),
             "i" -> IdmlValue(123),
             "f" -> IdmlValue(123.4),
