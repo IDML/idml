@@ -19,8 +19,8 @@ class JsoupAttributes(val attributes: Attributes) extends IdmlObject {
   // scalastyle:on null
 
   /** The underlying field container for this object */
-  override val fields: mutable.SortedMap[String, IdmlValue] =
-    mutable.SortedMap[String, IdmlValue](attributes.asScala.map {
+  override val fields: mutable.Map[String, IdmlValue] =
+    mutable.Map[String, IdmlValue](attributes.asScala.map {
       case attrib: Attribute => attrib.getKey -> IString(attrib.getValue)
     }.toSeq: _*)
 }

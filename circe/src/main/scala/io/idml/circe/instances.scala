@@ -41,7 +41,7 @@ object instances {
       Json.arr(n.items.filterNot(_.isInstanceOf[IdmlNothing]).map(rawIdmlCirceEncoder): _*)
     case n: IdmlObject =>
       Json.obj(
-        n.fields.toList.filterNot(_._2.isInstanceOf[IdmlNothing]).map {
+        n.fields.toList.filterNot(_._2.isInstanceOf[IdmlNothing]).sortBy(_._1).map {
           case (k, v) => k -> rawIdmlCirceEncoder(v)
         }: _*
       )
@@ -51,7 +51,7 @@ object instances {
 
   def decodeObject(value: JsonObject): IdmlObject =
     new IObject(
-      value.toIterable.foldLeft(mutable.SortedMap.empty[String, IdmlValue]) {
+      value.toIterable.foldLeft(mutable.Map.empty[String, IdmlValue]) {
         case (acc, (k, v)) => acc += k -> v.foldWith(rawIdmlCirceDecoder)
       }
     )

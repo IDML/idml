@@ -20,7 +20,7 @@ class IObjectTest extends FunSuite with MustMatchers {
 
   def withPrimitives =
     new IObject(
-      mutable.SortedMap(
+      mutable.Map(
         "s" -> IdmlValue("abc"),
         "i" -> IdmlValue(123),
         "f" -> IdmlValue(123.4),
@@ -29,9 +29,9 @@ class IObjectTest extends FunSuite with MustMatchers {
 
   def withNestedObjects =
     new IObject(
-      mutable.SortedMap(
+      mutable.Map(
         "o" -> new IObject(
-          mutable.SortedMap(
+          mutable.Map(
             "s" -> IdmlValue("abc"),
             "i" -> IdmlValue(123),
             "f" -> IdmlValue(123.4),
@@ -40,7 +40,7 @@ class IObjectTest extends FunSuite with MustMatchers {
 
   def withNestedArrays =
     new IObject(
-      mutable.SortedMap(
+      mutable.Map(
         "a" -> new IArray(
           mutable.ListBuffer(
             IdmlValue("abc"),

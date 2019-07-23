@@ -42,7 +42,7 @@ object Diff {
     if (left == right) {
       left
     } else {
-      val diffs = mutable.SortedMap[String, IdmlValue]()
+      val diffs = mutable.Map[String, IdmlValue]()
 
       left.fields.foreach {
         case (k: String, leftValue: IdmlValue) =>

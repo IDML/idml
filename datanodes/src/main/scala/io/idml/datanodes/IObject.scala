@@ -11,18 +11,18 @@ object IObject {
 
   /** Create a PObject from a variable number of parameters */
   def apply(fields: (String, IdmlValue)*): IObject = {
-    IObject(mutable.SortedMap(fields: _*))
+    IObject(mutable.Map(fields: _*))
   }
 
-  def apply(): IObject = new IObject(mutable.SortedMap.empty)
+  def apply(): IObject = new IObject(mutable.Map.empty)
 
   def of(kv: java.util.Map[String, IdmlValue]): IObject = {
-    IObject(mutable.SortedMap(kv.asScala.toList: _*))
+    IObject(mutable.Map(kv.asScala.toList: _*))
   }
 }
 
 /** The default IdmlValue implementation for an object */
-case class IObject(fields: mutable.SortedMap[String, IdmlValue]) extends IdmlObject {
+case class IObject(fields: mutable.Map[String, IdmlValue]) extends IdmlObject {
 
   /** Create a copy of this object that can be safely modified */
   override def deepCopy: IObject =
