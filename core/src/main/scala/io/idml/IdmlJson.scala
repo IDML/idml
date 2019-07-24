@@ -41,7 +41,7 @@ trait IdmlJson {
 
 object IdmlJson {
   @throws[NoSuchElementException]("if there isn't an available implementation")
-  def load(): IdmlJson     = ServiceLoader.load(classOf[IdmlJson]).iterator().next()
+  def load(): IdmlJson     = ServiceLoader.load(classOf[IdmlJson], getClass.getClassLoader).iterator().next()
   def newObject(): IObject = IObject()
 }
 
