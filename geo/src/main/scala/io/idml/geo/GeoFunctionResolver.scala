@@ -13,13 +13,13 @@ class GeoFunctionResolver(json: IdmlJson) extends FunctionResolver {
 
   lazy val countries: IdmlValue = json.parse(
     Resources
-      .toString(Resources.getResource("io/idml/geo/Countries.json"), Charset.defaultCharset())
+      .toString(Resources.getResource(getClass, "Countries.json"), Charset.defaultCharset())
       .ensuring(_ != null)
   )
 
   lazy val regions: IdmlValue = json.parse(
     Resources
-      .toString(Resources.getResource("io/idml/geo/Regions.json"), Charset.defaultCharset())
+      .toString(Resources.getResource(getClass, "Regions.json"), Charset.defaultCharset())
       .ensuring(_ != null)
   )
 
