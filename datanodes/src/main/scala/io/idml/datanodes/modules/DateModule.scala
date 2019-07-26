@@ -1,26 +1,27 @@
 // scalastyle:off import.grouping
 package io.idml.datanodes.modules
 
+import java.time.{Instant, LocalDateTime, ZoneId, ZonedDateTime}
+import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
 import java.util.TimeZone
 
+import io.idml
 import io.idml.datanodes.{IDate, IDateFormats, IInt, IString}
 import io.idml.{BadDateFormat, CastFailed, CastUnsupported, IdmlInt, IdmlNothing, IdmlString, IdmlValue}
-import org.joda.time.{DateTime, DateTimeZone}
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 
 import scala.util.{Failure, Success, Try}
 
 object DateModule {
 
-  DateTimeZone.setDefault(DateTimeZone.UTC)
+//  DateTimeZone.setDefault(DateTimeZone.UTC)
 
   /** The default output date format */
-  val DefaultDateFormat = IDateFormats.RFC822Printer
+  val DefaultDateFormat = IDateFormats.rfc1123
 
   def millisToDate(n: IdmlValue, pfmt: Any = DefaultDateFormat): IdmlValue = {
     pfmt match {
       case fmtStr: IdmlString =>
-        Try(DateTimeFormat.forPattern(fmtStr.value)) match {
+        Try(DateTimeFormatter.ofPattern(fmtStr.value)) match {
           case Success(fmt) => millisToDateFMT(n, fmt)
           case _            => BadDateFormat
         }
@@ -29,11 +30,11 @@ object DateModule {
     }
   }
 
-  private def millisToDateFMT(n: IdmlValue, fmt: DateTimeFormatter) = {
+  private def millisToDateFMT(n: IdmlValue, fmt: DateTimeFormatter) : IdmlValue = {
     n match {
-      case o: IdmlInt => IDate(new DateTime(o.value), fmt)
+      case o: IdmlInt => IDate(ZonedDateTime.ofInstant(Instant.ofEpochMilli(o.value), ZoneId.of("UTC")), fmt)
       case o: IdmlString =>
-        Try(IDate(new DateTime(o.value.toLong), fmt)) match {
+        Try(IDate(ZonedDateTime.ofInstant(Instant.ofEpochMilli(o.value.toLong), ZoneId.of("UTC")), fmt)) match {
           case Success(date) => date
           case Failure(f)    => CastUnsupported
         }
@@ -42,24 +43,19 @@ object DateModule {
   }
 
   def applyTimezone(supplied: IDate, tzStr: String): IdmlValue = {
-    Try(IDateFormats.TimezoneFormatter.withOffsetParsed().parseDateTime(tzStr)) match {
-      case Success(tz) =>
-        IDate(supplied.dateVal.withZone(tz.getZone))
-      case Failure(f) =>
-        Try(TimeZone.getTimeZone(tzStr)) match {
-          case Success(tz: TimeZone) =>
-            IDate(supplied.dateVal.withZone(DateTimeZone.forTimeZone(tz)))
-          case Failure(f2) => CastFailed
-        }
+    IDateFormats.timezone(tzStr) match {
+      case Some(tz) =>
+        IDate(ZonedDateTime.ofInstant(supplied.dateVal.toInstant, tz))
+      case None =>
+        CastFailed
     }
   }
 
   /** */
   def stringToDate(str: String, df: DateTimeFormatter): IdmlValue = {
-    Try(df.parseDateTime(str)) match {
-      case Success(date)                        => new IDate(date)
+    Try(ZonedDateTime.from(df.parse(str))) match {
+      case Success(date)                        => IDate.create(date).getOrElse(CastFailed)
       case Failure(x: IllegalArgumentException) => CastFailed
-      case Failure(e)                           => throw e
     }
   }
 
@@ -67,15 +63,11 @@ object DateModule {
   /** Convert from a string to a date */
   def stringToDate(str: String): IdmlValue = {
     for (df <- IDateFormats.Formatters) {
-      Try(df.withOffsetParsed().parseDateTime(str)) match {
-        case Success(date)                        => return new IDate(date)
+      Try{ZonedDateTime.from(df.parse(str))} match {
+        case Success(date)                        => return IDate.create(date).getOrElse(CastFailed)
         case Failure(e: IllegalArgumentException) => ()
-        case Failure(e)                           => throw e
+        case Failure(e)                           => ()
       }
-    }
-    Try(new DateTime(str)) match {
-      case Success(date) => return new IDate(date)
-      case Failure(e)    => ()
     }
     CastFailed
   }
@@ -83,10 +75,13 @@ object DateModule {
 
   /** Convert from a unix timestamp to date object */
   def timestampToDate(num: Long): IdmlValue = {
-    if (num > 0 && num < Int.MaxValue) {
-      new IDate(new DateTime(num * 1000))
-    } else {
-      CastFailed
+    (num, Math.log10(num) + 1) match {
+      case (num, _) if num < 1 => CastFailed
+      case (num, digits) if digits < 14 =>
+        IDate.create(ZonedDateTime.ofInstant(Instant.ofEpochSecond(num), ZoneId.of("UTC"))).getOrElse(CastFailed)
+      case (num, digits) if digits >= 14 =>
+        IDate.create(ZonedDateTime.ofInstant(Instant.ofEpochMilli(num), ZoneId.of("UTC"))).getOrElse(CastFailed)
+      case _ => CastFailed
     }
   }
 
@@ -114,7 +109,7 @@ trait DateModule {
     */
   def date(formatStr: IdmlValue): IdmlValue = formatStr match {
     case formatStrLike: IdmlString =>
-      Try(DateTimeFormat.forPattern(formatStrLike.value)) match {
+      Try(DateTimeFormatter.ofPattern(formatStrLike.value)) match {
         case Success(userFormat) =>
           this match {
             case d: IDate       => IString(dateToString(userFormat)(d))
@@ -128,9 +123,9 @@ trait DateModule {
     case _ => BadDateFormat
   }
 
-  def rssDate(): IdmlValue = specificDate(IDateFormats.RFC822Printer)
+  def rssDate(): IdmlValue = specificDate(DateTimeFormatter.RFC_1123_DATE_TIME)
 
-  def dateToString(df: DateTimeFormatter)(d: IDate) = df.print(d.dateVal)
+  def dateToString(df: DateTimeFormatter)(d: IDate) = df.format(d.dateVal)
 
   def specificDate(df: DateTimeFormatter): IdmlValue = this match {
     case _: IDate | _: IdmlNothing => this
@@ -143,7 +138,7 @@ trait DateModule {
   def microtime(): IdmlValue = IInt(System.currentTimeMillis() * 1000L)
 
   /** The current date */
-  def now(): IdmlValue = IDate(new DateTime())
+  def now(): IdmlValue = IDate(ZonedDateTime.now())
 
   def millis(): IdmlValue = this match {
     case _: IDate | _: IdmlNothing => this
@@ -153,12 +148,12 @@ trait DateModule {
   }
 
   def toEpoch(): IdmlValue = this match {
-    case d: IDate => IInt(d.dateVal.getMillis() / 1000L)
+    case d: IDate => IInt(d.dateVal.toInstant.getEpochSecond)
     case _        => CastUnsupported
   }
 
   def toEpochMillis(): IdmlValue = this match {
-    case d: IDate => IInt(d.dateVal.getMillis())
+    case d: IDate => IInt(d.dateVal.toInstant.toEpochMilli)
     case _        => CastUnsupported
   }
 

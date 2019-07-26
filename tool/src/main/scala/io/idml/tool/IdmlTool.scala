@@ -1,3 +1,5 @@
+package io.idml.tool
+
 import java.io.File
 import java.net.URI
 
@@ -7,9 +9,8 @@ import cats.implicits._
 import cats.syntax._
 import cats.data._
 import com.monovore.decline._
-import DeclineHelpers._
+import io.idml.tool.DeclineHelpers._
 import io.idml.BuildInfo
-import io.idml.tool.IOCommandApp
 
 object IdmlTool extends IOCommandApp[IO[ExitCode]] {
   override def name: String    = "idml"

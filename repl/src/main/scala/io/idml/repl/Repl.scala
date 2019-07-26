@@ -6,8 +6,8 @@ import java.util.{Optional, Properties}
 
 import io.idml.datanodes.IObject
 import io.idml._
+import io.idml.circe.IdmlCirce
 import io.idml.hashing.HashingFunctionResolver
-import io.idml.jackson.IdmlJackson
 import io.idml.jsoup.{IdmlJsoup, JsoupFunctionResolver}
 
 import scala.sys.ShutdownHookThread
@@ -32,7 +32,7 @@ class Repl {
   var mode: String         = "json"
   var doc: Option[IObject] = None
 
-  val idmlJson = IdmlJackson.default
+  val idmlJson = IdmlCirce
 
   def run(args: Array[String]) = runInner(args)
 

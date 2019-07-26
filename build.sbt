@@ -87,7 +87,7 @@ lazy val hashing = project.dependsOn(core).settings(commonSettings)
 
 lazy val utils = project.dependsOn(core).dependsOn(jsoup).dependsOn(jackson % "test->test").settings(commonSettings)
 
-lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).dependsOn(jackson).settings(commonSettings)
+lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).dependsOn(circe).settings(commonSettings)
 
 lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils).dependsOn(circe).settings(commonSettings)
 
@@ -143,7 +143,40 @@ lazy val tool = project
       case PathList("buildinfo/BuildInfo$.class")                                 => MergeStrategy.first
       case PathList("META-INF", "services", "io.idml.functions.FunctionResolver") => MergeStrategy.concat
       case _                                                                      => MergeStrategy.first
-    }
-  )
+    },
+    Proguard / proguardVersion := "6.0.3",
+    Proguard / proguardMerge := true,
+    Proguard / proguardMergeStrategies += ProguardMerge.discard("META-INF/MANIFEST.MF"),
+    Proguard / proguardMergeStrategies += ProguardMerge.discard("META-INF/NOTICE.txt"),
+    Proguard / proguardMergeStrategies += ProguardMerge.discard("META-INF/LICENSE.txt"),
+    Proguard / proguardMergeStrategies += ProguardMerge.append("META-INF/services/io.idml.functions.FunctionResolver"),
+    Proguard / proguardMergeStrategies += ProguardMerge.first("buildinfo/BuildInfo$.class"),
+    Proguard / proguardOptions ++= Seq(
+      "-dontobfuscate",
+      "-dontoptimize",
+      "-dontnote",
+      "-dontwarn",
+      "-ignorewarnings",
+      "-keep class scala.Symbol {*;}",
+      "-keep public class org.slf4j.** { *; }",
+      "-keep public class ch.** { *; }",
+      "-keep class io.idml.functions.BuiltinFunctionResolver {*;}",
+      "-keep class io.idml.functions.IdmlValueFunctionResolver {*;}",
+      "-keep class io.idml.functions.IdmlValueNaryFunctionResolver {*;}",
+      "-keep class io.idml.jsoup.JsoupFunctionResolver {*;}",
+      "-keep class io.idml.hashing.HashingFunctionResolver {*;}",
+      "-keep class io.idml.circe.CirceFunctions {*;}",
+      "-keep class io.idml.geo.DefaultGeoFunctionResolver {*;}",
+      "-keep class io.idml.geo.GeoDatabaseFunctionResolver {*;}",
+      "-keep class org.jline.terminal.impl.jna.JnaSupportImpl {*;}",
+      "-keep class org.jsoup.nodes.Entities {*;}",
+      "-keep class org.joda.time.** {*;}",
+    ),
+    Proguard / proguardInputs  := (dependencyClasspath in Compile).value.files,
+    Proguard / proguardMergedInputs ++= ProguardOptions.noFilter((packageBin in Compile).value),
+    Proguard / proguardOptions += ProguardOptions.keepMain("io.idml.tool.IdmlTool"),
+    Proguard / proguard / javaOptions := Seq("-Xmx2g"),
+    Proguard / proguardOutputs := Seq(new File(target.value, "idml-proguarded.jar")),
+  ).enablePlugins(SbtProguard)
 
 //lazy val geodb = project.dependsOn(core).dependsOn(geo)

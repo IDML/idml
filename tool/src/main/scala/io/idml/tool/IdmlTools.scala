@@ -1,3 +1,5 @@
+package io.idml.tool
+
 import java.io.File
 import java.net.{URI, URL}
 
@@ -7,12 +9,12 @@ import cats.implicits._
 import cats.syntax._
 import cats.data._
 import com.monovore.decline._
-import DeclineHelpers._
+import io.idml.tool.DeclineHelpers._
 import io.idml._
+import io.idml.circe.IdmlCirce
 import io.idml.utils.{ClassificationException, DocumentValidator}
 import io.idmlrepl.Repl
 import io.idml.hashing.HashingFunctionResolver
-import io.idml.jackson.IdmlJackson
 import io.idml.jsoup.JsoupFunctionResolver
 import io.idml.lang.DocumentParseException
 import io.idml.server.Server
@@ -40,7 +42,7 @@ object IdmlTools {
   val functionResolver: Opts[FunctionResolverService] = (dynamic, plugins).mapN { (d, pf) =>
     val baseFunctionResolver = if (d) { new FunctionResolverService } else {
       new StaticFunctionResolverService(
-        (StaticFunctionResolverService.defaults(IdmlJackson.default).asScala ++ List(new JsoupFunctionResolver(),
+        (StaticFunctionResolverService.defaults(IdmlCirce).asScala ++ List(new JsoupFunctionResolver(),
                                                                                      new HashingFunctionResolver())).asJava)
     }
     pf.fold(baseFunctionResolver) { urls =>
@@ -96,7 +98,7 @@ object IdmlTools {
       (pretty, unmapped, strict, file, functionResolver, traceFile)
         .mapN { (p, u, s, f, fr, t) =>
           val config     = new IdmlToolConfig(f, p, s, u, t)
-          val jsonModule = IdmlJackson.default
+          val jsonModule = IdmlCirce
 
           val unmappedModule = if (config.unmapped) Some(new UnmappedFieldsFinder) else None
           val analysisModule = if (config.traceFile.isDefined) Some(new Annotator(jsonModule)) else None

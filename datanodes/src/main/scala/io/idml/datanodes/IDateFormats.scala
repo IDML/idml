@@ -1,6 +1,11 @@
 package io.idml.datanodes
 
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatterBuilder, DateTimeParser, ISODateTimeFormat}
+import java.time.{ZoneId, ZoneOffset}
+import java.time.format._
+import java.time.temporal.TemporalAccessor
+
+import scala.util.Try
+import cats.implicits._
 
 /** Date formats */
 object IDateFormats {
@@ -10,7 +15,11 @@ object IDateFormats {
   val maxDigits = 4
   val space     = " "
 
+  val rfc1123: DateTimeFormatter = DateTimeFormatter.RFC_1123_DATE_TIME
+
+  /*
   private val RFC822Day = new DateTimeFormatterBuilder()
+    .appendText(DAY_OF_WEEK, )
     .appendDayOfWeekShortText()
     .appendLiteral(",")
     .toParser
@@ -41,36 +50,49 @@ object IDateFormats {
     .appendOptional(RFC822TzOffset)
     .toFormatter
   val RFC822Printer = DateTimeFormat.forPattern("E, dd MMM y HH:mm:ss Z")
-  val TwitterDate   = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss Z yyyy")
-
+   */
+  val TwitterDate   = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss Z yyyy")
   val Formatters = List(
     TwitterDate,
-    RFC822,
-    DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"),
-    DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ssZZ"),
-    DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZZ"),
-    DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss"),
-    ISODateTimeFormat.basicDateTime(),
-    ISODateTimeFormat.basicTTime(),
-    ISODateTimeFormat.basicDateTimeNoMillis(),
-    ISODateTimeFormat.date()
+    DateTimeFormatter.RFC_1123_DATE_TIME,
+//    RFC822,
+    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
+    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssZZ"),
+    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZZ"),
+    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"),
+    DateTimeFormatter.ISO_DATE_TIME,
+    DateTimeFormatter.ISO_TIME,
+    DateTimeFormatter.ISO_DATE
   )
 
-  private val timezones = List(
-    new DateTimeFormatterBuilder().appendTimeZoneId().toParser,
-    new DateTimeFormatterBuilder().appendTimeZoneShortName().toParser,
-    new DateTimeFormatterBuilder().appendTimeZoneName().toParser,
+  val timezoneParsers: List[DateTimeFormatter] = List(
+    new DateTimeFormatterBuilder().appendZoneOrOffsetId().toFormatter,
     new DateTimeFormatterBuilder()
-      .appendTimeZoneOffset("0000", false, minFields, maxFields)
-      .toParser,
+      .appendOffset("+HHMM", "0000")
+      .toFormatter,
     new DateTimeFormatterBuilder()
-      .appendTimeZoneOffset("00:00", true, minFields, maxFields)
-      .toParser
-  ).toArray[DateTimeParser]
+      .appendOffset("+HH:MM", "00:00")
+      .toFormatter
+  )
 
-  // scalastyle:off null
-  val TimezoneFormatter = new DateTimeFormatterBuilder()
-    .append(null, timezones)
-    .toFormatter
-  // scalastyle:on null
+  object HasZoneId {
+    def unapply(t: TemporalAccessor): Option[ZoneId] = Try { ZoneId.from(t) }.toOption
+  }
+  object HasZoneOffset {
+    def unapply(t: TemporalAccessor): Option[ZoneOffset] = Try { ZoneOffset.from(t) }.toOption
+  }
+  object IsShortCode {
+    def unapply(s: String): Option[ZoneId] = Try { ZoneId.of(s, ZoneId.SHORT_IDS) }.toOption
+  }
+
+  def timezone(s: String): Option[ZoneId] =
+    timezoneParsers
+      .flatMap(t => Try { t.parse(s) }.toOption)
+      .collectFirst {
+        case HasZoneId(id) => id
+        case HasZoneOffset(offset) => offset
+      }.recoverWith {
+      case _ => IsShortCode.unapply(s)
+    }
+
 }

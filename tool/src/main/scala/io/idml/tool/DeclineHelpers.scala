@@ -1,11 +1,9 @@
+package io.idml.tool
+
 import java.io.File
 
-import cats._
-import cats.effect._
-import cats.implicits._
-import cats.syntax._
-import cats.data._
-import com.monovore.decline._
+import cats.data.{NonEmptyList, Validated, ValidatedNel}
+import com.monovore.decline.Argument
 
 object DeclineHelpers {
 

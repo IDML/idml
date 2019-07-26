@@ -2,8 +2,8 @@ package io.idmlrepl
 
 import java.io.PrintWriter
 
-import io.idml.jackson.IdmlJackson
-import io.idml.{jackson, _}
+import io.idml._
+import io.idml.circe.IdmlCirce
 import org.scalatest.{BeforeAndAfterAll, FunSpec}
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito.{never, stub, verify, when}
@@ -130,7 +130,7 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
       repl.processJson(INPUT_JSON)
 
       assert(
-        repl.doc.get == IdmlJackson.default
+        repl.doc.get == IdmlCirce
           .parse(INPUT_JSON)
           .asInstanceOf[IdmlObject])
       verify(repl.out).println(
@@ -158,14 +158,14 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
       repl.processJson(INPUT_JSON)
       repl.processIdml(ptolemy)(INPUT_IDML)
       val mapping      = ptolemy.compile(INPUT_IDML)
-      val expectedJson = IdmlJackson.default.pretty(mapping.run(repl.doc.get))
+      val expectedJson = IdmlCirce.pretty(mapping.run(repl.doc.get))
 
       verify(repl.out).println(expectedJson)
     }
 
     it("should print an error if an exception is thrown whilst processing") {
       val mapping      = ptolemy.compile(INPUT_IDML)
-      val expectedJson = IdmlJackson.default.pretty(mapping.run(repl.doc.get))
+      val expectedJson = IdmlCirce.pretty(mapping.run(repl.doc.get))
 
       when(repl.out.println(expectedJson))
         .thenThrow(new RuntimeException(PROCESS_IDML_EXCEPTION))
@@ -186,7 +186,7 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
 
       val repl = new TestRepl()
       repl.processJson(INPUT_JSON)
-      val expectedJson = IdmlJackson.default.pretty(mapping.run(repl.doc.get))
+      val expectedJson = IdmlCirce.pretty(mapping.run(repl.doc.get))
 
       repl.processSchema(ptolemy)(INPUT_SCHEMA)
       verify(repl.out).println(PROCESS_JSON_ACCEPTED)
@@ -199,7 +199,7 @@ class ReplTest extends FunSpec with MockitoSugar with BeforeAndAfterAll {
 
       val repl = new TestRepl()
       repl.processJson(INPUT_JSON)
-      val output = IdmlJackson.default.pretty(mapping.run(repl.doc.get))
+      val output = IdmlCirce.pretty(mapping.run(repl.doc.get))
 
       when(repl.out.println(output))
         .thenThrow(new RuntimeException(PROCESS_SCHEMA_EXCEPTION))
