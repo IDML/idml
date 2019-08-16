@@ -68,5 +68,12 @@
     "mapping": "negativezero = -0.0",
     "input": {},
     "output": {"negativezero": 0.0}
+  },
+
+  {
+    "name": "floats with exponents",
+    "mapping": "number = 1.23E2",
+    "input": {},
+    "output": {"number": 1.23E2 }
   }
 ]
