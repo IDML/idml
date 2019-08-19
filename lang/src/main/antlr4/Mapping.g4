@@ -125,7 +125,8 @@ String          : '"'  ( EscapeSeq | ~( '\\'|'\n'|'"' ) )* '"'
                 | '\'' ( EscapeSeq | ~( '\\'|'\n'|'\'' ) )* '\''
                 | '"""' ( EscapeSeq | ~( '\\') )* '"""';
 
-Float           : [0-9]+ '.' [0-9]*;
+Float           : [0-9]+ '.' [0-9]* Exponent?;
+Exponent        : ('E' | 'e') (Minus | Plus)? [0-9]+;
 
 fragment EscapeSeq : '\\' . ;
 

@@ -21,8 +21,8 @@ object TestDiff {
   def generateDiff(got: Json, wanted: Json, context: Int = 2): String = {
     (print(got), print(wanted)).bisequence.map {
       case (gots, wanteds) =>
-        val gotLines    = gots.lines.toList.asJava
-        val wantedLines = wanteds.lines.toList.asJava
+        val gotLines    = gots.linesWithSeparators.map(_.stripLineEnd).toList.asJava
+        val wantedLines = wanteds.linesWithSeparators.map(_.stripLineEnd).toList.asJava
         val patch       = DiffUtils.diff(gotLines, wantedLines)
         val unified     = DiffUtils.generateUnifiedDiff("output.json", "expected-output.json", gotLines, patch, context)
 
