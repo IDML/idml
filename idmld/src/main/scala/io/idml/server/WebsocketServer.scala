@@ -20,6 +20,7 @@ import io.idml.jsoup.JsoupFunctionResolver
 import io.idml._
 import io.idml.circe.instances._
 import io.idml.circe._
+import io.idml.utils.Tracer.Annotator
 import fs2._
 import org.http4s.server.websocket.WebSocketBuilder
 import org.http4s.websocket.WebSocketFrame.Text
@@ -37,7 +38,7 @@ object WebsocketServer {
   import org.http4s.circe.CirceEntityDecoder._
 
   case class Request(in: List[IdmlObject], idml: String, path: Option[String])
-  case class Response(out: Option[List[Json]], errors: Option[List[String]])
+  case class Response(out: Option[List[Json]], errors: Option[List[String]], traced: Option[List[String]])
 
   case class Complete(in: List[IdmlObject], idml: String, position: Int)
 
@@ -92,24 +93,34 @@ object WebsocketServer {
                     .flatMap(identity)
                     .flatMap { x =>
                       Try {
-                        log.info(x.toString)
+                        val tracer = new Annotator(IdmlCirce)
                         val chain = idml.compile(x.idml)
                         val jsons = x.in
                         val p     = x.path.getOrElse("root")
                         val path  = idml.compile(s"result = $p")
-                        jsons.map { j =>
-                          Try { path.run(chain.run(j)).asJson }.toEither
-                        }.sequence
+                        jsons.traverse { j =>
+                          Try {
+                            val ctx = new IdmlContext(j)
+                            ctx.setListeners(List[IdmlListener](tracer).asJava)
+                            Mapping.fromMultipleMappings(List(path, chain))
+                            val result = chain.run(ctx).output
+                            val focusedResult = path.run(result)
+                            (focusedResult.asJson, tracer.render(x.idml))
+                          }.toEither
+                        }
                       }.toEither
                         .leftMap(e => List(e.getMessage))
                         .flatMap(_.toTry.toEither.leftMap(e => List(e.getMessage)))
                     }
-                    .map(result => Response(Some(result), None))
-                    .leftMap(e => Response(None, Some(e)))
+                    .map{ results =>
+                      val (jsons, rendered) = results.separate
+                      Response(Some(jsons), None, Some(rendered))
+                    }
+                    .leftMap(e => Response(None, Some(e), None))
                     .merge
                 }
               )
-            case _ => Stream.emit(Response(None, Some(List("Please send your request as Text")))).covary[IO]
+            case _ => Stream.emit(Response(None, Some(List("Please send your request as Text")), None)).covary[IO]
           }
         }
 
