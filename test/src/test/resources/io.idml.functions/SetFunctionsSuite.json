@@ -1,0 +1,50 @@
+[
+  {
+    "name": "can diff two arrays",
+    "mapping": "r = a.diff(b)",
+    "input": {"a": [1,2,3], "b": [2,3,4]},
+    "output": {"r":  [1]}
+  },
+  {
+    "name": "can union two arrays",
+    "mapping": "r = a.union(b)",
+    "input": {"a": [1,2,3], "b": [2,3,4]},
+    "output": {"r":  [1,2,3,4]}
+  },
+  {
+    "name": "can intersect two arrays",
+    "mapping": "r = a.intersect(b)",
+    "input": {"a": [1,2,3], "b": [2,3,4]},
+    "output": {"r":  [2,3]}
+  },
+  {
+    "name": "can diff two complex arrays",
+    "mapping": "r = a.diff(b)",
+    "input": {"a": [{"v":1 }, {"v": 2}], "b": [{"v": 2}, {"v": 3}]},
+    "output": {"r":  [{"v": 1}]}
+  },
+  {
+    "name": "can union two complex arrays",
+    "mapping": "r = a.union(b)",
+    "input": {"a": [{"v":1 }, {"v": 2}], "b": [{"v": 2}, {"v": 3}]},
+    "output": {"r":  [{"v":  1}, {"v": 2}, {"v": 3}]}
+  },
+  {
+    "name": "can intersect two complex arrays",
+    "mapping": "r = a.intersect(b)",
+    "input": {"a": [{"v":1 }, {"v": 2}], "b": [{"v": 2}, {"v": 3}]},
+    "output": {"r":  [{"v": 2}]}
+  },
+  {
+    "name": "can diff mixed type arrays",
+    "mapping": "r = a.diff(b)",
+    "input": {"a": [1, "hello world", {"v":  2}], "b": [1, "hi", {"v":  2}]},
+    "output": {"r":  ["hello world"]}
+  },
+  {
+    "name": "can diff mixed type arrays 2",
+    "mapping": "r = b.diff(a)",
+    "input": {"a": [1, "hello world", {"v":  2}], "b": [1, "hi", {"v":  2}]},
+    "output": {"r":  ["hi"]}
+  }
+]

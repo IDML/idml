@@ -137,6 +137,36 @@ trait ArrayModule {
       InvalidCaller
   }
 
+  def union(other: IdmlValue): IdmlValue = (this, other) match {
+    case (a: IdmlArray, b: IdmlArray) => IArray(a.items.toSet.union(b.items.toSet).toBuffer)
+    case (_: IdmlArray, _) =>
+      InvalidParameters
+    case (_, _: IdmlArray) =>
+      InvalidCaller
+    case (_, _) =>
+      InvalidCaller
+  }
+
+  def intersect(other: IdmlValue): IdmlValue = (this, other) match {
+    case (a: IdmlArray, b: IdmlArray) => IArray(a.items.toSet.intersect(b.items.toSet).toBuffer)
+    case (_: IdmlArray, _) =>
+      InvalidParameters
+    case (_, _: IdmlArray) =>
+      InvalidCaller
+    case (_, _) =>
+      InvalidCaller
+  }
+
+  def diff(other: IdmlValue): IdmlValue = (this, other) match {
+    case (a: IdmlArray, b: IdmlArray) => IArray(a.items.toSet.diff(b.items.toSet).toBuffer)
+    case (_: IdmlArray, _) =>
+      InvalidParameters
+    case (_, _: IdmlArray) =>
+      InvalidCaller
+    case (_, _) =>
+      InvalidCaller
+  }
+
   import cats._, cats.implicits._, cats.syntax._
 
   def combineAll(): IdmlValue = this match {
