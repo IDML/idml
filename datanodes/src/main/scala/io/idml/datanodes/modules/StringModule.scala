@@ -70,6 +70,7 @@ trait StringModule {
 object StringModule {
   def stringTransformer(i: IdmlValue)(f: String => Option[String]): IdmlValue = i match {
     case s: IdmlString => f(s.value).map(IString).getOrElse(CastFailed)
+    case _             => CastUnsupported
   }
 
   def base64encode(s: String): Option[String] =
