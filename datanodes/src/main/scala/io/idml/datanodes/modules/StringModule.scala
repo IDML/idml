@@ -1,5 +1,8 @@
 package io.idml.datanodes.modules
 
+import java.nio.charset.StandardCharsets
+import java.util.Base64
+
 import io.idml.datanodes.IString
 import io.idml._
 import com.google.common.base.Charsets
@@ -54,4 +57,32 @@ trait StringModule {
     }
   }
 
+  import StringModule.stringTransformer
+
+  def base64encode(): IdmlValue        = stringTransformer(this)(StringModule.base64encode)
+  def base64decode(): IdmlValue        = stringTransformer(this)(StringModule.base64decode)
+  def base64mimeEncode(): IdmlValue    = stringTransformer(this)(StringModule.base64mimeEncode)
+  def base64mimeDecode(): IdmlValue    = stringTransformer(this)(StringModule.base64mimeDecode)
+  def base64urlsafeEncode(): IdmlValue = stringTransformer(this)(StringModule.base64urlsafeEncode)
+  def base64urlsafeDecode(): IdmlValue = stringTransformer(this)(StringModule.base64urlsafeDecode)
+}
+
+object StringModule {
+  def stringTransformer(i: IdmlValue)(f: String => Option[String]): IdmlValue = i match {
+    case s: IdmlString => f(s.value).map(IString).getOrElse(CastFailed)
+    case _             => CastUnsupported
+  }
+
+  def base64encode(s: String): Option[String] =
+    Try { new String(Base64.getEncoder.encode(s.getBytes(StandardCharsets.UTF_8))) }.toOption
+  def base64decode(s: String): Option[String] =
+    Try { new String(Base64.getDecoder.decode(s)) }.toOption
+  def base64mimeEncode(s: String): Option[String] =
+    Try { Base64.getMimeEncoder.encodeToString(s.getBytes(StandardCharsets.UTF_8)) }.toOption
+  def base64mimeDecode(s: String): Option[String] =
+    Try { new String(Base64.getMimeDecoder.decode(s)) }.toOption
+  def base64urlsafeEncode(s: String): Option[String] =
+    Try { new String(Base64.getUrlEncoder.encodeToString(s.getBytes(StandardCharsets.UTF_8))) }.toOption
+  def base64urlsafeDecode(s: String): Option[String] =
+    Try { new String(Base64.getUrlDecoder.decode(s)) }.toOption
 }
