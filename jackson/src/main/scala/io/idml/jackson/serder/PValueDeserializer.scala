@@ -1,28 +1,49 @@
 package io.idml.jackson.serder
 
-import io.idml.datanodes.{IArray, IDouble, IFalse, IInt, IObject, IString, ITrue}
+import com.fasterxml.jackson.core.JsonParser.NumberType
+import io.idml.datanodes._
 import io.idml.{IdmlNull, IdmlValue}
-import com.fasterxml.jackson.core.{JsonParser, JsonToken}
+import com.fasterxml.jackson.core.{JsonParseException, JsonParser, JsonToken}
 import com.fasterxml.jackson.databind.`type`.TypeFactory
 import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer}
 
 import scala.collection.mutable
+import scala.util.Try
 
 /** The Jackson de-serializer for PValues */
 class PValueDeserializer(factory: TypeFactory, klass: Class[_]) extends JsonDeserializer[Object] {
+
+  private def digitCounter(s: String): Int = s.toLowerCase.split('e').headOption.map(_.count(_.isDigit)).getOrElse(0)
+
   def deserialize(jp: JsonParser, ctxt: DeserializationContext): Object = {
 
     // scalastyle:off null
     if (jp.getCurrentToken == null) jp.nextToken()
     // scalastyle:on null
 
+    def mapNumber(t: NumberType, p: JsonParser): IdmlValue = t match {
+      case NumberType.INT         => IInt(p.getLongValue)
+      case NumberType.LONG        => IInt(p.getLongValue)
+      case NumberType.BIG_INTEGER => IBigInt(p.getBigIntegerValue)
+      case NumberType.FLOAT       => IDouble(p.getDoubleValue)
+      case NumberType.DOUBLE if p.getDoubleValue.isInfinite =>
+        Try {
+          IBigDecimal(p.getDecimalValue)
+        }.getOrElse(IDouble(p.getDoubleValue))
+      case NumberType.DOUBLE if digitCounter(p.getText) < 16  => IDouble(p.getDoubleValue)
+      case NumberType.DOUBLE if digitCounter(p.getText) >= 16 => IBigDecimal(p.getDecimalValue)
+      case NumberType.BIG_DECIMAL                             => IBigDecimal(p.getDecimalValue)
+    }
+
     val value = jp.getCurrentToken match {
-      case JsonToken.VALUE_NULL         => IdmlNull
-      case JsonToken.VALUE_NUMBER_INT   => new IInt(jp.getLongValue)
-      case JsonToken.VALUE_NUMBER_FLOAT => new IDouble(jp.getValueAsDouble)
-      case JsonToken.VALUE_STRING       => new IString(jp.getText)
-      case JsonToken.VALUE_TRUE         => ITrue
-      case JsonToken.VALUE_FALSE        => IFalse
+      case JsonToken.VALUE_NULL => IdmlNull
+      case JsonToken.VALUE_NUMBER_INT =>
+        mapNumber(jp.getNumberType, jp)
+      case JsonToken.VALUE_NUMBER_FLOAT =>
+        mapNumber(jp.getNumberType, jp)
+      case JsonToken.VALUE_STRING => new IString(jp.getText)
+      case JsonToken.VALUE_TRUE   => ITrue
+      case JsonToken.VALUE_FALSE  => IFalse
 
       case JsonToken.START_ARRAY =>
         startArray(jp, ctxt)

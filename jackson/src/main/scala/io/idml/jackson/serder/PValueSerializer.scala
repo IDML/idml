@@ -1,6 +1,6 @@
 package io.idml.jackson.serder
 
-import io.idml.{IdmlArray, IdmlBool, IdmlDouble, IdmlInt, IdmlNothing, IdmlNull, IdmlObject, IdmlString, IdmlValue}
+import io.idml._
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.{JsonSerializer, SerializerProvider}
 
@@ -8,10 +8,12 @@ import com.fasterxml.jackson.databind.{JsonSerializer, SerializerProvider}
 class PValueSerializer extends JsonSerializer[IdmlValue] {
   def serialize(value: IdmlValue, json: JsonGenerator, provider: SerializerProvider) {
     value match {
-      case n: IdmlInt    => json.writeNumber(n.value)
-      case n: IdmlDouble => json.writeNumber(n.value)
-      case n: IdmlString => json.writeString(n.value)
-      case n: IdmlBool   => json.writeBoolean(n.value)
+      case n: IdmlInt        => json.writeNumber(n.value)
+      case n: IdmlDouble     => json.writeNumber(n.value)
+      case n: IdmlString     => json.writeString(n.value)
+      case n: IdmlBool       => json.writeBoolean(n.value)
+      case n: IdmlBigInt     => json.writeNumber(n.value.bigInteger)
+      case n: IdmlBigDecimal => json.writeNumber(n.value.bigDecimal)
 
       case n: IdmlArray =>
         json.writeStartArray()

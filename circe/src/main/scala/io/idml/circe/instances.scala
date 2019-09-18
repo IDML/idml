@@ -7,20 +7,39 @@ import io.idml.datanodes._
 
 import scala.collection.mutable
 import scala.util.Try
-import cats._, cats.implicits._
-
+import cats._
+import cats.implicits._
+import io.circe.idml.utils.JsonNumberFolder
 import io.idml._
 
 /**
   * Encoder and Decoder instances for Idml types
   */
 object instances {
+  private def digitCounter(s: String): Int = s.toLowerCase.split('e').headOption.map(_.count(_.isDigit)).getOrElse(0)
+
+  def loadNumber(value: JsonNumber): IdmlValue =
+    JsonNumberFolder.fold(value)
+  /*    value.toLong
+      .map(IInt.apply)
+      .widen[IdmlValue]
+      .orElse(value.toBigInt.map(IBigInt.apply))
+      .orElse(
+        if (digitCounter(value.toString) > 15)
+          value.toBigDecimal.map(IBigDecimal.apply)
+        else
+          None
+      )
+      .getOrElse(
+        IDouble(value.toDouble)
+      )
+   */
 
   lazy val rawIdmlCirceDecoder: Folder[IdmlValue] = new Folder[IdmlValue] {
     override def onNull: IdmlValue                    = IdmlNull
     override def onBoolean(value: Boolean): IdmlValue = IBool(value)
     override def onNumber(value: JsonNumber): IdmlValue =
-      value.toLong.fold[IdmlValue](IDouble(value.toDouble))(l => IInt(l))
+      loadNumber(value)
     override def onString(value: String): IdmlValue = IString(value)
     override def onArray(value: Vector[Json]): IdmlValue = new IArray(
       value.map(_.foldWith(rawIdmlCirceDecoder)).toBuffer
@@ -32,10 +51,12 @@ object instances {
     Decoder[Json].emapTry(o => Try(o.foldWith(rawIdmlCirceDecoder)))
 
   lazy val rawIdmlCirceEncoder: IdmlValue => Json = {
-    case n: IdmlInt    => Json.fromLong(n.value)
-    case n: IdmlDouble => Json.fromDoubleOrNull(n.value)
-    case n: IdmlString => Json.fromString(n.value)
-    case n: IdmlBool   => Json.fromBoolean(n.value)
+    case n: IdmlInt        => Json.fromLong(n.value)
+    case n: IdmlDouble     => Json.fromDoubleOrNull(n.value)
+    case n: IdmlBigInt     => Json.fromBigInt(n.value)
+    case n: IdmlBigDecimal => Json.fromBigDecimal(n.value)
+    case n: IdmlString     => Json.fromString(n.value)
+    case n: IdmlBool       => Json.fromBoolean(n.value)
 
     case n: IdmlArray =>
       Json.arr(n.items.filterNot(_.isInstanceOf[IdmlNothing]).map(rawIdmlCirceEncoder): _*)

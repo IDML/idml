@@ -30,6 +30,11 @@ class IdmlCirceSpec extends WordSpec with MustMatchers {
         """{"Z":0,"a":1,"b":2,"c":3}"""
       )
     }
+    "cope with large numbers" in {
+      IdmlCirce.parse("-44902212991934795660017675319087735874437295674702226744363344604216950995e1") must equal(
+        IBigInt(BigInt("-449022129919347956600176753190877358744372956747022267443633446042169509950"))
+      )
+    }
   }
 
 }

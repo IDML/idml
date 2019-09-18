@@ -2,6 +2,8 @@ package io.idml;
 
 import io.idml.datanodes.*;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Map;
 
 /**
@@ -24,6 +26,8 @@ public class JIdmlValue {
     public static IdmlValue of(boolean b) {
         return new IBool(b);
     }
+    public static IdmlValue of(BigInteger bi) { return IBigInt.of(bi); }
+    public static IdmlValue of(BigDecimal bd) { return IBigDecimal.of(bd); }
     public static IdmlValue of(IdmlValue... v) {
         return IArray.of(v);
     }

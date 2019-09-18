@@ -40,9 +40,12 @@ object IdmlValue {
     // sort doubles and ints together
     case _: IdmlDouble => 5
     case _: IdmlInt    => 5
-    case _: IdmlObject => 6
-    case _: IdmlString => 7
-    case _             => 8
+    // and I guess BigDecimal and BigInteger go after
+    case _: IdmlBigDecimal => 6
+    case _: IdmlBigInt     => 6
+    case _: IdmlObject     => 7
+    case _: IdmlString     => 8
+    case _                 => 9
   }
 
   /** typeclass instances */
@@ -60,6 +63,14 @@ object IdmlValue {
     Ordering[Double].compare(a.value, b.value)
   }
 
+  implicit val bigIntOrdering: Ordering[IdmlBigInt] = { (a: IdmlBigInt, b: IdmlBigInt) =>
+    Ordering[BigInt].compare(a.value, b.value)
+  }
+
+  implicit val bigDecimalOrdering: Ordering[IdmlBigDecimal] = { (a: IdmlBigDecimal, b: IdmlBigDecimal) =>
+    Ordering[BigDecimal].compare(a.value, b.value)
+  }
+
   implicit val nullOrdering: Ordering[IdmlNothing] = (a: IdmlNothing, b: IdmlNothing) => 0
 
   implicit val ptolemyValueOrdering = new Ordering[IdmlValue] {
@@ -69,13 +80,17 @@ object IdmlValue {
         case i if i > 0 => 1
         case i if i == 0 =>
           (x, y) match {
-            case (x: IdmlInt, y: IdmlInt)       => Ordering[IdmlInt].compare(x, y)
-            case (x: IdmlString, y: IdmlString) => Ordering[IdmlString].compare(x, y)
-            case (x: IdmlBool, y: IdmlBool)     => Ordering[IdmlBool].compare(x, y)
-            case (x: IdmlDouble, y: IdmlDouble) => Ordering[IdmlDouble].compare(x, y)
-            case (x: IdmlInt, y: IdmlDouble)    => Ordering[IdmlDouble].compare(new IDouble(x.value.doubleValue()), y)
-            case (x: IdmlDouble, y: IdmlInt)    => Ordering[IdmlDouble].compare(x, new IDouble(y.value.doubleValue()))
-            case _                              => 0
+            case (x: IdmlInt, y: IdmlInt)               => Ordering[IdmlInt].compare(x, y)
+            case (x: IdmlString, y: IdmlString)         => Ordering[IdmlString].compare(x, y)
+            case (x: IdmlBool, y: IdmlBool)             => Ordering[IdmlBool].compare(x, y)
+            case (x: IdmlDouble, y: IdmlDouble)         => Ordering[IdmlDouble].compare(x, y)
+            case (x: IdmlInt, y: IdmlDouble)            => Ordering[IdmlDouble].compare(new IDouble(x.value.doubleValue()), y)
+            case (x: IdmlDouble, y: IdmlInt)            => Ordering[IdmlDouble].compare(x, new IDouble(y.value.doubleValue()))
+            case (x: IdmlBigInt, y: IdmlBigInt)         => Ordering[IdmlBigInt].compare(x, y)
+            case (x: IdmlBigDecimal, y: IdmlBigDecimal) => Ordering[IdmlBigDecimal].compare(x, y)
+            case (x: IdmlBigInt, y: IdmlBigDecimal)     => Ordering[IdmlBigDecimal].compare(x.toBigDecimal, y)
+            case (x: IdmlBigDecimal, y: IdmlBigInt)     => Ordering[IdmlBigDecimal].compare(x, y.toBigDecimal)
+            case _                                      => 0
           }
       }
 

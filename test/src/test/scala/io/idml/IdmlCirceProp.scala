@@ -22,7 +22,10 @@ class IdmlJsonProperties extends Properties("IdmlJson") with ArbitraryInstances 
       case (Right(_), Left(_)) =>
         false
       case (Left(_), _) =>
-        true // this JSON is a bit hard for jackson, so we'll give it some leeway
+        //true // this JSON is a bit hard for jackson, so we'll give it some leeway
+        // NOPE
+        //false
+        true
     }
   }
 }
