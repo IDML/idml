@@ -4,5 +4,11 @@
     "mapping": "output = input.array(int())",
     "input": {"input": ["123", "456", "789"]} ,
     "output": {"output": [123, 456, 789]}
+  },
+  {
+    "name": "combineAll should merge objects with the same keys",
+    "mapping": "x = [{\"x\":{\"a\":1}}, {\"x\":{\"b\":2}},{\"x\":{\"a\":3}}].combineAll().x",
+    "input": {},
+    "output": {"x": {"a": 3, "b": 2}}
   }
 ]

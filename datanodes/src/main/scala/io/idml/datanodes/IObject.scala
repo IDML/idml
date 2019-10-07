@@ -62,6 +62,9 @@ case class IObject(fields: mutable.Map[String, IdmlValue]) extends IdmlObject {
     }
   }
 
+  def deepMerge(other: IdmlObject): IObject =
+    internalDeepMerge(this, other).asInstanceOf[IObject]
+
   def deepMerge(other: IObject): IObject = {
     internalDeepMerge(this, other).asInstanceOf[IObject]
   }
