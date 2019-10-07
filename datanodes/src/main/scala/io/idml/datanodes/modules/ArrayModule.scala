@@ -175,7 +175,7 @@ trait ArrayModule {
         case a: IdmlArray if a.items.forall(_.isArray.value) =>
           IArray(a.items.asInstanceOf[mutable.Buffer[IdmlArray]].map(_.items).flatten)
         case a: IdmlArray if a.items.forall(_.isObject.value) =>
-          a.items.asInstanceOf[mutable.Buffer[IdmlObject]].foldLeft(IObject()) { case (o, i) => IObject(o.fields ++ i.fields) }
+          a.items.asInstanceOf[mutable.Buffer[IdmlObject]].foldLeft(IObject()) { case (o, i) => o.deepMerge(i) }
         case a: IdmlArray if a.items.forall(_.isString.value) =>
           IString(a.items.asInstanceOf[mutable.Buffer[IdmlString]].map(_.value).toList.combineAll)
         case a: IdmlArray if a.items.forall(_.isInt.value) =>
