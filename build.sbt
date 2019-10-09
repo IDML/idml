@@ -36,8 +36,9 @@ lazy val commonSettings = Seq(
   version in Docker := version.value,
   dockerUsername in Docker := Some("idml"),
   scalacOptions += "-Ypartial-unification",
+  scalacOptions += "-target:jvm-1.8",
   addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9"),
-  javacOptions ++= Seq("-source", "1.8")
+  javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 )
 
 lazy val lang = project.settings(commonSettings)
