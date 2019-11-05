@@ -40,4 +40,9 @@ class IStringTest extends FunSuite with MustMatchers {
 
   // capitalize
   test("capitalize")(new IString("hello world").capitalize() must equal(new IString("Hello World")))
+
+  // normalize
+  test("normalize - compose")(new IString("he\u0300llo world").normalize(IString("NFC")) must equal(IString("h\u00e8llo world")))
+  test("normalize - decompose")(new IString("h\u00e8llo world").normalize(IString("NFD")) must equal(IString("he\u0300llo world")))
+  test("normalize - bad form")(new IString("foo").normalize(IString("nope")) must equal(CastFailed))
 }
