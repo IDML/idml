@@ -60,6 +60,13 @@ lazy val core: Project = project
     buildInfoOptions += BuildInfoOption.BuildTime
   )
 
+lazy val rs = project
+  .dependsOn(core)
+  .settings(commonSettings)
+  .settings(
+    libraryDependencies += "io.higherkindness" %% "droste-core" % "0.7.0"
+  )
+
 lazy val test = project
   .dependsOn(core)
   .dependsOn(jackson % "compile->test")

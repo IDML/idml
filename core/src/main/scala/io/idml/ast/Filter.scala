@@ -4,7 +4,7 @@ import io.idml.datanodes.IArray
 import io.idml.{Filtered, IdmlArray, IdmlContext, IdmlNothing, IdmlString, IdmlValue}
 
 /** Top level class for implementing predicates */
-trait Predicate extends Argument {
+sealed trait Predicate extends Argument {
   def invoke(ctx: IdmlContext) {
     val tmp = ctx.cursor
     if (!predicate(ctx, tmp)) {
