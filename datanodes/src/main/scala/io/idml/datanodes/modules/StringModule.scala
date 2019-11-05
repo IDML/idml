@@ -1,6 +1,7 @@
 package io.idml.datanodes.modules
 
 import java.nio.charset.StandardCharsets
+import java.text.Normalizer
 import java.util.Base64
 
 import io.idml.datanodes.IString
@@ -57,6 +58,11 @@ trait StringModule {
     }
   }
 
+  def normalize(form: IdmlValue): IdmlValue = (this, form) match {
+    case (input: IdmlString, form: IdmlString) =>
+      StringModule.normalize(input.value, form.value)
+    case _ => InvalidCaller
+  }
   import StringModule.stringTransformer
 
   def base64encode(): IdmlValue        = stringTransformer(this)(StringModule.base64encode)
@@ -68,6 +74,13 @@ trait StringModule {
 }
 
 object StringModule {
+  def normalize(input: String, form: String): IdmlValue =
+    Try { Normalizer.Form.valueOf(form) }
+      .flatMap { form =>
+        Try { Normalizer.normalize(input, form) }.map(IString)
+      }
+      .getOrElse(CastFailed)
+
   def stringTransformer(i: IdmlValue)(f: String => Option[String]): IdmlValue = i match {
     case s: IdmlString => f(s.value).map(IString).getOrElse(CastFailed)
     case _             => CastUnsupported
