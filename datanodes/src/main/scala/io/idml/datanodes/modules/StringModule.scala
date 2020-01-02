@@ -1,5 +1,6 @@
 package io.idml.datanodes.modules
 
+import java.net.{URLDecoder, URLEncoder}
 import java.nio.charset.StandardCharsets
 import java.text.Normalizer
 import java.util.Base64
@@ -71,6 +72,8 @@ trait StringModule {
   def base64mimeDecode(): IdmlValue    = stringTransformer(this)(StringModule.base64mimeDecode)
   def base64urlsafeEncode(): IdmlValue = stringTransformer(this)(StringModule.base64urlsafeEncode)
   def base64urlsafeDecode(): IdmlValue = stringTransformer(this)(StringModule.base64urlsafeDecode)
+  def urlEncode(): IdmlValue           = stringTransformer(this)(StringModule.urlEncode)
+  def urlDecode(): IdmlValue           = stringTransformer(this)(StringModule.urlDecode)
 }
 
 object StringModule {
@@ -98,4 +101,8 @@ object StringModule {
     Try { new String(Base64.getUrlEncoder.encodeToString(s.getBytes(StandardCharsets.UTF_8))) }.toOption
   def base64urlsafeDecode(s: String): Option[String] =
     Try { new String(Base64.getUrlDecoder.decode(s)) }.toOption
+  def urlEncode(s: String): Option[String] =
+    Try { URLEncoder.encode(s, StandardCharsets.UTF_8.name) }.toOption
+  def urlDecode(s: String): Option[String] =
+    Try { URLDecoder.decode(s, StandardCharsets.UTF_8.name) }.toOption
 }

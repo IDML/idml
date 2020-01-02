@@ -1,0 +1,36 @@
+[
+  {
+    "name": "urlEncode encodes strings",
+    "mapping": "a = b.urlEncode()",
+    "input": {"b": "hello world? 1 + 1 = 2"},
+    "output": {"a": "hello+world%3F+1+%2B+1+%3D+2" }
+  },
+
+  {
+    "name": "urlDecode decodes strings",
+    "mapping": "a = b.urlDecode()",
+    "input": {"b": "hello+world%3F+1+%2B+1+%3D+2"},
+    "output": {"a":  "hello world? 1 + 1 = 2" }
+  },
+
+  {
+    "name": "urlEncode then urlDecode produces input unchanged",
+    "mapping": "a = b.urlEncode().urlDecode()",
+    "input": {"b": "hello world? 1 + 1 = 2"},
+    "output": {"a": "hello world? 1 + 1 = 2"}
+  },
+
+  {
+    "name": "urlEncode ignores regular characters",
+    "mapping": "a = b.urlEncode()",
+    "input": {"b": "foo"},
+    "output": {"a": "foo"}
+  },
+
+  {
+    "name": "urlDecode ignores regular characters",
+    "mapping": "a = b.urlDecode()",
+    "input": {"b": "foo"},
+    "output": {"a": "foo"}
+  }
+]
