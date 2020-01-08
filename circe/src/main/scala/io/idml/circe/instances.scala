@@ -36,15 +36,14 @@ object instances {
     case n: IdmlDouble => Json.fromDoubleOrNull(n.value)
     case n: IdmlString => Json.fromString(n.value)
     case n: IdmlBool   => Json.fromBoolean(n.value)
-
-    case n: IdmlArray =>
-      Json.arr(n.items.filterNot(_.isInstanceOf[IdmlNothing]).map(rawIdmlCirceEncoder): _*)
     case n: IdmlObject =>
       Json.obj(
         n.fields.toList.filterNot(_._2.isInstanceOf[IdmlNothing]).sortBy(_._1).map {
           case (k, v) => k -> rawIdmlCirceEncoder(v)
         }: _*
       )
+    case n: IdmlArray =>
+      Json.arr(n.items.filterNot(_.isInstanceOf[IdmlNothing]).map(rawIdmlCirceEncoder): _*)
     case _: IdmlNothing => Json.Null
     case IdmlNull       => Json.Null
   }

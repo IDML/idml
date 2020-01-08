@@ -8,8 +8,6 @@ import scala.util.Try
 /** A structure that has array-like behaviour */
 trait IdmlArray extends IdmlValue with CompositeValue {
 
-  def formatValue: mutable.Buffer[IdmlValue] = items
-
   /** The underlying items array */
   def items: mutable.Buffer[IdmlValue]
 
