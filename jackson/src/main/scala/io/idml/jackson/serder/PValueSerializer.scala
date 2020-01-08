@@ -3,6 +3,7 @@ package io.idml.jackson.serder
 import io.idml.{IdmlArray, IdmlBool, IdmlDouble, IdmlInt, IdmlNothing, IdmlNull, IdmlObject, IdmlString, IdmlValue}
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.{JsonSerializer, SerializerProvider}
+import io.idml.datanodes.IDomElement
 
 /** The Jackson serializer for PValues */
 class PValueSerializer extends JsonSerializer[IdmlValue] {
@@ -13,11 +14,6 @@ class PValueSerializer extends JsonSerializer[IdmlValue] {
       case n: IdmlString => json.writeString(n.value)
       case n: IdmlBool   => json.writeBoolean(n.value)
 
-      case n: IdmlArray =>
-        json.writeStartArray()
-        n.items filterNot (_.isInstanceOf[IdmlNothing]) foreach json.writeObject
-        json.writeEndArray()
-
       case n: IdmlObject =>
         json.writeStartObject()
         n.fields.filterNot(_._2.isInstanceOf[IdmlNothing]).toList.sortBy(_._1).foreach {
@@ -25,6 +21,11 @@ class PValueSerializer extends JsonSerializer[IdmlValue] {
             json.writeObjectField(k, v)
         }
         json.writeEndObject()
+
+      case n: IdmlArray =>
+        json.writeStartArray()
+        n.items filterNot (_.isInstanceOf[IdmlNothing]) foreach json.writeObject
+        json.writeEndArray()
 
       case _: IdmlNothing => ()
       case IdmlNull       => json.writeNull()

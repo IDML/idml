@@ -7,8 +7,6 @@ import scala.collection.mutable
 /** The IdmlValue that represents objects */
 abstract class IdmlObject extends IdmlValue {
 
-  def formatValue: mutable.Map[String, IdmlValue] = fields
-
   /** The underlying field container for this object */
   def fields: mutable.Map[String, IdmlValue]
 

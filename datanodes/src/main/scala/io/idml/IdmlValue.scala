@@ -15,6 +15,7 @@ abstract class IdmlValue
     with MathsModule
     with RegexModule
     with ArrayModule
+    with DomModule
 
 /** The base class for all json values */
 object IdmlValue {
