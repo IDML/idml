@@ -1,0 +1,75 @@
+<html><head><title>IDML: Hashing</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="fairhair.ai" /><meta name="description" content="Ingestion Data Mapping Language" /><meta name="og:image" content="/img/poster.png" /><meta name="image" property="og:image" content="/img/poster.png" /><meta name="og:title" content="IDML: Hashing" /><meta name="title" property="og:title" content="IDML: Hashing" /><meta name="og:site_name" content="IDML" /><meta name="og:url" content="https://idml.io/" /><meta name="og:type" content="website" /><meta name="og:description" content="Ingestion Data Mapping Language" /><link rel="icon" type="image/png" href="/img/favicon.png" /><meta name="twitter:title" content="IDML: Hashing" /><meta name="twitter:image" content="/img/poster.png" /><meta name="twitter:description" content="Ingestion Data Mapping Language" /><meta name="twitter:card" content="summary_large_image" /><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/highlight/styles/solarized-light.css" /><link rel="stylesheet" href="/css/style.css" /><link rel="stylesheet" href="/css/palette.css" /><link rel="stylesheet" href="/css/codemirror.css" /><link rel="stylesheet" href="/css/override.css" /><link rel="stylesheet" href="/css/toc.css" /></head><body class="docs"><div id="wrapper"><div id="sidebar-wrapper"><ul id="sidebar" class="sidebar-nav"><li class="sidebar-brand"><a href="/" class="brand"><div class="brand-wrapper"><span>IDML</span></div></a></li>   <li><a href="/getting-started.html" class="">Getting Started</a></li> <li><a href="/philosophy.html" class="">Philosophy</a></li> <li><a href="/features/core-language.html" class="">Language Features</a> <ul class="sub_section"> <li><a href="/features/core-language.html" class="">Core Language</a></li> <li><a href="/features/expressions.html" class="">Expressions</a></li> <li><a href="/features/predicates.html" class="">Predicates</a></li></ul></li> <li><a href="/functions/index.html" class="">Functions</a> <ul class="sub_section"> <li><a href="/functions/navigation.html" class="">Navigation</a></li> <li><a href="/functions/string.html" class="">String</a></li> <li><a href="/functions/array.html" class="">Array</a></li> <li><a href="/functions/date.html" class="">Date</a></li> <li><a href="/functions/email.html" class="">Email</a></li> <li><a href="/functions/maths.html" class="">Maths</a></li> <li><a href="/functions/object.html" class="">Object</a></li> <li><a href="/functions/random.html" class="">Random</a></li> <li><a href="/functions/regex.html" class="">Regex</a></li> <li><a href="/functions/url.html" class="">URL</a></li> <li><a href="/functions/uuid.html" class="">UUID</a></li> <li><a href="/functions/advanced.html" class="">Advanced</a></li></ul></li> <li><a href="/" class="">Modules</a> <ul class="sub_section"> <li><a href="/modules/geo.html" class="">Geo</a></li> <li><a href="/modules/jsoup.html" class="">jsoup (HTML and XML)</a></li> <li><a href="/modules/hashing.html" class=" active ">Hashing</a></li></ul></li></ul></div><div id="page-content-wrapper"><div class="nav"><div class="container-fluid"><div class="row"><div class="col-lg-12"><div class="action-menu pull-left clearfix"><a href="#menu-toggle" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></a></div><ul class="pull-right"><li id="gh-eyes-item" class="hidden-xs"><a href="https://github.com/idml/idml"><i class="fa fa-eye"></i><span>WATCH<span id="eyes" class="label label-default">--</span></span></a></li><li id="gh-stars-item" class="hidden-xs"><a href="https://github.com/idml/idml"><i class="fa fa-star-o"></i><span>STARS<span id="stars" class="label label-default">--</span></span></a></li></ul></div></div></div></div><div id="content" data-github-owner="idml" data-github-repo="idml"><div class="content-wrapper"><section><h1>Hashing</h1>
+
+<nav role="navigation" id="toc"></nav>
+
+<p>The hashing module includes common hashing algorithms which may be called on strings</p>
+
+<p>This module is optional and must be included in the list of FunctionResolvers passed to the Ptolemy engine constructor.</p>
+
+<h3 id="included-hashing-algorithms">Included hashing algorithms</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Algorithm</th>
+      <th>Function Call</th>
+      <th>Output</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://cyan4973.github.io/xxHash/">xxHash32</a></td>
+      <td><code>input.xxHash32()</code></td>
+      <td>32-bit hex</td>
+    </tr>
+    <tr>
+      <td><a href="https://cyan4973.github.io/xxHash/">xxHash64</a></td>
+      <td><code>input.xxHash64()</code></td>
+      <td>64-bit hex</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/google/cityhash">cityHash</a></td>
+      <td><code>input.cityHash()</code></td>
+      <td>64-bit hex</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/aappleby/smhasher">murmurHash3</a></td>
+      <td><code>input.murmurHash3()</code></td>
+      <td>64-bit hex</td>
+    </tr>
+    <tr>
+      <td><a href="https://en.wikipedia.org/wiki/SHA-1">sha1</a></td>
+      <td><code>input.sha1()</code></td>
+      <td>20-bit hex</td>
+    </tr>
+    <tr>
+      <td><a href="https://en.wikipedia.org/wiki/SHA-2">sha256</a></td>
+      <td><code>input.sha256()</code></td>
+      <td>256-bit hex</td>
+    </tr>
+    <tr>
+      <td><a href="https://en.wikipedia.org/wiki/SHA-2">sha512</a></td>
+      <td><code>input.sha512()</code></td>
+      <td>512-bit hex</td>
+    </tr>
+    <tr>
+      <td><a href="https://en.wikipedia.org/wiki/MD5">md5</a></td>
+      <td><code>input.md5()</code></td>
+      <td>128-bit hex</td>
+    </tr>
+    <tr>
+      <td><a href="https://en.wikipedia.org/wiki/Cyclic_redundancy_check">crc32</a></td>
+      <td><code>input.crc32()</code></td>
+      <td>32-bit hex</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Note: you can use the functions available on strings in the <code>Maths</code> set of functions to parse these into integers if you really need to, they are <a href="/functions/maths.html#parsehex">parseHex</a> and <a href="/functions/maths.html#parsehexunsigned">parseHexUnsigned</a>, you probably want the latter.</p>
+
+
+<link rel="stylesheet" type="text/css" href="/css/toc.css"></link>
+<script type="text/javascript" src="/js/toc.js"></script>
+</section></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/highlight/highlight.pack.js"></script><script>hljs.configure({languages:['scala','java','bash']});
+hljs.initHighlighting();
+              </script><script src="/js/idml-hilight.js"></script><script src="/js/toc.js"></script><script src="/js/main.js"></script></body></html>

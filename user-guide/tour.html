@@ -1,0 +1,437 @@
+<html><head><title>IDML: Whirlwind Tour</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="fairhair.ai" /><meta name="description" content="Ingestion Data Mapping Language" /><meta name="og:image" content="/img/poster.png" /><meta name="image" property="og:image" content="/img/poster.png" /><meta name="og:title" content="IDML: Whirlwind Tour" /><meta name="title" property="og:title" content="IDML: Whirlwind Tour" /><meta name="og:site_name" content="IDML" /><meta name="og:url" content="https://idml.io/" /><meta name="og:type" content="website" /><meta name="og:description" content="Ingestion Data Mapping Language" /><link rel="icon" type="image/png" href="/img/favicon.png" /><meta name="twitter:title" content="IDML: Whirlwind Tour" /><meta name="twitter:image" content="/img/poster.png" /><meta name="twitter:description" content="Ingestion Data Mapping Language" /><meta name="twitter:card" content="summary_large_image" /><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/highlight/styles/solarized-light.css" /><link rel="stylesheet" href="/css/style.css" /><link rel="stylesheet" href="/css/palette.css" /><link rel="stylesheet" href="/css/codemirror.css" /><link rel="stylesheet" href="/css/override.css" /><link rel="stylesheet" href="/css/toc.css" /></head><body class="docs"><div id="wrapper"><div id="sidebar-wrapper"><ul id="sidebar" class="sidebar-nav"><li class="sidebar-brand"><a href="/" class="brand"><div class="brand-wrapper"><span>IDML</span></div></a></li>       </ul></div><div id="page-content-wrapper"><div class="nav"><div class="container-fluid"><div class="row"><div class="col-lg-12"><div class="action-menu pull-left clearfix"><a href="#menu-toggle" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></a></div><ul class="pull-right"><li id="gh-eyes-item" class="hidden-xs"><a href="https://github.com/idml/idml"><i class="fa fa-eye"></i><span>WATCH<span id="eyes" class="label label-default">--</span></span></a></li><li id="gh-stars-item" class="hidden-xs"><a href="https://github.com/idml/idml"><i class="fa fa-star-o"></i><span>STARS<span id="stars" class="label label-default">--</span></span></a></li></ul></div></div></div></div><div id="content" data-github-owner="idml" data-github-repo="idml"><div class="content-wrapper"><section><h1 id="whirlwind-tour">Whirlwind Tour</h1>
+
+<h2 id="assignments">Assignments</h2>
+
+<p>Mappings consist of a left and right side separated with a single equality sign.</p>
+
+<pre><code>my.output.field = some.input.field
+</code></pre>
+
+<p>The clear benefit of this is it handles object hierarchies pretty well. For example:</p>
+
+<ul>
+  <li>If <code>my</code> or <code>output</code> don’t exist then the nested structure is generated</li>
+  <li>You wont get null-pointer exceptions if the right-hand side is missing. The field is simply missing from output unless you assign it to some other value or set a default</li>
+</ul>
+
+<h2 id="literals">Literals</h2>
+
+<p>If you want to assign a literal value to a field you can write something like this:</p>
+
+<pre><code>my.text = "twitter"
+my.int = 123
+my.float = 123.4
+my.bool = true
+</code></pre>
+
+<h2 id="coalesce">Coalesce</h2>
+
+<p>If we coalesce paths we iterate through a list of options and pick the first one we discover. For example, if we want to use <em>email.sender</em> if <em>email.from</em> isn’t present we can do this:</p>
+
+<pre><code>my.sender = email.(from | sender).name
+</code></pre>
+
+<h2 id="wildcard">Wildcard</h2>
+<p>The wildcard symbol, <em>*</em>, can be used to match any field in an object.</p>
+
+<pre><code>ex1 = *.b
+ex2 = a.*.b
+</code></pre>
+
+<h2 id="anywhere-wildcard">Anywhere wildcard</h2>
+<p>The anywhere wildcard symbol, <em>**</em>, can be used to match a sub-path anywhere inside an object.</p>
+
+<pre><code>ex1 = **.a
+ex2 = a.**.b
+</code></pre>
+
+<h2 id="functions">Functions</h2>
+<p>Any dynamic path can have one or more functions chained together. Some functions take the field they are called on whereas others require additional parameters.</p>
+
+<pre><code>my.id      = any.number.int().max(100)
+my.string  = something.string().required()
+</code></pre>
+
+<h3 id="built-in-functions">Built-in functions</h3>
+
+<p>Here’s a list of available functions:</p>
+
+<ul>
+  <li><code>string.uppercase()</code></li>
+</ul>
+
+<p>The uppercase function converts the case of a string</p>
+
+<pre><code>Input:  {"a": "hi there"}
+IDML:   x = a.uppercase()
+Output: {"x": "HI THERE"}
+</code></pre>
+
+<ul>
+  <li><code>string.lowercase()</code></li>
+</ul>
+
+<p>The lowercase function converts the case of a string</p>
+
+<pre><code>Input:  {"a": "Hi There!"}
+IDML:   x = a.lowercase()
+Output: {"x": "hi there!"}
+</code></pre>
+
+<ul>
+  <li><code>pattern.format()</code></li>
+</ul>
+
+<p>The format function allows you to format values and concatenate strings with format-compatible format strings.</p>
+
+<pre><code>Input:  {"a": 0.00097281289}
+IDML:   x = "%.2g".format(a)
+Output: {"x": "0.00097"}
+</code></pre>
+
+<p>for other formatting examples, see the <a href="../modules/string.md">string module</a></p>
+
+<ul>
+  <li><code>match(pattern)</code>, <code>split(pattern)</code>, <code>replace(search, replace)</code>, <code>isMatch(pattern)</code>,</li>
+</ul>
+
+<p>see the <a href="../modules/regex.md">regex module</a></p>
+
+<ul>
+  <li><code>seed.random()</code></li>
+</ul>
+
+<p><code>seed</code> may be a String, Int, or Object, and this will always output a 64-bit Int</p>
+
+<pre><code>Input:  {"a": "1", "b": "2", "c": {"d": "3", "e": "4"}}
+IDML:   myrand   = c.d.random()
+Output: {"myrand": -8079212482812021964}
+</code></pre>
+
+<ul>
+  <li><code>seed.random(min,max)</code></li>
+</ul>
+
+<p><code>seed</code> may be a String, Int, or Object. <code>min</code> and <code>max</code> may be both Int or both Double</p>
+
+<pre><code>Input:  {"a": "1", "b": "2", "c": {"d": "3", "e": "4"}}
+
+IDML:   rand_int   = c.random(0, 100)
+        rand_float = c.random(0.0, 100.0)
+
+Output: {"rand_int": 68, "rand_float": 26.99476451853262}
+</code></pre>
+
+<ul>
+  <li><code>object.serialize()</code></li>
+</ul>
+
+<p>Serializes this object into a JSON string</p>
+
+<pre><code>Input:  {"c": {"d": "3", "e": "4", "f": 5}}
+
+IDML:   [main]
+        summary = c.apply("summary_tpl").serialize()
+
+        [summary_tpl]
+        fld1 = d
+        fld2 = e
+
+Output: {"summary": "{\"fld2\":\"4\",\"fld1\":\"3\"}"}
+</code></pre>
+
+<ul>
+  <li><code>array.combinations(n)</code></li>
+</ul>
+
+<p>generates all the combinations of <code>n</code> elements from the items in the array</p>
+
+<pre><code>Input:  {"mylist": ["a", "b", "c", "d"]}
+
+IDML:   combos2 = mylist.combinations(2)
+        combos3 = mylist.combinations(3)
+
+Output: {
+            "combos2": [ [ "a", "b" ], [ "a", "c" ], [ "a", "d" ], [ "b", "c" ], [ "b", "d" ], [ "c", "d" ] ],
+            "combos3": [ [ "a", "b", "c" ], [ "a", "b", "d" ], [ "a", "c", "d" ], [ "b", "c", "d" ] ]
+        }
+</code></pre>
+
+<ul>
+  <li><code>array.empty()</code></li>
+</ul>
+
+<p>returns a bool saying if the input list is empty or not</p>
+
+<pre><code>Input:  {"a": [], "b": ["not empty"]}
+
+IDML:   x = a.empty()
+        y = b.empty()
+
+Output: {"x": true, "y" : false}
+</code></pre>
+
+<ul>
+  <li><code>array.unique()</code></li>
+</ul>
+
+<p>filters the array down to unique items</p>
+
+<pre><code>Input:  {"mylist": ["a", "b", "a", "c", "a", ""]}
+
+IDML:   x = mylist.unique()
+
+Output: {"x": ["a", "b", "c", ""]}
+</code></pre>
+
+<ul>
+  <li><code>empty()</code></li>
+</ul>
+
+<p>returns true if the value is empty or null</p>
+
+<pre><code>Input:  {"a": null, "b": "", c: false, d: "not empty"}
+
+IDML:   a1 = a.empty()
+        b1 = b.empty()
+        c1 = c.empty()
+        d1 = d.empty()
+        z1 = e.empty()
+
+Output: {"b1" : true,  "d1" : false}
+</code></pre>
+
+<p>this function can be very useful as a filter:</p>
+
+<pre><code>Input:  {
+            "entities": [
+                {
+                    "name": "Bill Clinton",
+                    "type": "Person"
+                },
+                {
+                    "name": "Liza Minnelli"
+                },
+                {
+                    "name": "New York New York song",
+                    "type": ""
+                },
+                {
+                    "name": "New York",
+                    "type": "Location"
+                }
+            ]
+        }
+
+IDML:   names = entities [ type exists and not type.empty() == true].extract(name)
+
+Output: {"names": ["Bill Clinton", "New York"]}
+</code></pre>
+
+<ul>
+  <li><code>isTrue</code>, <code>isFalse</code>, <code>isNull</code>, <code>isNothing</code>, <code>isString</code>, <code>isInt</code></li>
+</ul>
+
+<p>type checking functions</p>
+
+<pre><code>Input:  {"a": true, "b": false, "c": null, "d": "xxxx", "e": 123}
+
+IDML:   a1 = a.isTrue()
+        b1 = b.isFalse()
+        c1 = c.isNull()
+        d1 = d.isString()
+        e1 = e.isInt()
+        f1 = f.isNothing()
+
+        a2 = a.isFalse()
+        b2 = b.isTrue()
+        c2 = c.isNothing()
+        d2 = d.isInt()
+        e2 = e.isString()
+
+Output: {
+          "a1": true,
+          "b1": true,
+          "c1": true,
+          "d1": true,
+          "e1": true,
+          "f1": true,
+          "a2": false,
+          "b2": false,
+          "c2": false,
+          "d2": false,
+          "e2": false
+        }
+</code></pre>
+
+<ul>
+  <li><code>date().rssDate()</code></li>
+</ul>
+
+<p>formats the date in the RSS format (<a href="https://tools.ietf.org/html/rfc5322#section-3.3">RFC-822, 1036, 1123, 2822</a>)</p>
+
+<pre><code>Input:  {"ts": 1518828435}
+IDML:   mydate = ts.date().rssDate()
+Output: {"mydate": "Sat, 17 Feb 2018 00:47:15 +0000"}
+</code></pre>
+
+<p>for other date functions, see the <a href="../modules/date.md">date module</a></p>
+
+<ul>
+  <li><code>email()</code></li>
+</ul>
+
+<p>parses an input field as email, and extracts its components</p>
+
+<pre><code>Input:  {"x": "Bill Clinton &lt;bill@whitehouse.gov&gt;"}
+
+IDML:   addr   = x.email().address
+        name   = x.email().name
+        user   = x.email().username
+        domain = x.email().domain
+
+Output: {
+          "addr": "bill@whitehouse.gov",
+          "name": "Bill Clinton",
+          "user": "bill",
+          "domain": "whitehouse.gov"
+        }
+</code></pre>
+
+<ul>
+  <li><code>url()</code></li>
+</ul>
+
+<p>parses an input field as a URL, and extracts its components</p>
+
+<pre><code>Input:  {"x": "https://en.wikipedia.org/wiki/Andrea_Palladio?sections=all#Palaces"}
+
+IDML:   proto = x.url().protocol
+        host  = x.url().host
+        path  = x.url().path
+        query = x.url().query
+
+Output: {
+          "proto" : "https",
+          "host" : "en.wikipedia.org",
+          "path" : "/wiki/Andrea_Palladio",
+          "query" : "sections=all"
+        }
+</code></pre>
+
+<h2 id="indexes">Indexes</h2>
+<p>Array elements can be referred to with a numerical index.</p>
+
+<p>The indexes begin at zero and a negative number will wrap around, so the first item can be retrieved with <em>0</em> and the final item can be retrieved with <em>-1</em></p>
+
+<pre><code>first = a[0]
+last = a[-1]
+</code></pre>
+
+<h2 id="variables">Variables</h2>
+<p>Variables allow you to refer to something that’s been created on the left-hand side:</p>
+
+<pre><code>blog.body = html
+blog.text = @blog.body.stripTags()
+</code></pre>
+
+<h2 id="slices">Slices</h2>
+<p>A range of array elements can be sliced with two numerical values.</p>
+
+<p>In the below examples we demonstrate how you can select the first four items, select everything except the first item and select the second, third and fourth item.</p>
+
+<pre><code>first_four         = input[:3]
+tail               = input[1:]
+two_three_and_four = input[1:3]
+</code></pre>
+
+<h2 id="filters">Filters</h2>
+<p>Filters are a custom form of CSDL that determines whether a mapping rule is applied or not.</p>
+
+<pre><code>twitter.type        = "retweet" [ retweeted_status exists ]
+interaction.content = status [ type == "status" ].message
+</code></pre>
+
+<p>See them as an if statement; nothing will happen if the expression evaluates to false.</p>
+
+<p>The customised form of CSDL can accept static paths and relative paths. The relative paths point to the item being iterated, which is particularly useful when filtering arrays.</p>
+
+<pre><code> people_in_paris = people[location == "Paris"].extract(name)
+</code></pre>
+
+<p>NB: the left-hand-side provides scope for the square brackets, so given this input:</p>
+
+<pre><code>{"a": "1", "b": "2", "c": {"d": "3", "e": "4"}}
+</code></pre>
+
+<p>this is the expected behaviour:</p>
+
+<pre><code>x1 = [b == "2"] "test"      # invalid, as the conditional is missing a LHS, so the predicate will be ignored and by pure luck (aka undefined behaviour) will generate this result: {"x1": "test"}
+x2 = "test" [b == "2"]      # invalid, as the LHS is a literal value, without a child called "b"
+x3 = "test" [root.b == "2"] # use keyword `root` to break out of the current scope; result: {"x3": "test"}
+x4 = c [d == "3"].e         # result: {"x4": "4"}
+x5 = c [this.d == "3"]      # use keyword `this` to reference object in scope; result: {"x5": {"d": "3", "e": "4"}}
+x6 = c.e [root.a == "1"]    # use keyword `root` to break out of the current scope; result: {"x6": "4"}
+</code></pre>
+
+<h3 id="filter-field-operators">Filter field operators</h3>
+
+<pre><code>ex1 = my.field [my.other.field exists]
+ex2 = my.field [my.field == my.other.field]
+ex3 = my.field [my.field != my.other.field]
+</code></pre>
+
+<h3 id="expression-operators">Expression operators</h3>
+
+<p>The standard CSDL logical operators can be used. Operator precedence is currently undefined but can be enforced by using brackets.</p>
+
+<pre><code>people_in_paris_named_jon     = people [location == "Paris" and name == "Jon" ].name
+people_in_paris_or_london     = people [location == "Paris" or location == "London" ].name
+people_not_in_paris_or_london = people [not (location == "Paris" or location == "London") ].name
+</code></pre>
+
+<p>Mapping rules are delimited by newlines but as long as the line ends with a dot you can continue on to the next line. CSDL filters are not newline sensitive as they begin and end with curly brackets.</p>
+
+<h2 id="blocks">Blocks</h2>
+<p>In the following example,  <em>[main]</em> designates the entry point of the mapping.</p>
+
+<pre><code>[main]
+twitter            = [not retweeted_status exists].apply("tweet")
+twitter.retweet    = [retweeted_status exists].apply("tweet")
+twitter.retweeted  = retweeted_status.apply("tweet")
+
+[tweet]
+id                 = id_str
+created_at         = created_at.date()
+geo                = geo.coordinates.geo()
+place              = place.apply("place")
+
+[place]
+id 		           = id_str
+url 	           = place_link
+</code></pre>
+
+<p>If you want to use blocks then the mapping must have a <em>[main]</em> block which acts as the entry point of hte application. Other templates can be activated with the <em>apply</em> method, which becomes particularly powerful when paired with a CSDL filter.</p>
+
+<h3 id="scope">Scope</h3>
+<p>Inside the body of a template:</p>
+
+<ul>
+  <li>The left-hand side is points to a new object</li>
+  <li>The right-hand side is points to the object the template is applied to</li>
+</ul>
+
+<p>The above makes templates very effective for re-using key bits of functionality.</p>
+
+<p>So in the earlier example:</p>
+
+<ul>
+  <li><strong>main</strong> iterates the data being submitted and returns the interaction</li>
+  <li><strong>tweet</strong> iterates either the top level objects or their <em>retweeted_status</em> and returns the retweet and <em>retweeted</em> objects</li>
+</ul>
+
+<p>You can use the <strong>root</strong> and <strong>this</strong> keyword if you want to be explicit about scope.</p>
+
+</section></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/highlight/highlight.pack.js"></script><script>hljs.configure({languages:['scala','java','bash']});
+hljs.initHighlighting();
+              </script><script src="/js/idml-hilight.js"></script><script src="/js/toc.js"></script><script src="/js/main.js"></script></body></html>

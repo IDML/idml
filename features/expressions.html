@@ -1,0 +1,164 @@
+<html><head><title>IDML: Expressions</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="fairhair.ai" /><meta name="description" content="Ingestion Data Mapping Language" /><meta name="og:image" content="/img/poster.png" /><meta name="image" property="og:image" content="/img/poster.png" /><meta name="og:title" content="IDML: Expressions" /><meta name="title" property="og:title" content="IDML: Expressions" /><meta name="og:site_name" content="IDML" /><meta name="og:url" content="https://idml.io/" /><meta name="og:type" content="website" /><meta name="og:description" content="Ingestion Data Mapping Language" /><link rel="icon" type="image/png" href="/img/favicon.png" /><meta name="twitter:title" content="IDML: Expressions" /><meta name="twitter:image" content="/img/poster.png" /><meta name="twitter:description" content="Ingestion Data Mapping Language" /><meta name="twitter:card" content="summary_large_image" /><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/highlight/styles/solarized-light.css" /><link rel="stylesheet" href="/css/style.css" /><link rel="stylesheet" href="/css/palette.css" /><link rel="stylesheet" href="/css/codemirror.css" /><link rel="stylesheet" href="/css/override.css" /><link rel="stylesheet" href="/css/toc.css" /></head><body class="docs"><div id="wrapper"><div id="sidebar-wrapper"><ul id="sidebar" class="sidebar-nav"><li class="sidebar-brand"><a href="/" class="brand"><div class="brand-wrapper"><span>IDML</span></div></a></li>   <li><a href="/getting-started.html" class="">Getting Started</a></li> <li><a href="/philosophy.html" class="">Philosophy</a></li> <li><a href="/features/core-language.html" class="">Language Features</a> <ul class="sub_section"> <li><a href="/features/core-language.html" class="">Core Language</a></li> <li><a href="/features/expressions.html" class=" active ">Expressions</a></li> <li><a href="/features/predicates.html" class="">Predicates</a></li></ul></li> <li><a href="/functions/index.html" class="">Functions</a> <ul class="sub_section"> <li><a href="/functions/navigation.html" class="">Navigation</a></li> <li><a href="/functions/string.html" class="">String</a></li> <li><a href="/functions/array.html" class="">Array</a></li> <li><a href="/functions/date.html" class="">Date</a></li> <li><a href="/functions/email.html" class="">Email</a></li> <li><a href="/functions/maths.html" class="">Maths</a></li> <li><a href="/functions/object.html" class="">Object</a></li> <li><a href="/functions/random.html" class="">Random</a></li> <li><a href="/functions/regex.html" class="">Regex</a></li> <li><a href="/functions/url.html" class="">URL</a></li> <li><a href="/functions/uuid.html" class="">UUID</a></li> <li><a href="/functions/advanced.html" class="">Advanced</a></li></ul></li> <li><a href="/" class="">Modules</a> <ul class="sub_section"> <li><a href="/modules/geo.html" class="">Geo</a></li> <li><a href="/modules/jsoup.html" class="">jsoup (HTML and XML)</a></li> <li><a href="/modules/hashing.html" class="">Hashing</a></li></ul></li></ul></div><div id="page-content-wrapper"><div class="nav"><div class="container-fluid"><div class="row"><div class="col-lg-12"><div class="action-menu pull-left clearfix"><a href="#menu-toggle" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></a></div><ul class="pull-right"><li id="gh-eyes-item" class="hidden-xs"><a href="https://github.com/idml/idml"><i class="fa fa-eye"></i><span>WATCH<span id="eyes" class="label label-default">--</span></span></a></li><li id="gh-stars-item" class="hidden-xs"><a href="https://github.com/idml/idml"><i class="fa fa-star-o"></i><span>STARS<span id="stars" class="label label-default">--</span></span></a></li></ul></div></div></div></div><div id="content" data-github-owner="idml" data-github-repo="idml"><div class="content-wrapper"><section><h1>Expressions</h1>
+
+<nav role="navigation" id="toc"></nav>
+
+<p>Expressions are the main building block of IDML, they evaluate into values.</p>
+
+<h2 id="literals">Literals</h2>
+
+<p>If you want to assign a literal value to a field you can write something like this:</p>
+
+<pre><code>my.text = "twitter"
+my.int = 123
+my.float = 123.4
+my.bool = true
+</code></pre>
+
+<h2 id="coalesce">Coalesce</h2>
+
+<p>The Coalesce expression is a pair of rounded brackets, and expressions with bars between them, it evaluates as the first expression which wasn’t null.</p>
+
+<pre><code class="language-idml">my.sender = email.(from | sender).name    # this will attempt to use email.from, and otherwise use email.sender
+</code></pre>
+
+<h2 id="if-expressions">If Expressions</h2>
+
+<p>These are used to branch on a predicate.</p>
+
+<pre><code class="language-idml">result = if a &gt; b then c else d      # if a is bigger than b, set result to c, otherwise set it to d
+result1 = if foo exists then bar     # if the variable foo exists, then set result1 to bar
+</code></pre>
+
+<h2 id="pattern-matching">Pattern Matching</h2>
+
+<p>This lets you inspect a value with a list of predicates and expressions, and run the first one which matches.</p>
+
+<pre><code class="language-idml">result = match value
+ this &lt; 5  =&gt; "less than 5"
+ this &gt; 5  =&gt; "more than 5"
+ this == 5 =&gt; "five"
+ _ =&gt; "fallthrough"
+</code></pre>
+
+<p>Of course it’s an expression so you can do something complex like this:</p>
+
+<pre><code class="language-idml">result = ("the answer is: " + match value
+ this &lt; 5 =&gt; "less than 5"
+ this &gt; 5 =&gt; "more than 5"
+ this == 5 =&gt; "five"
+).capitalize()
+</code></pre>
+
+<h2 id="relative-paths">Relative Paths</h2>
+
+<p>These are used to evaluate a path from the <em>input</em> within the current context, they can start with <code>this</code>, or just be a variable path.</p>
+
+<pre><code class="language-idml">this      # the current scope
+this.a    # traverse into a inside the current scope
+a         # as above
+this.a.b  # get the b field from the a object in the current scope
+a.b       # as above
+this.*    # get every object inside the current scope
+*         # as above
+this.*.b  # get every b field inside every object in the current scope
+*.b       # as above
+</code></pre>
+
+<h2 id="absolute-paths">Absolute Paths</h2>
+
+<p>These have the prefix of <code>root</code> and also address the <em>input</em> object.</p>
+
+<pre><code class="language-idml">root.a    # get a from the root scope
+root.a.b  # get b from a from the root scope
+</code></pre>
+
+<h2 id="variable-paths">Variable Paths</h2>
+
+<p>These are used to address the <em>output</em> object and have the <code>@</code> prefix</p>
+
+<pre><code class="language-idml">foo = "hello"
+bar = @foo    # set the `bar` field to whatever we've already put in `foo`
+</code></pre>
+
+<h2 id="temporary-variable-paths">Temporary Variable Paths</h2>
+
+<p>These are used to address <em>temporary variables</em> and have the <code>$</code> prefix</p>
+
+<pre><code class="language-idml">let foo = "hello"
+bar = $foo     # set the `bar` field to the expression stored in the temporary variable `foo`
+</code></pre>
+
+<h2 id="array-traversal">Array Traversal</h2>
+
+<p>Array elements can be referred to with a numerical index.</p>
+
+<p>The indexes begin at zero and a negative number will wrap around, so the first item can be retrieved with <em>0</em> and the final item can be retrieved with <em>-1</em></p>
+
+<pre><code class="language-idml">first = a[0]
+last = a[-1]
+</code></pre>
+
+<h2 id="array-slices">Array Slices</h2>
+<p>A range of array elements can be sliced with two numerical values.</p>
+
+<p>In the below examples we demonstrate how you can select the first four items, select everything except the first item and select the second, third and fourth item.</p>
+
+<pre><code class="language-idml">first_four         = input[:3]
+tail               = input[1:]
+two_three_and_four = input[1:3]
+</code></pre>
+
+<h2 id="functions">Functions</h2>
+
+<p>Functions are either provided as a globally available function, or are available on certain data types as a suffix, see the next few sections for full listings.</p>
+
+<pre><code class="language-idml">my.id      = any.number.int().max(100)
+my.string  = "%s %s".format(a, b).capitalize()
+</code></pre>
+
+<h2 id="filters">Filters</h2>
+<p>Filters allow you to filter an array or object using a <a href="/features/predicates.html">predicate</a>:</p>
+
+<pre><code class="language-idml">twitter.type        = "retweet" [ retweeted_status exists ]
+interaction.content = status [ type == "status" ].message
+</code></pre>
+
+<p>See them as an if statement; nothing will happen if the expression evaluates to false.</p>
+
+<p>These are evaluated inside a relative scope of the item being traversed over, setting <code>this</code> to the current item, and evaluating all paths inside it, which is useful for filtering arrays:</p>
+
+<pre><code class="language-idml">people_in_paris = people[location == "Paris"].extract(name)
+</code></pre>
+
+<p>NB: the left-hand-side provides scope for the square brackets, so given this input:</p>
+
+<pre><code class="language-json">{"a": "1", "b": "2", "c": {"d": "3", "e": "4"}}
+</code></pre>
+
+<p>this is the expected behaviour:</p>
+
+<pre><code class="language-idml">x1 = [b == "2"] "test"      # invalid, as the conditional is missing a LHS, so the predicate will be ignored and by pure luck (aka undefined behaviour) will generate this result: {"x1": "test"}
+x2 = "test" [b == "2"]      # invalid, as the LHS is a literal value, without a child called "b"
+x3 = "test" [root.b == "2"] # use keyword `root` to break out of the current scope; result: {"x3": "test"}
+x4 = c [d == "3"].e         # result: {"x4": "4"}
+x5 = c [this.d == "3"]      # use keyword `this` to reference object in scope; result: {"x5": {"d": "3", "e": "4"}}
+x6 = c.e [root.a == "1"]    # use keyword `root` to break out of the current scope; result: {"x6": "4"}
+</code></pre>
+
+<h2 id="maths">Maths</h2>
+
+<p>The operators <code>+</code>, <code>-</code>, <code>/</code> and <code>*</code> are available for numeric operations, they take an expression as their left and right and resolve them.</p>
+
+<pre><code class="language-idml">a = 1 + 2
+b = 2 / 3
+c = d * e
+</code></pre>
+
+<p>See the Maths section for full documentation.</p>
+
+
+<link rel="stylesheet" type="text/css" href="/css/toc.css"></link>
+<script type="text/javascript" src="/js/toc.js"></script>
+</section></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/highlight/highlight.pack.js"></script><script>hljs.configure({languages:['scala','java','bash']});
+hljs.initHighlighting();
+              </script><script src="/js/idml-hilight.js"></script><script src="/js/toc.js"></script><script src="/js/main.js"></script></body></html>
