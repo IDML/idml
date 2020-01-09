@@ -149,3 +149,6 @@ lazy val tool = project
   )
 
 //lazy val geodb = project.dependsOn(core).dependsOn(geo)
+
+lazy val docs = project
+  .settings(commonSettings)

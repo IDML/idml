@@ -1,0 +1,86 @@
+---
+options:
+  ## api section
+  - title: Dependencies
+    url: dependencies.html
+    menu_type: api
+    menu_section: api
+  - title: Basic Usage
+    url: basic-usage.html
+    menu_type: api
+    menu_section: api
+
+  ## language section
+  - title: Getting Started
+    url: getting-started.html
+    menu_type: language
+    nested_options:
+  - title: Philosophy
+    url: philosophy.html
+    menu_type: language
+  - title: Language Features
+    menu_type: language
+    url: features/core-language.html
+    nested_options:
+      - title: Core Language
+        url: features/core-language.html
+        menu_type: language
+      - title: Expressions
+        url: features/expressions.html
+        menu_type: language
+      - title: Predicates
+        url: features/predicates.html
+        menu_type: language
+  - title: Functions
+    menu_type: language
+    url: functions/index.html
+    nested_options:
+    - title: Navigation
+      url: functions/navigation.html
+      menu_type: language
+    - title: String
+      url: functions/string.html
+      menu_type: language
+    - title: Array
+      url: functions/array.html
+      menu_type: language
+    - title: Date
+      url: functions/date.html
+      menu_type: language
+    - title: Email
+      url: functions/email.html
+      menu_type: language
+    - title: Maths
+      url: functions/maths.html
+      menu_type: language
+    - title: Object
+      url: functions/object.html
+      menu_type: language
+    - title: Random
+      url: functions/random.html
+      menu_type: language
+    - title: Regex
+      url: functions/regex.html
+      menu_type: language
+    - title: URL
+      url: functions/url.html
+      menu_type: language
+    - title: UUID
+      url: functions/uuid.html
+      menu_type: language
+    - title: Advanced
+      url: functions/advanced.html
+      menu_type: language
+  - title: Modules
+    menu_type: language
+    nested_options:
+    - title: Geo
+      url: modules/geo.html
+      menu_type: language
+    - title: jsoup (HTML and XML)
+      url: modules/jsoup.html
+      menu_type: language
+    - title: Hashing
+      url: modules/hashing.html
+      menu_type: language
+
