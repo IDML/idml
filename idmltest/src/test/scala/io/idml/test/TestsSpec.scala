@@ -23,7 +23,7 @@ class TestsSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
 
   val test = Test[Either[Ref, ?], Either[Ref, ?], Json](
     "example test",
-    Right("r = a + b"),
+    Right(Left("r = a + b")),
     Right(
       Json.obj(
         "a" -> Json.fromInt(2),

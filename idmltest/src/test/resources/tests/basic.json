@@ -1,6 +1,11 @@
 {
   "name": "basic test",
-  "code": "r = a + b",
+  "code": {
+    "pipeline": "a",
+    "database": {
+      "a": "r = a + b"
+    }
+  },
   "input": {
     "a": 2,
     "b": 1

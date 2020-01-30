@@ -28,7 +28,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
       val r = new TestRunner
       r.runSingle(
           None,
-          "r = a + b",
+          Left("r = a + b"),
           json"""
                {
                  "a": 1,
@@ -43,7 +43,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
     val r = new TestRunner
     r.runSingle(
         Some(1554117846L),
-        "r = now()",
+        Left("r = now()"),
         json"""
                {
                }
@@ -58,6 +58,24 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
     state must equal(List(TestState.Success))
     r.printed.toList must equal(
       List(fansi.Color.Green("basic test passed").toString())
+    )
+  }
+  "be able to run a pipeline test" in {
+    val test  = Paths.get(getClass.getResource("/tests/basic-pipeline.json").getFile)
+    val r     = new TestRunner
+    val state = r.runTest(false)(cs)(test).unsafeRunSync()
+    state must equal(List(TestState.Success))
+    r.printed.toList must equal(
+      List(fansi.Color.Green("basic pipeline test passed").toString())
+    )
+  }
+  "be able to run a pipeline test with references" in {
+    val test  = Paths.get(getClass.getResource("/tests/pipeline-ref.json").getFile)
+    val r     = new TestRunner
+    val state = r.runTest(false)(cs)(test).unsafeRunSync()
+    state must equal(List(TestState.Success))
+    r.printed.toList must equal(
+      List(fansi.Color.Green("pipeline reference test passed").toString())
     )
   }
   "be able to run a test with nulls" in {

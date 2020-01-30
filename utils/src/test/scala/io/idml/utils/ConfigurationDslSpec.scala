@@ -41,38 +41,44 @@ class ConfigurationDslSpec extends WordSpec with MustMatchers {
   "The DSL" should {
     val idml = IdmlBuilder.withStaticFunctions().build()
     "be able to run two mappings" in {
-      DSL.run { s =>
-        Either.fromOption(
-          Map(
-            "a" -> idml.compile("map = \"a\"\na = true"),
-            "b" -> idml.compile("map = \"b\"\nb = true")
-          ).get(s),
-          "Could not find mapping"
-        )
-      }.apply("a+b").map { m =>
-        m.run(IObject())
-      } must equal(
+      DSL
+        .run { s =>
+          Either.fromOption(
+            Map(
+              "a" -> idml.compile("map = \"a\"\na = true"),
+              "b" -> idml.compile("map = \"b\"\nb = true")
+            ).get(s),
+            "Could not find mapping"
+          )
+        }
+        .apply("a+b")
+        .map { m =>
+          m.run(IObject())
+        } must equal(
         Right(
           IObject(
             "map" -> IString("b"),
-            "a" -> IBool(true),
-            "b" -> IBool(true)
+            "a"   -> IBool(true),
+            "b"   -> IBool(true)
           )
         )
       )
     }
     "should be able to chain two mappings" in {
-      DSL.run { s =>
-        Either.fromOption(
-          Map(
-            "a" -> idml.compile("aout = input + 1"),
-            "b" -> idml.compile("bout = aout + 1")
-          ).get(s),
-          "Could not find mapping"
-        )
-      }.apply("a|b").map { m =>
-        m.run(IObject("input" -> IInt(0)))
-      } must equal(
+      DSL
+        .run { s =>
+          Either.fromOption(
+            Map(
+              "a" -> idml.compile("aout = input + 1"),
+              "b" -> idml.compile("bout = aout + 1")
+            ).get(s),
+            "Could not find mapping"
+          )
+        }
+        .apply("a|b")
+        .map { m =>
+          m.run(IObject("input" -> IInt(0)))
+        } must equal(
         Right(
           IObject(
             "bout" -> IInt(2),

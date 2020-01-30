@@ -26,10 +26,34 @@ object Tests {
 
 }
 
+final case class PipelinedCode[T](
+    pipeline: String,
+    database: Map[String, T]
+)
+object PipelinedCode {
+  implicit val functor: Functor[PipelinedCode] = new Functor[PipelinedCode] {
+    override def map[A, B](fa: PipelinedCode[A])(f: A => B): PipelinedCode[B] = fa.copy(database = fa.database.mapValues(f))
+  }
+  implicit val pipelinedCodeTraverse: Traverse[PipelinedCode] = new Traverse[PipelinedCode] {
+    override def traverse[G[_], A, B](fa: PipelinedCode[A])(f: A => G[B])(implicit evidence$1: Applicative[G]): G[PipelinedCode[B]] =
+      fa.database.toList
+        .traverse {
+          case (k, v) =>
+            f(v).tupleLeft(k)
+        }
+        .map { d =>
+          fa.copy(database = d.toMap)
+        }
+    override def foldLeft[A, B](fa: PipelinedCode[A], b: B)(f: (B, A) => B): B =
+      fa.database.values.foldLeft(b)(f)
+    override def foldRight[A, B](fa: PipelinedCode[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
+      fa.database.values.foldRight(lb)(f)
+  }
+}
 final case class Ref(`$ref`: String)
 final case class Test[F[_], F2[_], T](
     name: String,
-    code: F[String],
+    code: F[Either[String, PipelinedCode[F[String]]]],
     input: F[T],
     output: F2[T],
     time: Option[Long],
@@ -57,8 +81,11 @@ object Test {
 
   implicit class ResolveSyntax[T: Decoder](t: ParsedTest[T]) {
     def resolve[F[_]: Sync](load: Ref => F[String], parse: String => F[Json]): F[ResolvedTest[T]] = {
+      val reportAndLoad = (r: Ref) => reportErrorWithRef(r, load(r))
       (
-        t.code.swap.traverse(r => reportErrorWithRef(r, load(r))).map(_.merge),
+        t.code
+          .leftTraverse(reportAndLoad)
+          .flatMap(_.traverse(_.traverse(_.traverse(_.leftTraverse(reportAndLoad).map(_.merge)))).map(_.flatten)),
         t.input.swap.traverse(r => reportErrorWithRef(r, load(r).flatMap(parse).flatMap(decodeRaise[F, T]))).map(_.merge),
         t.output.swap.traverse(r => reportErrorWithRef(r, load(r).flatMap(parse).flatMap(decodeRaise[F, T]))).map(_.merge)
       ).mapN {
@@ -74,8 +101,11 @@ object Test {
     }
 
     def updateResolve[F[_]: Sync](load: Ref => F[String], parse: String => F[Json]): F[UpdatableTest[T]] = {
+      val reportAndLoad = (r: Ref) => reportErrorWithRef(r, load(r))
       (
-        t.code.swap.traverse(r => reportErrorWithRef(r, load(r))).map(_.merge),
+        t.code
+          .leftTraverse(reportAndLoad)
+          .flatMap(_.traverse(_.traverse(_.traverse(_.leftTraverse(reportAndLoad).map(_.merge)))).map(_.flatten)),
         t.input.swap.traverse(r => reportErrorWithRef(r, load(r).flatMap(parse).flatMap(decodeRaise[F, T]))).map(_.merge),
       ).mapN {
         case (c, i) =>
