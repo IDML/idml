@@ -13,7 +13,7 @@ import io.circe.Printer.spaces2
 import io.idml.circe.IdmlCirce
 import io.idml.circe.instances._
 import io.idml._
-import io.idml.utils.configuration.DSL
+import io.idml.utils.configuration.Pipeline
 import fs2._
 import Test._
 
@@ -47,7 +47,7 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
               c => IO { p.compile(c) },
               pc =>
                 IO.fromEither(
-                  DSL
+                  Pipeline
                     .run(name => Try { p.compile(pc.database(name)) }.toEither.leftMap(_.getMessage))
                     .apply(pc.pipeline)
                     .leftMap(s => new Throwable(s)))

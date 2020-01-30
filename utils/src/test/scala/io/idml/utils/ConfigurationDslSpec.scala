@@ -1,8 +1,8 @@
 package io.idml.utils
 
 import org.scalatest.{MustMatchers, WordSpec}
-import configuration.DSL
-import DSL._
+import configuration.Pipeline
+import Pipeline._
 import ConfigurationMapping._
 import atto._
 import Atto._
@@ -13,7 +13,7 @@ import io.idml.datanodes.{IBool, IInt, IObject, IString}
 
 class ConfigurationDslSpec extends WordSpec with MustMatchers {
 
-  val parse: String => Either[String, ConfigurationMapping] = DSL.Parser.apply[Either[String, ?]](_)
+  val parse: String => Either[String, ConfigurationMapping] = Pipeline.Parser.apply[Either[String, ?]](_)
   "The DSL parser" should {
     "parse single mappings" in {
       parse("abc") must equal(Right(SingleMapping("abc")))
@@ -41,7 +41,7 @@ class ConfigurationDslSpec extends WordSpec with MustMatchers {
   "The DSL" should {
     val idml = IdmlBuilder.withStaticFunctions().build()
     "be able to run two mappings" in {
-      DSL
+      Pipeline
         .run { s =>
           Either.fromOption(
             Map(
@@ -65,7 +65,7 @@ class ConfigurationDslSpec extends WordSpec with MustMatchers {
       )
     }
     "should be able to chain two mappings" in {
-      DSL
+      Pipeline
         .run { s =>
           Either.fromOption(
             Map(

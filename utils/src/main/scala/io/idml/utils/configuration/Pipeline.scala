@@ -17,7 +17,7 @@ import higherkindness.droste.scheme._
   *
   * Note: | takes precedence over + so in `a|b+c` the `b` and `c` mappings are combined, and fed the output from `a`
   */
-object DSL {
+object Pipeline {
   @deriveFixedPoint sealed trait ConfigurationMapping
   object ConfigurationMapping {
     final case class SingleMapping(name: String)                                   extends ConfigurationMapping
