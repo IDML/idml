@@ -1,0 +1,16 @@
+{
+  "name": "basic pipeline test",
+  "code": {
+    "pipeline": "a",
+    "database": {
+      "a": "r = a + b"
+    }
+  },
+  "input": {
+    "a": 2,
+    "b": 1
+  },
+  "output": {
+    "r": 3
+  }
+}
