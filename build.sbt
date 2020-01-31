@@ -92,6 +92,8 @@ lazy val utils = project.dependsOn(core).dependsOn(jsoup).dependsOn(jackson % "t
 
 lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).dependsOn(jackson).settings(commonSettings)
 
+lazy val repl2 = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).dependsOn(circe).dependsOn(utils).settings(commonSettings)
+
 lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils).dependsOn(circe).settings(commonSettings)
 
 lazy val idmldoc = project.dependsOn(core).dependsOn(utils).dependsOn(circe).settings(commonSettings)

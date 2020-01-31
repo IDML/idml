@@ -1,13 +1,14 @@
-name := "idml-tool"
+name := "idml-repl2"
 
-libraryDependencies += "com.monovore" %% "decline" % "0.5.0"
+libraryDependencies ++= Seq(
+  "com.lihaoyi"  %% "fansi"         % "0.2.7",
+  "org.jline" % "jline-terminal-jna" % "3.13.3",
+  "org.jline" % "jline-reader" % "3.13.3",
+  "org.mockito"   % "mockito-all" % "1.9.5" % Test,
+  "org.scalatest" %% "scalatest"  % "3.0.4" % Test
+)
 
-//libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.1"
-//libraryDependencies += "org.codehaus.janino" % "janino" % "2.6.1"
-
-libraryDependencies += "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.13.0"
-
-mainClass in Compile := Some("IdmlTool")
+mainClass in Compile := Some("io.idmlrepl.Main")
 
 enablePlugins(SbtProguard)
 
@@ -29,7 +30,7 @@ Proguard / proguardOptions ++= Seq(
 Proguard / proguardInputs  := (dependencyClasspath in Compile).value.files
 Proguard / proguardMergedInputs ++= ProguardOptions.noFilter((packageBin in Compile).value)
 Proguard / proguard / javaOptions := Seq("-Xmx2g")
-Proguard / proguardOutputs := Seq(new File(target.value, "tool-proguard.jar"))
+Proguard / proguardOutputs := Seq(new File(target.value, "repl2-proguard.jar"))
 
 
-proguardOptions in Proguard += ProguardOptions.keepMain("IdmlTool")
+proguardOptions in Proguard += ProguardOptions.keepMain("io.idmlrepl.Main")
