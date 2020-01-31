@@ -13,10 +13,12 @@ import io.circe.Printer.spaces2
 import io.idml.circe.IdmlCirce
 import io.idml.circe.instances._
 import io.idml._
+import io.idml.utils.configuration.Pipeline
 import fs2._
 import Test._
 
 import scala.collection.JavaConverters._
+import scala.util.Try
 
 class UnbalancedMultiTest(s: String) extends Throwable(s)
 
@@ -37,21 +39,31 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
     ).build()
   }
 
-  def run[T, O](f: (Mapping, T) => IO[O])(time: Option[Long], code: String, input: T): IO[O] =
+  def run[T, O](f: (Mapping, T) => IO[O])(time: Option[Long], code: Either[String, PipelinedCode[String]], input: T): IO[O] =
     for {
       p <- ptolemy(time.map(_ * 1000))
-      m <- IO { p.compile(code) }
+      m <- code
+            .bitraverse(
+              c => IO { p.compile(c) },
+              pc =>
+                IO.fromEither(
+                  Pipeline
+                    .run(name => Try { p.compile(pc.database(name)) }.toEither.leftMap(_.getMessage))
+                    .apply(pc.pipeline)
+                    .leftMap(s => new Throwable(s)))
+            )
+            .map(_.merge)
       r <- f(m, input)
     } yield r
 
-  def runSingle: (Option[Long], String, Json) => IO[Json] =
+  def runSingle: (Option[Long], Either[String, PipelinedCode[String]], Json) => IO[Json] =
     run({ (m: Mapping, j: Json) =>
       IO {
         j.as[IdmlObject].map(m.run).map(_.asJson.foldWith(notNulls)).leftWiden[Throwable]
       }.rethrow
     })
 
-  def runMulti(implicit timer: ContextShift[IO]): (Option[Long], String, List[Json]) => IO[List[Json]] =
+  def runMulti(implicit timer: ContextShift[IO]): (Option[Long], Either[String, PipelinedCode[String]], List[Json]) => IO[List[Json]] =
     run({ (m: Mapping, js: List[Json]) =>
       js.parTraverse { j =>
         IO {
@@ -76,7 +88,7 @@ class RunnerUtils(dynamic: Boolean, plugins: Option[NonEmptyList[URL]]) extends 
   case class DifferentOutput(name: String, diff: String)
 
   trait IdmlUtils[T] {
-    def run(implicit timer: ContextShift[IO]): (Option[Long], String, T) => IO[T]
+    def run(implicit timer: ContextShift[IO]): (Option[Long], Either[String, PipelinedCode[String]], T) => IO[T]
     def toString(t: T): String
     def validate(t: ResolvedTest[T]): Either[Throwable, ResolvedTest[T]]
     def inspectOutput(resolved: ResolvedTest[T], output: T, diff: (Json, Json) => String): List[Either[DifferentOutput, String]]

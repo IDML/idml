@@ -1,5 +1,5 @@
 {
-  "name": "basic test",
+  "name": "basic pipeline test",
   "code": {
     "pipeline": "a",
     "database": {

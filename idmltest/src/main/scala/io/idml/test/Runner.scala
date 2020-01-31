@@ -46,7 +46,13 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
     with CirceEitherEncoders {
 
   def load(test: Path): IO[Either[Tests[List[Json]], Tests[Json]]] =
-    readAll(blockingEc)(test).flatMap(parseJ).flatMap(as[Either[Tests[List[Json]], Tests[Json]]])
+    for {
+      text   <- readAll(blockingEc)(test)
+      j      <- parseJ(text)
+      single = j.as[Tests[Json]].map(_.asRight[Tests[List[Json]]])
+      multi  = j.as[Tests[List[Json]]].map(_.asLeft[Tests[Json]])
+      result <- IO.fromEither(multi orElse single)
+    } yield result
   def resolve[T: Decoder](path: Path, tests: Tests[T]): IO[List[ResolvedTest[T]]] =
     tests.tests.traverse(
       _.resolve(

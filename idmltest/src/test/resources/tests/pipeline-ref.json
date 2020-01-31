@@ -1,0 +1,20 @@
+{
+  "name": "pipeline reference test",
+  "code": {
+    "pipeline": "a|b",
+    "database": {
+      "a": {
+        "$ref": "idml/a.idml"
+      },
+      "b": {
+        "$ref": "idml/b.idml"
+      }
+    }
+  },
+  "input": {
+  },
+  "output": {
+    "a": 2,
+    "m": "b"
+  }
+}
