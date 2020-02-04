@@ -1,6 +1,7 @@
 name := "idml-repl2"
 
 libraryDependencies ++= Seq(
+  "org.typelevel" %% "cats-effect" % "1.2.0",
   "com.lihaoyi"  %% "fansi"         % "0.2.7",
   "org.jline" % "jline-terminal-jna" % "3.13.3",
   "org.jline" % "jline-reader" % "3.13.3",
@@ -24,7 +25,15 @@ Proguard / proguardOptions ++= Seq(
   "-dontnote",
   "-dontwarn",
   "-ignorewarnings",
-  "-keep class scala.Symbol {*;}"
+  "-keep class scala.Symbol {*;}",
+  "-keep public class org.slf4j.* {*;}",
+  "-keep public class ch.qos.logback.* { *; }",
+  "-keep public class org.slf4j.* { *; }",
+  """-keepclassmembers class * extends java.lang.Enum {
+    |    <fields>;
+    |    public static **[] values();
+    |    public static ** valueOf(java.lang.String);
+    |}""".stripMargin
 )
 
 Proguard / proguardInputs  := (dependencyClasspath in Compile).value.files
