@@ -1,11 +1,12 @@
 name := "idml-tool"
 
-libraryDependencies += "com.monovore" %% "decline" % "0.5.0"
+enablePlugins(UniversalPlugin)
 
-//libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.1"
-//libraryDependencies += "org.codehaus.janino" % "janino" % "2.6.1"
 
-libraryDependencies += "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.13.0"
+libraryDependencies ++= List(
+  "com.monovore" %% "decline" % "0.5.0",
+  "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.13.0",
+)
 
 mainClass in Compile := Some("IdmlTool")
 
