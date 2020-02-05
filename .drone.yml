@@ -1,12 +1,13 @@
---
+---
 kind: pipeline
 name: default
+steps:
+  -
+    commands:
+      - "sbt test"
+    image: "scalacenter/scala-docs:1.5"
+    name: "compile and test"
 trigger:
   event:
     - push
 
-steps:
-  - name: compile and test
-    image: scalacenter/scala-docs:1.5
-    commands:
-      - sbt test
