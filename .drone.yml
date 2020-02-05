@@ -2,12 +2,27 @@
 kind: pipeline
 name: default
 steps:
-  -
-    commands:
+  - commands:
       - "sbt test"
     image: "scalacenter/scala-docs:1.5"
     name: "compile and test"
+  - commands:
+      - "sbt \"project tool\" \"proguard\""
+      - cp tool/target/tool-proguard.jar idml.jar
+      - cp tool/src/graal/resource-config.json resource-config.json
+  - name: graal
+    image: oracle/graalvm-ce:19.3.1
+    commands:
+      - gu install native-image
+      - native-image --no-fallback -H:ResourceConfigurationFiles=resource-config.json  -H:+TraceClassInitialization --initialize-at-build-time -jar idml.jar
+  - name: publish
+    image: plugins/github-release
+    settings:
+      api_key: ${GITHUB_KEY}
+      files: idml
+    when:
+      event: tag
+
 trigger:
   event:
     - push
-
