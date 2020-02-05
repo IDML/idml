@@ -21,7 +21,9 @@ steps:
     image: plugins/github-release
     settings:
       api_key: ${GITHUB_KEY}
-      files: idml
+      files:
+        - idml
+        - idml.jar
     when:
       event: tag
 
