@@ -1,6 +1,9 @@
 name := "idml-repl2"
 
 libraryDependencies ++= Seq(
+  "co.fs2"        %% "fs2-io"        % "1.0.4",
+  "org.typelevel" %% "cats-mtl-core" % "0.5.0",
+  "org.typelevel" %% "cats-tagless-macros" % "0.5",
   "org.typelevel" %% "cats-effect" % "1.2.0",
   "com.lihaoyi"  %% "fansi"         % "0.2.7",
   "org.jline" % "jline-terminal-jna" % "3.13.3",
@@ -8,6 +11,8 @@ libraryDependencies ++= Seq(
   "org.mockito"   % "mockito-all" % "1.9.5" % Test,
   "org.scalatest" %% "scalatest"  % "3.0.4" % Test
 )
+
+ addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 
 mainClass in Compile := Some("io.idmlrepl.Main")
 
