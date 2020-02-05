@@ -1,0 +1,12 @@
+--
+kind: pipeline
+name: default
+trigger:
+  event:
+    - push
+
+steps:
+  - name: compile and test
+    image: scalacenter/scala-docs:1.5
+    commands:
+      - sbt test
