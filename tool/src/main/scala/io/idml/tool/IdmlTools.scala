@@ -48,18 +48,6 @@ object IdmlTools {
     }
   }
 
-  val repl = Command(
-    name = "repl",
-    header = "IDML REPL"
-  ) {
-    functionResolver.map { fr =>
-      IO {
-        new Repl().runInner(List().toArray, Some(fr))
-        ExitCode.Success
-      }
-    }
-  }
-
   def server(implicit c: ConcurrentEffect[IO], t: Timer[IO]) =
     Command(
       name = "server",

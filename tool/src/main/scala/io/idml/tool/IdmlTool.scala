@@ -18,7 +18,7 @@ object IdmlTool extends IOCommandApp[IO[ExitCode]] {
   override def commandLine: Opts[IO[ExitCode]] =
     NonEmptyList
       .of(
-        IdmlTools.repl,
+        io.idmlrepl.Main.execute(),
         IdmlTools.apply,
         IdmlTools.server,
         io.idml.test.Main.execute(),
