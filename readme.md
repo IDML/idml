@@ -1,5 +1,8 @@
 # Ingestion Data Mapping Language
 
+[![Build Status](https://cloud.drone.io/api/badges/IDML/idml/status.svg)](https://cloud.drone.io/IDML/idml)
+
+
 See http://idml.io/
 
 ## History

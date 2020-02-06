@@ -39,7 +39,10 @@ lazy val commonSettings = Seq(
   scalacOptions += "-target:jvm-1.8",
   addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
-  addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.patch)
+  addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.patch),
+  git.gitTagToVersionNumber := { tag: String =>
+    if (tag matches "[0-9].*") Some(tag) else None
+  }
 )
 
 lazy val lang = project.settings(commonSettings)
@@ -90,7 +93,7 @@ lazy val hashing = project.dependsOn(core).settings(commonSettings)
 
 lazy val utils = project.dependsOn(core).dependsOn(jsoup).dependsOn(jackson % "test->test").settings(commonSettings)
 
-lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).dependsOn(jackson).settings(commonSettings)
+lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).dependsOn(circe).dependsOn(utils).settings(commonSettings)
 
 lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils).dependsOn(circe).dependsOn(geo).settings(commonSettings)
 
