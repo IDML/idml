@@ -42,7 +42,8 @@ lazy val commonSettings = Seq(
   addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.patch),
   git.gitTagToVersionNumber := { tag: String =>
     if (tag matches "[0-9].*") Some(tag) else None
-  }
+  },
+  version in ThisBuild := sys.env.get("DRONE_TAG").getOrElse((version in ThisBuild).value)
 )
 
 lazy val lang = project.settings(commonSettings)
