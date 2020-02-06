@@ -9,6 +9,7 @@ import cats.data._
 import com.monovore.decline._
 import DeclineHelpers._
 import io.idml._
+import io.idml.geo.{GeoDatabaseFunctionResolver, GeoFunctionResolver}
 import io.idml.utils.{ClassificationException, DocumentValidator}
 import io.idmlrepl.Repl
 import io.idml.hashing.HashingFunctionResolver
@@ -16,6 +17,7 @@ import io.idml.jackson.IdmlJackson
 import io.idml.jsoup.JsoupFunctionResolver
 import io.idml.lang.DocumentParseException
 import io.idml.server.Server
+import io.idml.circe.IdmlCirce
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
@@ -41,7 +43,9 @@ object IdmlTools {
     val baseFunctionResolver = if (d) { new FunctionResolverService } else {
       new StaticFunctionResolverService(
         (StaticFunctionResolverService.defaults(IdmlJackson.default).asScala ++ List(new JsoupFunctionResolver(),
-                                                                                     new HashingFunctionResolver())).asJava)
+                                                                                     new HashingFunctionResolver(),
+                                                                                     new GeoFunctionResolver(IdmlCirce),
+                                                                                     new GeoDatabaseFunctionResolver)).asJava)
     }
     pf.fold(baseFunctionResolver) { urls =>
       FunctionResolverService.orElse(baseFunctionResolver, new PluginFunctionResolverService(urls.toList.toArray))
