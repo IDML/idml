@@ -29,7 +29,7 @@ class JLine[F[_]](name: String, t: Terminal)(implicit F: Sync[F]) {
     .parser(new Parser {
       override def parse(currentLine: String, currentCursor: Int, context: Parser.ParseContext): ParsedLine = {
         if (!currentLine.endsWith("\n")) {
-          throw new EOFError(0, currentCursor, "gotta end with double enter")
+          throw new EOFError(-1, -1, "gotta end with double enter")
         }
         new ParsedLine {
           override def word(): String             = currentLine
