@@ -39,7 +39,10 @@ lazy val commonSettings = Seq(
   scalacOptions += "-target:jvm-1.8",
   addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
-  addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.patch)
+  addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.0" cross CrossVersion.patch),
+  git.gitTagToVersionNumber := { tag: String =>
+    if (tag matches "[0-9].*") Some(tag) else None
+  }
 )
 
 lazy val lang = project.settings(commonSettings)
