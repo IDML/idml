@@ -20,7 +20,8 @@ steps:
   - name: publish
     image: plugins/github-release
     settings:
-      api_key: ${GITHUB_KEY}
+      api_key:
+        from_secret: GITHUB_KEY
       files:
         - idml
         - idml.jar
