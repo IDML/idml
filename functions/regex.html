@@ -2,7 +2,7 @@
 
 <nav role="navigation" id="toc"></nav>
 
-<p>These functions allow you to manipulate strings using Java regular expressions.</p>
+<p>These functions allow you to manipulate strings using Java regular expressions. The underlying implementation is re2 (see <a href="https://github.com/google/re2/wiki/Syntax">syntax</a>).</p>
 
 <h2 id="match">match</h2>
 <h3 id="match-with-no-groups">match with no groups</h3>
@@ -31,6 +31,13 @@
 <pre><code> output = input.match("(foo) (bar) (baz)")
  {"input": "foo bar baz"}
  {"output": ["foo", "bar", "baz"]}
+</code></pre>
+
+<h3 id="match-newline-using-">match newline using .</h3>
+
+<pre><code> output = input.match("(?s)(foo.*)")
+ {"input": "foo bar\n baz"}
+ {"output": ["foo bar\n baz"]}
 </code></pre>
 
 <h2 id="matches">matches</h2>
@@ -86,6 +93,9 @@
 </code></pre>
 
 <h2 id="ismatch">isMatch</h2>
+
+<p>Check if the entire string matches a regular expression</p>
+
 <h3 id="one-character-match">one character match</h3>
 
 <pre><code> output = input.isMatch("a")
@@ -102,11 +112,17 @@
 
 <h3 id="wildcard-match">wildcard match</h3>
 
-<pre><code> output = input.isMatch(".*coo.*")
- {"input": "ca"}
+<pre><code> output = input.isMatch(".*bar.*")
+ {"input": "foo bar baz"}
  {"output": true}
 </code></pre>
 
+<h3 id="partial-expression-that-does-not-match">partial expression that does not match</h3>
+
+<pre><code> output = input.isMatch("foo")
+ {"input": "foo bar baz"}
+ {"output": false}
+</code></pre>
 
 
 <link rel="stylesheet" type="text/css" href="/css/toc.css"></link>
