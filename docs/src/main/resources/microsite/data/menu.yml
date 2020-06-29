@@ -74,9 +74,6 @@ options:
   - title: Modules
     menu_type: language
     nested_options:
-    - title: Geo
-      url: modules/geo.html
-      menu_type: language
     - title: jsoup (HTML and XML)
       url: modules/jsoup.html
       menu_type: language
