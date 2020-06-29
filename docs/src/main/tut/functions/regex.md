@@ -4,7 +4,7 @@ title: Regex
 section: language
 ---
 
-These functions allow you to manipulate strings using Java regular expressions.
+These functions allow you to manipulate strings using Java regular expressions. The underlying implementation is re2 (see [syntax](https://github.com/google/re2/wiki/Syntax)).
 
 
 ## match
@@ -31,6 +31,12 @@ These functions allow you to manipulate strings using Java regular expressions.
      output = input.match("(foo) (bar) (baz)")
      {"input": "foo bar baz"}
      {"output": ["foo", "bar", "baz"]}
+
+### match newline using .
+
+     output = input.match("(?s)(foo.*)")
+     {"input": "foo bar\n baz"}
+     {"output": ["foo bar\n baz"]}
 
 
 ## matches
@@ -79,6 +85,9 @@ These functions allow you to manipulate strings using Java regular expressions.
      {"output": "dogdogdog"}
 
 ## isMatch
+
+Check if the entire string matches a regular expression
+
 ### one character match
 
      output = input.isMatch("a")
@@ -94,7 +103,12 @@ These functions allow you to manipulate strings using Java regular expressions.
 
 ### wildcard match
 
-     output = input.isMatch(".*coo.*")
-     {"input": "ca"}
+     output = input.isMatch(".*bar.*")
+     {"input": "foo bar baz"}
      {"output": true}
 
+### partial expression that does not match
+
+     output = input.isMatch("foo")
+     {"input": "foo bar baz"}
+     {"output": false}
