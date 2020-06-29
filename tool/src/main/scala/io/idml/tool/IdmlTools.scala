@@ -9,7 +9,6 @@ import cats.data._
 import com.monovore.decline._
 import DeclineHelpers._
 import io.idml._
-import io.idml.geo.{GeoDatabaseFunctionResolver, GeoFunctionResolver}
 import io.idml.utils.{ClassificationException, DocumentValidator}
 import io.idmlrepl.Repl
 import io.idml.hashing.HashingFunctionResolver
@@ -42,10 +41,10 @@ object IdmlTools {
   val functionResolver: Opts[FunctionResolverService] = (dynamic, plugins).mapN { (d, pf) =>
     val baseFunctionResolver = if (d) { new FunctionResolverService } else {
       new StaticFunctionResolverService(
-        (StaticFunctionResolverService.defaults(IdmlCirce).asScala ++ List(new JsoupFunctionResolver(),
-                                                                                     new HashingFunctionResolver(),
-                                                                                     new GeoFunctionResolver(IdmlCirce),
-                                                                                     new GeoDatabaseFunctionResolver)).asJava)
+        (StaticFunctionResolverService
+          .defaults(IdmlCirce)
+          .asScala ++ List(new JsoupFunctionResolver(), new HashingFunctionResolver())).asJava
+      )
     }
     pf.fold(baseFunctionResolver) { urls =>
       FunctionResolverService.orElse(baseFunctionResolver, new PluginFunctionResolverService(urls.toList.toArray))
@@ -74,14 +73,17 @@ object IdmlTools {
       name = "apply",
       header = "IDML command line tool",
     ) {
-      val pretty    = Opts.flag("pretty", "Enable pretty printing of output", short = "p").orFalse
-      val unmapped  = Opts.flag("unmapped", "This probably doesn't do what you think it does", short = "u").orFalse
-      val strict    = Opts.flag("strict", "Enable strict mode", short = "s").orFalse
+      val pretty   = Opts.flag("pretty", "Enable pretty printing of output", short = "p").orFalse
+      val unmapped = Opts.flag("unmapped", "This probably doesn't do what you think it does", short = "u").orFalse
+      val strict   = Opts.flag("strict", "Enable strict mode", short = "s").orFalse
       val traceFile = Opts.option[String]("trace", "File to trace into", "t").orNone.mapValidated {
-        case Some(f) => Validated.fromEither(Either.catchNonFatal(Some(new File(f))).leftMap(e => s"Invalid file: ${e.getLocalizedMessage}")).toValidatedNel
+        case Some(f) =>
+          Validated
+            .fromEither(Either.catchNonFatal(Some(new File(f))).leftMap(e => s"Invalid file: ${e.getLocalizedMessage}"))
+            .toValidatedNel
         case None => Validated.valid[String, Option[File]](None).toValidatedNel
       }
-      val file      = Opts.arguments[File]("mapping file").orEmpty
+      val file = Opts.arguments[File]("mapping file").orEmpty
 
       val log = LoggerFactory.getLogger("idml-tool")
 

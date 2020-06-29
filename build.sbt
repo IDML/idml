@@ -73,20 +73,6 @@ lazy val test = project
     publishArtifact := false
   )
 
-lazy val geo = project
-  .dependsOn(core)
-  .settings(commonSettings)
-  .dependsOn(jackson % "test->test")
-  .dependsOn(test % "test->test")
-  .settings(
-    fork in Test := true,
-    envVars in Test := Map(
-      "IDML_GEO_DB_DRIVER"       -> "org.sqlite.JDBC",
-      "IDML_GEO_CITY_JDBC_URL"   -> "jdbc:sqlite::resource:cities.test.db",
-      "IDML_GEO_ADMIN1_JDBC_URL" -> "jdbc:sqlite::resource:admin1.test.db"
-    )
-  )
-
 lazy val jsoup = project.dependsOn(core).dependsOn(test % "test->test").settings(commonSettings)
 
 lazy val hashing = project.dependsOn(core).settings(commonSettings)
@@ -95,7 +81,7 @@ lazy val utils = project.dependsOn(core).dependsOn(jsoup).dependsOn(jackson % "t
 
 lazy val repl = project.dependsOn(core).dependsOn(jsoup).dependsOn(hashing).dependsOn(circe).dependsOn(utils).settings(commonSettings)
 
-lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils).dependsOn(circe).dependsOn(geo).settings(commonSettings)
+lazy val idmld = project.dependsOn(core).dependsOn(hashing).dependsOn(jsoup).dependsOn(utils).dependsOn(circe).settings(commonSettings)
 
 lazy val idmldoc = project.dependsOn(core).dependsOn(utils).dependsOn(circe).settings(commonSettings)
 
@@ -103,11 +89,10 @@ lazy val `idmldoc-plugin` = project.dependsOn(idmldoc).settings(commonSettings)
 
 lazy val idmltest = project.dependsOn(core).dependsOn(utils).dependsOn(circe).settings(commonSettings)
 
-lazy val `idmltest-plugin` = project.dependsOn(idmltest).dependsOn(hashing).dependsOn(geo).dependsOn(jsoup).dependsOn(jackson).settings(commonSettings)
+lazy val `idmltest-plugin` = project.dependsOn(idmltest).dependsOn(hashing).dependsOn(jsoup).dependsOn(jackson).settings(commonSettings)
 
 lazy val idmltutor = project
   .dependsOn(hashing)
-  .dependsOn(geo)
   .dependsOn(jsoup)
   .dependsOn(circe)
   .dependsOn(idmltest)
@@ -135,7 +120,6 @@ lazy val tool = project
   .dependsOn(idmltest)
   .dependsOn(hashing)
   .dependsOn(idmltutor)
-  .dependsOn(geo)
   .enablePlugins(DockerPlugin, JavaAppPackaging)
   .settings(commonSettings)
   .settings(
@@ -151,8 +135,6 @@ lazy val tool = project
       case _                                                                      => MergeStrategy.first
     }
   )
-
-//lazy val geodb = project.dependsOn(core).dependsOn(geo)
 
 lazy val docs = project
   .settings(commonSettings)

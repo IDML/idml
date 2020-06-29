@@ -17,7 +17,6 @@ import io.idml.utils.{AnalysisModule, AutoComplete}
 import io.idml.ast.IdmlFunctionMetadata
 import io.idml.hashing.HashingFunctionResolver
 import io.idml.jsoup.JsoupFunctionResolver
-import io.idml.geo.{GeoFunctionResolver, GeoDatabaseFunctionResolver}
 import io.idml._
 import io.idml.circe.instances._
 import io.idml.circe._
@@ -43,7 +42,7 @@ object WebsocketServer {
   case class Complete(in: List[IdmlObject], idml: String, position: Int)
 
   val functions =
-    (StaticFunctionResolverService.defaults(IdmlCirce).asScala ++ List(new JsoupFunctionResolver, new HashingFunctionResolver, new GeoFunctionResolver(IdmlCirce), new GeoDatabaseFunctionResolver)).toList
+    (StaticFunctionResolverService.defaults(IdmlCirce).asScala ++ List(new JsoupFunctionResolver, new HashingFunctionResolver)).toList
       .flatMap { f =>
         f.providedFunctions().filterNot(_.name.startsWith("$"))
       }
@@ -54,8 +53,6 @@ object WebsocketServer {
       .withResolver(new JsoupFunctionResolver)
       .withResolver(new HashingFunctionResolver)
       .withResolver(new AnalysisModule)
-      .withResolver(new GeoFunctionResolver(IdmlCirce))
-      .withResolver(new GeoDatabaseFunctionResolver)
       .build()
 
   def service(fr: FunctionResolverService)(implicit ec: ExecutionContext, c: Concurrent[IO]) = {
