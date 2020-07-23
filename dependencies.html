@@ -19,8 +19,66 @@
       <td>The core of the language, this is the main interpreter</td>
     </tr>
     <tr>
+      <td>jackson</td>
+      <td>The Jackson JSON bindings, the default JSON parser</td>
+    </tr>
+    <tr>
+      <td>circe</td>
+      <td>Circe JSON bindings, the default JSON parser for scala projects</td>
+    </tr>
+    <tr>
+      <td>jsoup</td>
+      <td>HTML cleaning function and XML bindings</td>
+    </tr>
+    <tr>
       <td>utils</td>
       <td>Extra utilities, such as document classifiers</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Modules that extend IDML to add extra functions are:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Module</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>jsoup</td>
+      <td>adds XHML/HTML functions like <code>stripTags</code> and <code>parseXml</code>/<code>parseHtml</code></td>
+    </tr>
+    <tr>
+      <td>jackson/circe</td>
+      <td>add <code>parseJson</code> and other associated functions for working with JSON at runtime</td>
+    </tr>
+    <tr>
+      <td>hashing</td>
+      <td>Adds all mainstream hash functions</td>
+    </tr>
+    <tr>
+      <td>geo</td>
+      <td>Geo functions like ISO code lookups</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Other modules you probably don’t need to depend on directly are:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Module</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>bench</td>
+      <td>microbenchmarks for finding performance regressions</td>
     </tr>
     <tr>
       <td>repl</td>
@@ -31,26 +89,36 @@
       <td>the IDML tool</td>
     </tr>
     <tr>
-      <td>geo</td>
-      <td>geo functions</td>
+      <td>idmltutor</td>
+      <td>the interactive tutor</td>
     </tr>
     <tr>
-      <td>jsoup</td>
-      <td>HTML cleaning function and basic XML support</td>
+      <td>test</td>
+      <td>the test framework</td>
     </tr>
-  </tbody>
-  <tbody>
+    <tr>
+      <td>idmldoc</td>
+      <td>the documentation framework</td>
+    </tr>
+    <tr>
+      <td>idmltest-plugin</td>
+      <td>the sbt plugin for idmltest</td>
+    </tr>
+    <tr>
+      <td>idmldoc-plugin</td>
+      <td>the sbt plugin for idmldoc</td>
+    </tr>
     <tr>
       <td>lang</td>
-      <td>the core parser, internal</td>
+      <td>the core parser</td>
     </tr>
     <tr>
       <td>datanodes</td>
-      <td>the core JSON AST, internal</td>
+      <td>the core JSON AST</td>
     </tr>
     <tr>
-      <td>geodb</td>
-      <td>tools for building the geo database, internal</td>
+      <td>execnodes</td>
+      <td>the evaluation AST</td>
     </tr>
   </tbody>
 </table>
@@ -61,8 +129,8 @@
 
 <pre><code class="language-xml">&lt;dependency&gt;
     &lt;groupId&gt;io.idml&lt;/groupId&gt;
-    &lt;artifactId&gt;ptolemy-core_2.12&lt;/artifactId&gt;
-    &lt;version&gt;1.0.xxx&lt;/version&gt;
+    &lt;artifactId&gt;idml-core_2.12&lt;/artifactId&gt;
+    &lt;version&gt;2.0.xxx&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre>
 
@@ -70,7 +138,7 @@
 
 <p>The dependency can also be managed with SBT:</p>
 
-<pre><code>libraryDependencies += "io.idml.ptolemy" %% "ptolemy-core" % "1.0.xxx"
+<pre><code>libraryDependencies += "io.idml" %% "idml-core" % "2.0.xxx"
 </code></pre>
 
 
