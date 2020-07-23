@@ -1,4 +1,4 @@
-<html><head><title>IDML: Basic Usage</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="fairhair.ai" /><meta name="description" content="Ingestion Data Mapping Language" /><meta name="og:image" content="/img/poster.png" /><meta name="image" property="og:image" content="/img/poster.png" /><meta name="og:title" content="IDML: Basic Usage" /><meta name="title" property="og:title" content="IDML: Basic Usage" /><meta name="og:site_name" content="IDML" /><meta name="og:url" content="https://idml.io/" /><meta name="og:type" content="website" /><meta name="og:description" content="Ingestion Data Mapping Language" /><link rel="icon" type="image/png" href="/img/favicon.png" /><meta name="twitter:title" content="IDML: Basic Usage" /><meta name="twitter:image" content="/img/poster.png" /><meta name="twitter:description" content="Ingestion Data Mapping Language" /><meta name="twitter:card" content="summary_large_image" /><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/highlight/styles/solarized-light.css" /><link rel="stylesheet" href="/css/style.css" /><link rel="stylesheet" href="/css/palette.css" /><link rel="stylesheet" href="/css/codemirror.css" /><link rel="stylesheet" href="/css/override.css" /><link rel="stylesheet" href="/css/toc.css" /></head><body class="docs"><div id="wrapper"><div id="sidebar-wrapper"><ul id="sidebar" class="sidebar-nav"><li class="sidebar-brand"><a href="/" class="brand"><div class="brand-wrapper"><span>IDML</span></div></a></li> <li><a href="/dependencies.html" class="">Dependencies</a></li> <li><a href="/basic-usage.html" class=" active ">Basic Usage</a></li>     </ul></div><div id="page-content-wrapper"><div class="nav"><div class="container-fluid"><div class="row"><div class="col-lg-12"><div class="action-menu pull-left clearfix"><a href="#menu-toggle" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></a></div><ul class="pull-right"><li id="gh-eyes-item" class="hidden-xs"><a href="https://github.com/idml/idml"><i class="fa fa-eye"></i><span>WATCH<span id="eyes" class="label label-default">--</span></span></a></li><li id="gh-stars-item" class="hidden-xs"><a href="https://github.com/idml/idml"><i class="fa fa-star-o"></i><span>STARS<span id="stars" class="label label-default">--</span></span></a></li></ul></div></div></div></div><div id="content" data-github-owner="idml" data-github-repo="idml"><div class="content-wrapper"><section><h1>Basic Usage</h1>
+<html><head><title>IDML: Basic Usage</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="DataSift" /><meta name="description" content="Ingestion Data Mapping Language" /><meta name="og:image" content="/img/poster.png" /><meta name="image" property="og:image" content="/img/poster.png" /><meta name="og:title" content="IDML: Basic Usage" /><meta name="title" property="og:title" content="IDML: Basic Usage" /><meta name="og:site_name" content="IDML" /><meta name="og:url" content="https://idml.io/" /><meta name="og:type" content="website" /><meta name="og:description" content="Ingestion Data Mapping Language" /><link rel="icon" type="image/png" href="/img/favicon.png" /><meta name="twitter:title" content="IDML: Basic Usage" /><meta name="twitter:image" content="/img/poster.png" /><meta name="twitter:description" content="Ingestion Data Mapping Language" /><meta name="twitter:card" content="summary_large_image" /><link rel="icon" type="image/png" sizes="16x16" href="/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/highlight/styles/solarized-light.css" /><link rel="stylesheet" href="/css/style.css" /><link rel="stylesheet" href="/css/palette.css" /><link rel="stylesheet" href="/css/codemirror.css" /><link rel="stylesheet" href="/css/override.css" /><link rel="stylesheet" href="/css/toc.css" /></head><body class="docs"><div id="wrapper"><div id="sidebar-wrapper"><ul id="sidebar" class="sidebar-nav"><li class="sidebar-brand"><a href="/" class="brand"><div class="brand-wrapper"><span>IDML</span></div></a></li> <li><a href="/dependencies.html" class="">Dependencies</a></li> <li><a href="/basic-usage.html" class=" active ">Basic Usage</a></li>     </ul></div><div id="page-content-wrapper"><div class="nav"><div class="container-fluid"><div class="row"><div class="col-lg-12"><div class="action-menu pull-left clearfix"><a href="#menu-toggle" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></a></div><ul class="pull-right"><li id="gh-eyes-item" class="hidden-xs"><a href="https://github.com/idml/idml.github.io"><i class="fa fa-eye"></i><span>WATCH<span id="eyes" class="label label-default">--</span></span></a></li><li id="gh-stars-item" class="hidden-xs"><a href="https://github.com/idml/idml.github.io"><i class="fa fa-star-o"></i><span>STARS<span id="stars" class="label label-default">--</span></span></a></li></ul></div></div></div></div><div id="content" data-github-owner="idml" data-github-repo="idml.github.io"><div class="content-wrapper"><section><h1>Basic Usage</h1>
 
 <nav role="navigation" id="toc"></nav>
 
@@ -8,56 +8,72 @@
 
 <p>Here’s a simple Java “hello world”:</p>
 
-<pre><code>import io.idml.ptolemy.*;
+<pre><code>import io.idml.*;
+import io.idml.geo.GeoFunctionResolver;
+import io.idml.jackson.IdmlJackson;
+import io.idml.lang.DocumentParseException;
 
 public class JavaExample {
     public static void main(String[] args) {
-
         // Initialize the runtime. You only need one of these per application
-        Ptolemy ptolemy = new Ptolemy();
+        Idml idml = IdmlBuilder.withFunctionsFromServiceLoader().build();
+        // Make a JSON implementation so we can pick a backend
+        IdmlJson idmlJson = new IdmlJackson(); // you could pass in an ObjectMapper if you wanted
+        // To avoid reflection and service loaders you initialize like this
+        Idml idml2 = IdmlBuilder.withDefaultStaticFunctions(idmlJson).withResolver(new GeoFunctionResolver(idmlJson)).build();
 
-        // Parse a simple mapping that turns
-        PtolemyMapping mapping = ptolemy.fromString("x = a.b.int()");
+        try {
+            // Parse a simple mapping that turns
+            Mapping mapping = idml.compile("x = a.b.int()");
 
-        // Parse some json data taken from a string
-        PtolemyValue input = PtolemyJson.parse("{\"a\": {\"b\": \"123\"}}");
+            // Parse some json data taken from a string
+            IdmlValue input = idmlJson.parse("{\"a\": {\"b\": \"123\"}}");
 
-        // Run a mapping
-        PtolemyValue output = mapping.run(input);
+            // Run a mapping
+            IdmlValue output = mapping.run(input);
 
-        // Pretty-print the output as json
-        System.out.println(PtolemyJson.pretty(output));
+            // Pretty-print the output as json
+            System.out.println(idmlJson.pretty(output));
+        } catch (DocumentParseException | IdmlJsonReadingException e) {
+            e.printStackTrace();
+        }
     }
 }
 </code></pre>
 
 <h2 id="initialization">Initialization</h2>
 
-<p>The Ptolemy object is the main execution context of the system. It acts as a factory for all other objects and can safely be shared between threads.</p>
+<p>The Idml object is the main execution context of the system. It acts as a factory for mappings and can safely be shared between threads.</p>
 
-<pre><code>Ptolemy ptolemy = new Ptolemy();
+<pre><code>Idml idml = IdmlBuilder.withFunctionsFromServiceLoader().build();
+</code></pre>
+
+<p>The IdmlJson object is used to manipulate the JSON representations, it is optional to use this, and you can use a <code>jackson</code> or <code>circe</code> based one.</p>
+
+<pre><code>IdmlJson idmlJson = new IdmlJackson();
 </code></pre>
 
 <h2 id="working-with-data">Working with data</h2>
 
-<p>The PtolemyVaue class wraps some queryable data. Right now it supports JSON using Jackson and XML using JSoup.</p>
+<p>The IdmlValue class wraps some queryable data. Right now it supports JSON using Jackson or Circe and XML using JSoup.</p>
 
-<pre><code>PtolemyValue input = PtolemyJson.parse("{\"a\": {\"b\": \"123\"}}");
+<pre><code>IdmlValue input = idmlJson.parse("{\"a\": {\"b\": \"123\"}}");
 </code></pre>
 
 <p>Basic transformations can be performed on the object itself, but usually this isn’t necessary</p>
 
-<pre><code>PtolemyValue result = input.get("a").get("b").bool();
+<pre><code>IdmlValue result = input.get("a").get("b").bool();
 </code></pre>
 
 <h2 id="mappings">Mappings</h2>
 
-<p>You can create a mapping from a string or use one of the built-in resolvers which will allow you to load from an embedded JAR resource or from the local filesystem.</p>
+<p>You can create a mapping from a string using the <code>compile</code> method, and it can throw a <code>DocumentParseException</code>:</p>
 
-<pre><code>PtolemyMapping a = ptolemy.fromString("x = b");
-PtolemyMapping b = ptolemy.loadResource("my-mapping.ini");
-PtolemyMapping c = ptolemy.loadFile("my-mapping.ini");
-PtolemyValue output = mapping.run(input);
+<pre><code>try {
+    Mapping a = idml.compile("x = b");
+} catch (DocumentParseException e) {
+    e.printStackTrace()
+}
 </code></pre>
 
 <h2 id="chains">Chains</h2>
@@ -66,20 +82,24 @@ PtolemyValue output = mapping.run(input);
 
 <p>This use case evolved from the interation data model at DataSift where we have raw data, for example, Twitter, a sanitized version of that data, and then generalized:</p>
 
-<pre><code>PtolemyChain facebookMapping = ptolemy.newChain(
-    // Normalization: The text body of Facebook posts varies depending on whether it's a story, video, etc.
-    ptolemy.fromString("facebook.content = this.(text | story | message).string()"),
+<pre><code>try {
+    Mapping facebookMapping = idml.chain(
+         // Normalization: The text body of Facebook posts varies depending on whether it's a story, video, etc.
+         idml.compile("facebook.content = this.(text | story | message).string()"),
 
-    // Generalization: interaction.content refers to the body in all types.. Facebook, Twitter, Sina, etc.
-    ptolemy.fromString("interaction.content = facebook.content.stripTags()"),
+         // Generalization: interaction.content refers to the body in all types.. Facebook, Twitter, Sina, etc.
+         idml.compile("interaction.content = facebook.content.stripTags()"),
 
-    // Validation: This schema validation is shared by all mappings to make sure that we follow uniform rules
-    ptolemy.fromString("interaction.content : string().default(\"Aw damn, there's no tex on this one!\")")
-);
-// A simplified version of data received from the Facebook Graph API
-PtolemyValue facebookPost = PtolemyJson.parse("{\"message\": \"Some message\"}");
-// Chains can be run just like any other mapping
-PtolemyValue output = facebookMapping.run(facebookPost);
+         // Validation: This schema validation is shared by all mappings to make sure that we follow uniform rules
+         idml.compile("interaction.content : string().default(\"Aw damn, there's no tex on this one!\")")
+    );
+    // A simplified version of data received from the Facebook Graph API
+    IdmlValue facebookPost = idmlJson.parse("{\"message\": \"Some message\"}");
+    // Chains can be run just like any other mapping
+    IdmlValue output = facebookMapping.run(facebookPost);
+} catch (DocumentParseException | IdmlJsonReadingException e) {
+    e.printStackTrace();
+}
 </code></pre>
 
 <p><img src="./diagrams/chain.png" alt="chain diagram" /></p>
@@ -90,21 +110,22 @@ PtolemyValue output = facebookMapping.run(facebookPost);
 
 <p>This allows you to write parallel mappings rather than mappings which are applied end to end.</p>
 
-<pre><code>// Initialize the runtime. You only need one of these per application
-Ptolemy ptolemy = new Ptolemy();
+<pre><code>try {
+    // Merge some mappings together into one mapping
+    Mapping merged = IdmlMapping.fromMultipleMappings(Arrays.asList(
+            idml.compile("interaction.content = text"),
+            idml.compile("interaction.author = author"),
+            idml.compile("interaction.content = real_text")
+    ));
 
-// Merge some mappings together into one mapping
-Mapping merged = PtolemyMapping.fromMultipleMappings(ptolemy, Arrays.asList(
-        ptolemy.fromString("interaction.content = text"),
-        ptolemy.fromString("interaction.author = author"),
-        ptolemy.fromString("interaction.content = real_text")
-));
+    IdmlValue input = idmlJson.parse(
+            "{\"text\": \"an example body\", \"author\": \"bob\", \"real_text\": \"an alternate body\"}"
+    );
 
-PtolemyValue input = PtolemyJson.parse(
-        "{\"text\": \"an example body\", \"author\": \"bob\", \"real_text\": \"an alternate body\"}"
-);
-
-System.out.println(PtolemyJson.pretty(merged.run(input)));
+    System.out.println(idmlJson.pretty(merged.run(input)));
+} catch (DocumentParseException | IdmlJsonReadingException e) {
+    e.printStackTrace();
+}
 </code></pre>
 
 <p><img src="./diagrams/merge.png" alt="chain diagram" /></p>

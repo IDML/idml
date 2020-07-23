@@ -1,0 +1,7 @@
+@startuml
+input -> output: map1
+output -> output: map2
+output -> output: map3
+output -> output: map4
+output -> output: map5
+@enduml
