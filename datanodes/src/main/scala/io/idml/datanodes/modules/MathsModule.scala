@@ -24,8 +24,8 @@ trait MathsModule {
 
   private def doSigRound(sd: IdmlValue, mode: RoundingMode): IdmlValue = {
     (this.toDoubleOption, sd) match {
-      case (Some(d), i: IInt) if i.value < 1 => InvalidParameters
-      case (Some(d), i: IInt)                => IDouble(BigDecimal(d.doubleValue()).round(new MathContext(i.value.toInt, mode)).doubleValue())
+      case (Some(_), i: IInt) if i.value < 1 => InvalidParameters
+      case (Some(d), i: IInt)                => IDouble(BigDecimal(d.doubleValue()).round(new MathContext(i.value.toInt, mode)).doubleValue)
       case (None, _)                         => InvalidCaller
       case (Some(_), _)                      => InvalidParameters
     }

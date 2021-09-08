@@ -24,9 +24,9 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
     } else if (ctx.coalesce() != null) {
       visitCoalesce(ctx.coalesce())
     } else if (ctx.Any() != null) {
-      Any
+      AnyExpr
     } else if (ctx.Wildcard() != null) {
-      Wildcard(Pipeline(Nil))
+      new Wildcard(new Pipeline(Nil))
     } else {
       throw new IllegalStateException()
     }
@@ -446,17 +446,17 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
   /** Traverse a predicate that may be one of many types */
   override def visitPredicate(ctx: PredicateContext): Predicate = {
     if (ctx.Underscore() != null) {
-      Underscore
+      UnderscorePred
     } else if (ctx.unitary() != null) {
       visitUnitary(ctx.unitary())
     } else if (ctx.binary() != null) {
       visitBinary(ctx.binary())
     } else if (ctx.And() != null) {
       require(ctx.predicate(0) != null && ctx.predicate(1) != null)
-      And(visitPredicate(ctx.predicate(0)), visitPredicate(ctx.predicate(1)))
+      new And(visitPredicate(ctx.predicate(0)), visitPredicate(ctx.predicate(1)))
     } else if (ctx.Or() != null) {
       require(ctx.predicate(0) != null && ctx.predicate(1) != null)
-      Or(visitPredicate(ctx.predicate(0)), visitPredicate(ctx.predicate(1)))
+      new Or(visitPredicate(ctx.predicate(0)), visitPredicate(ctx.predicate(1)))
     } else if (ctx.negation() != null) {
       visitNegation(ctx.negation())
     } else if (ctx.grouped() != null) {

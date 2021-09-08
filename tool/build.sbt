@@ -4,7 +4,7 @@ enablePlugins(UniversalPlugin)
 
 
 libraryDependencies ++= List(
-  "com.monovore" %% "decline" % "0.5.0",
+  "com.monovore" %% "decline" % "1.4.0",
   "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.13.0",
 )
 

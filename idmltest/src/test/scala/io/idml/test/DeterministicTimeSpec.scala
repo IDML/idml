@@ -3,11 +3,12 @@ import io.idml.datanodes.{IDate, IObject}
 import io.idml._
 import io.idml.circe.IdmlCirce
 import org.joda.time.{DateTime, DateTimeZone}
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.must
 
 import scala.collection.JavaConverters._
 
-class DeterministicTimeSpec extends WordSpec with MustMatchers {
+class DeterministicTimeSpec extends AnyWordSpec with must.Matchers {
   "DeterministicTime" should {
     "override now" in {
       val p = Idml.staticBuilderWithDefaults(IdmlCirce).withResolverPrepend(new DeterministicTime()).build()

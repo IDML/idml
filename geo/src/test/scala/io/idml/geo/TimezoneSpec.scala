@@ -1,8 +1,9 @@
 package io.idml.geo
 import io.idml.datanodes.IString
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.must
 
-class TimezoneSpec extends WordSpec with MustMatchers {
+class TimezoneSpec extends AnyWordSpec with must.Matchers {
 
   "the timezone function" should {
     "know the timezone of Reading" in {

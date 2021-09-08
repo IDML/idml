@@ -2,9 +2,10 @@ package io.idml.jackson
 
 import io.idml.IdmlJson
 import io.idml.datanodes.IString
-import org.scalatest.{FunSuite, MustMatchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
-class StringParsingSpec extends FunSuite with MustMatchers {
+class StringParsingSpec extends AnyFunSuite with Matchers {
   import IdmlJackson.default._
 
   // Parsing

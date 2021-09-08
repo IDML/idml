@@ -3,8 +3,10 @@ package io.idml.doc
 import sbt._
 import microsites._
 import sbt.Keys._
-import com.typesafe.sbt.site.SitePlugin.autoImport.{makeSite, siteDirectory}
-import cats.effect.IO
+import com.typesafe.sbt.site.SitePlugin.autoImport.makeSite
+import cats.effect.{IO, Blocker, ContextShift}
+
+import scala.concurrent.ExecutionContext
 
 object IdmlDocSbt extends AutoPlugin with MicrositeKeys {
 
@@ -18,13 +20,16 @@ object IdmlDocSbt extends AutoPlugin with MicrositeKeys {
   val idmlSourceDirectory: SettingKey[File] = settingKey[File]("folder to read IDML docs from")
 
   override val projectSettings = inConfig(Idml)(Defaults.configSettings) ++ Seq(
-    idmlSourceDirectory := (sourceDirectory in Compile).value / "tut",
+    idmlSourceDirectory := (Compile / sourceDirectory).value / "tut",
     idmlTargetDirectory := resourceManaged.value / "main" / "jekyll",
     idml := {
-      Main.processFiles[IO](idmlSourceDirectory.value.toPath, idmlTargetDirectory.value.toPath).unsafeRunSync()
+      implicit val cs: ContextShift[IO] = cats.effect.IO.contextShift(ExecutionContext.global)
+      Blocker[IO].use { blocker =>
+        Main.processFiles[IO](idmlSourceDirectory.value.toPath, idmlTargetDirectory.value.toPath, blocker)
+      }.unsafeRunSync()
     },
     makeIdml := {
-      Def.sequential(microsite, idml, makeSite, micrositeConfig)
+      Def.sequential(microsite, idml, makeSite)
     }.value,
   )
 

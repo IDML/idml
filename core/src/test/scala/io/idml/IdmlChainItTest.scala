@@ -1,9 +1,9 @@
 package io.idml
 
 import io.idml.datanodes.{IObject, ITrue}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class IdmlChainItTest extends FunSuite {
+class IdmlChainItTest extends AnyFunSuite {
 
   test("Test mapping chain order works properly") {
     val idml = Idml.autoBuilder().build()

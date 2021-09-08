@@ -3,10 +3,10 @@ package io.idml
 import io.idml.lang.DocumentParseException
 import io.idml.ast._
 import org.mockito.Answers
-import org.scalatest.FunSuite
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.mockito.MockitoSugar
 
-class IdmlParserTest extends FunSuite with MockitoSugar {
+class IdmlParserTest extends AnyFunSuite with MockitoSugar {
 
   test("Parses text") {
     new IdmlParser().parse(null, "a = b").nodes == Document(

@@ -1,9 +1,10 @@
 package io.idml.jackson
 
 import io.idml.datanodes.IInt
-import org.scalatest.{FunSuite, MustMatchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
-class IntParsingSpec extends FunSuite with MustMatchers {
+class IntParsingSpec extends AnyFunSuite with Matchers {
   import IdmlJackson.default._
 
   // Parsing

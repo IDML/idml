@@ -1,10 +1,6 @@
 package io.idml.geo
 
-import cats.effect._
 import cats.implicits._
-import doobie._
-import doobie.hikari._
-import doobie.implicits._
 import io.idml._
 import io.idml.ast.Pipeline
 import io.idml.datanodes.{IInt, IObject, IString}

@@ -1,10 +1,10 @@
 package io.idml.utils
 
 import io.idml.datanodes._
-import org.scalatest.FunSuite
-import org.scalatest.MustMatchers
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must
 
-class PValueComparisonTest extends FunSuite with MustMatchers {
+class PValueComparisonTest extends AnyFunSuite with must.Matchers {
   import io.idml.utils.PValueComparison._
 
   test("Accepts equal scalar values") {

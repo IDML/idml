@@ -1,24 +1,29 @@
 package io.idml.test
 
 import java.nio.file.{Files, Paths}
-
-import cats.effect.{IO, Timer}
+import cats.effect.{Blocker, IO, Timer}
 import com.google.re2j.Pattern
 import io.circe.Json
 import io.circe.generic.auto._
 import io.circe.literal.JsonStringContext
 import io.circe.syntax._
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.must
 import io.circe.literal._
+import org.scalatest.BeforeAndAfterAll
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.global
 
-class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
+class RunnerSpec extends AnyWordSpec with must.Matchers with CirceEitherEncoders with BeforeAndAfterAll {
 
   implicit val cs = IO.contextShift(global)
-  class TestRunner extends Runner(false, None, true, global)(cs) {
+  val (blocker, deallocateBlocker) = Blocker[IO].allocated.unsafeRunSync()
+
+  override def afterAll(): Unit = deallocateBlocker.unsafeRunSync()
+
+  class TestRunner extends Runner(false, None, true, blocker)(cs) {
     val printed                          = mutable.Buffer.empty[String]
     override def print(a: Any): IO[Unit] = IO { printed.append(a.toString) }
   }
@@ -29,12 +34,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
       r.runSingle(
           None,
           Left("r = a + b"),
-          json"""
-               {
-                 "a": 1,
-                 "b": 2
-               }
-        """
+          Json.obj("a" -> Json.fromInt(1), "b" -> Json.fromInt(2))
         )
         .unsafeRunSync() must equal(Json.obj("r" -> Json.fromInt(3)))
     }
@@ -44,10 +44,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
     r.runSingle(
         Some(1554117846L),
         Left("r = now()"),
-        json"""
-               {
-               }
-        """
+        Json.obj()
       )
       .unsafeRunSync() must equal(Json.obj("r" -> Json.fromString("Mon, 01 Apr 2019 11:24:06 +0000")))
   }
@@ -136,8 +133,8 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
       List(
         "---",
         "Test Summary:",
-        fansi.Color.Red("1 test failed").toString(),
         fansi.Color.Green("2 tests succeeded").toString(),
+        fansi.Color.Red("1 test failed").toString(),
         fansi.Color.Red("1 test errored").toString()
       ))
   }
@@ -166,18 +163,19 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to update a file that needs updating" in {
     val test     = Files.createTempFile("idml-test", ".json")
     val r        = new TestRunner
-    val testJson = json"""
-      {
-        "name" : "example test",
-        "code" : "r = a + b",
-        "input" : {
-           "a" : 2,
-           "b" : 2
-        },
-        "output" : {
-        }
-      }"""
-    r.writeAll(global)(test)(fs2.Stream.emit(testJson.spaces2)).unsafeRunSync()
+    val testJson =
+      Json.obj(
+        "name" -> Json.fromString("example test"),
+        "code" -> Json.fromString("r = a + b"),
+        "input" -> Json.obj(
+          "a" -> Json.fromInt(2),
+          "b" -> Json.fromInt(2)
+        ),
+        "output" -> Json.obj()
+      )
+    Blocker[IO].use { global =>
+      r.writeAll(global)(test)(fs2.Stream.emit(testJson.spaces2))
+    }.unsafeRunSync()
     val state = r.updateTest(false)(cs)(test).unsafeRunSync()
     Files.delete(test)
     state must equal(List(TestState.Updated, TestState.Updated))
@@ -191,7 +189,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to update a referred file that needs updating" in {
     val r = new TestRunner
 
-    {
+    Blocker[IO].use { global =>
       for {
         test   <- IO { Files.createTempFile("idml-test", ".json") }
         output <- IO { Files.createTempFile("idml-test", ".json") }
@@ -228,7 +226,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to create a referred file that needs creating" in {
     val r = new TestRunner
 
-    {
+    Blocker[IO].use { global =>
       for {
         test   <- IO { Files.createTempFile("idml-test", ".json") }
         output = Paths.get(test.getParent.toString, "create-me.json")
@@ -308,7 +306,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to update an inline multitest" in {
     val r = new TestRunner
 
-    {
+    Blocker[IO].use { global =>
       for {
         test <- IO { Files.createTempFile("idml-test", ".json") }
         testJson = Json.obj(
@@ -341,7 +339,7 @@ class RunnerSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
   "be able to update a referred file that needs updating in a multitest" in {
     val r = new TestRunner
 
-    {
+    Blocker[IO].use { global =>
       for {
         test   <- IO { Files.createTempFile("idml-test", ".json") }
         output <- IO { Files.createTempFile("idml-test", ".json") }

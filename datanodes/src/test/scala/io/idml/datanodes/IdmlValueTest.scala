@@ -1,10 +1,11 @@
 package io.idml.datanodes
 
 import io.idml.{IdmlNull, IdmlValue}
-import org.scalatest._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
 /** Test the behaviour of the IdmlValue class */
-class IdmlValueTest extends FunSuite with MustMatchers {
+class IdmlValueTest extends AnyFunSuite with Matchers {
 
   // Companion object
   test("companion - null")(IdmlValue(null) must equal(IdmlNull))

@@ -1,10 +1,11 @@
 package io.idml.test
 import io.circe.Json
-import org.scalatest.{FlatSpec, MustMatchers}
 import io.circe.literal._
 import io.idml.test.diffable.{DiffableParser, DiffablePrinter}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.must
 
-class DiffableFormatsSpec extends FlatSpec with MustMatchers {
+class DiffableFormatsSpec extends AnyFlatSpec with must.Matchers {
 
   "DiffPrinter" should "print things in a way that's nice to diff" in {
     DiffablePrinter.print(json"[1,2,3]") must equal(Right("""[

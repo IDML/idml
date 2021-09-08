@@ -1,11 +1,12 @@
 package io.idml
 
-import org.scalatest.FunSuite
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.funsuite.AnyFunSuite
 import org.mockito.Mockito._
+import org.scalatestplus.mockito.MockitoSugar
+
 import scala.collection.JavaConverters._
 
-class IdmlTest extends FunSuite with MockitoSugar {
+class IdmlTest extends AnyFunSuite with MockitoSugar {
 
   test("Passes strings to parser") {
     val parser = mock[IdmlParser]

@@ -29,5 +29,5 @@ class IdmlChain(val transforms: Mapping*) extends Mapping {
 
 object IdmlChain {
   def of(transforms: java.util.List[Mapping]): IdmlChain =
-    new IdmlChain(transforms.asScala: _*)
+    new IdmlChain(transforms.asScala.toSeq: _*)
 }

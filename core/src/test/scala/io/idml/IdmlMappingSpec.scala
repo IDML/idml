@@ -2,11 +2,12 @@ package io.idml
 import java.util
 
 import io.idml.datanodes.{IInt, IObject, IString}
-import org.scalatest.{FlatSpec, MustMatchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.must.Matchers
 
 import scala.collection.JavaConverters._
 
-class IdmlMappingSpec extends FlatSpec with MustMatchers {
+class IdmlMappingSpec extends AnyFlatSpec with Matchers {
 
   "IdmlMapping" should "enable combination of mappings" in {
     val idml                    = Idml.autoBuilder().build()

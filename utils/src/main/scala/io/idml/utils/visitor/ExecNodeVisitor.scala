@@ -26,7 +26,7 @@ trait ExecNodeVisitor {
     def parent: ExecPiplContext
   }
   case class ExecAnyContext(parent: ExecPiplContext) extends ExecExprContext {
-    def expr: Any.type = Any
+    def expr: AnyExpr.type = AnyExpr
   }
   case class ExecIndexContext(expr: Index, parent: ExecPiplContext)               extends ExecExprContext
   case class ExecNavContext(expr: ExecNav, parent: ExecPiplContext)               extends ExecExprContext
@@ -89,7 +89,7 @@ trait ExecNodeVisitor {
 
   def createExprContext(expr: Expression, ctx: ExecPiplContext): ExecExprContext = {
     expr match {
-      case Any                 => ExecAnyContext(ctx)
+      case AnyExpr                 => ExecAnyContext(ctx)
       case expr: Index         => ExecIndexContext(expr, ctx)
       case expr: ExecNav       => ExecNavContext(expr, ctx)
       case expr: Field         => ExecPathContext(expr, ctx)

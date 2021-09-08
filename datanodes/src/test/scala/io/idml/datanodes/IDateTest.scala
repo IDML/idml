@@ -3,10 +3,11 @@ package io.idml.datanodes
 import io.idml.datanodes.modules.DateModule
 import org.joda.time.format.DateTimeFormatterBuilder
 import org.joda.time.{DateTime, DateTimeZone, Hours}
-import org.scalatest._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
 /** Test the behaviour of the PDate class */
-class IDateTest extends FunSuite with MustMatchers {
+class IDateTest extends AnyFunSuite with Matchers {
   DateTimeZone.setDefault(DateTimeZone.UTC)
 
   val nowMs      = 1414755054310L

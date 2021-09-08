@@ -2,10 +2,11 @@ package io.idml.utils
 
 import io.idml.utils.DocumentClassifier.DocumentClassifierVisitor
 import io.idml.{FunctionResolverService, Idml, IdmlParser}
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.must
+import org.scalatest.wordspec.AnyWordSpec
 
 /** Verify the DocumentClassifier */
-class DocumentClassifierTest extends WordSpec with MustMatchers {
+class DocumentClassifierTest extends AnyWordSpec with must.Matchers {
 
   /** Adds 'string.classify' syntactic sugar to make tests simpler */
   implicit class RuleRunner(in: String) {

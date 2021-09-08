@@ -1,11 +1,12 @@
 package io.idml.test
 import io.circe.Json
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.must
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.literal.JsonStringContext
 
-class TestsSpec extends WordSpec with MustMatchers with CirceEitherEncoders {
+class TestsSpec extends AnyWordSpec with must.Matchers with CirceEitherEncoders {
 
   val testJson = json"""
       {

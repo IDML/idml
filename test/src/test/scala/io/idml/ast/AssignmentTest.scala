@@ -5,10 +5,10 @@ import io.idml.{IdmlContext, IdmlListener, IdmlValue, NoFields}
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import org.scalatest.FunSuite
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.mockito.MockitoSugar
 
-class AssignmentTest extends FunSuite with MockitoSugar {
+class AssignmentTest extends AnyFunSuite with MockitoSugar {
 
   def updateCursor(value: IdmlValue): Answer[Unit] = new Answer[Unit] {
     override def answer(invocation: InvocationOnMock) = {

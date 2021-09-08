@@ -2,9 +2,10 @@ package io.idml.jackson
 
 import io.idml.{IdmlContext, IdmlValue}
 import io.idml.datanodes.{IObject, IString}
-import org.scalatest.{FunSuite, MustMatchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
-class UUIDTest extends FunSuite with MustMatchers {
+class UUIDTest extends AnyFunSuite with Matchers {
   val funcs = new JacksonFunctions
   import funcs.uuid._
 

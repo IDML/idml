@@ -4,11 +4,12 @@ import io.idml.datanodes.{IArray, IInt, IObject}
 import io.idml.ast.{Block, Document}
 import io.idml.{IdmlContext, NoFields, UnknownBlockException}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
-import org.scalatest.{FunSuite, MustMatchers}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
 /** Verify the behaviour of the ApplyFunction */
-class ApplyFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
+class ApplyFunctionTest extends AnyFunSuite with Matchers with MockitoSugar {
 
   test("Constructor accepts a missing block") {
     ApplyFunction("missing_block")

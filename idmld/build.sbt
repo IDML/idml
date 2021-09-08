@@ -1,7 +1,7 @@
 name := "idmld"
 
-lazy val http4sVersion = "0.20.0-RC1"
-lazy val circeVersion  = "0.11.1"
+lazy val http4sVersion = "0.21.22"
+lazy val circeVersion  = "0.13.0"
 
 libraryDependencies ++= Seq(
   "org.http4s"     %% "http4s-core"         % http4sVersion,
