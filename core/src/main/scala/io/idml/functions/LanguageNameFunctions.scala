@@ -12,7 +12,7 @@ object LanguageNameFunctions {
     targetLocale.fold(lang.getDisplayLanguage)(t => lang.getDisplayLanguage(Locale.forLanguageTag(t))) match {
       // Java can just return the original input if it didn't know, and we'll blank that out
       // if you do want the java behaviour, use (code.languageName() | code)
-      case result if result == code => MissingField // Java can just return us the input, which we'll blank out as an unsuccessful call, if you want this behaviour do
+      case result if result == code => MissingField
       case result => IString(result)
     }
   }

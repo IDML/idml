@@ -24,6 +24,12 @@
     "output": {"output": "Dansk"}
   },
   {
+    "name": "languageName with a manual locale of chinese",
+    "mapping": "output = input.languageName(\"zh\")",
+    "input": {"input": "da"},
+    "output": {"output": "丹麦文"}
+  },
+  {
     "name": "languageName with null input",
     "mapping": "output = input.languageName()",
     "input": {},
