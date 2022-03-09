@@ -6,6 +6,12 @@
     "output": {"output": "English"}
   },
   {
+    "name": "languageName default locale with a 3-char input",
+    "mapping": "output = input.languageName()",
+    "input": {"input": "ban"},
+    "output": {"output": "Balinese"}
+  },
+  {
     "name": "languageName with manual locale of en",
     "mapping": "output = input.languageName(\"en\")",
     "input": {"input": "da"},
