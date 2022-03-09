@@ -43,6 +43,10 @@ class BuiltinFunctionResolver extends FunctionResolver {
         Some(GroupsByFunction(expression))
       case ("filter", (pred: Predicate) :: Nil) =>
         Some(FilterFunction(pred))
+      case ("languageName", Nil) =>
+        Some(LanguageNameFunctions.LanguageNameFunction0)
+      case ("languageName", (targetLocale: Pipeline) :: Nil) =>
+        Some(LanguageNameFunctions.LanguageNameFunction1(targetLocale))
       case _ =>
         None
     }
@@ -77,6 +81,8 @@ class BuiltinFunctionResolver extends FunctionResolver {
     ),
     IdmlFunctionMetadata("filter",
                          List("predicate" -> "filtering predicate"),
-                         "returns a new list with only the items which match the predicate")
+                         "returns a new list with only the items which match the predicate"),
+    IdmlFunctionMetadata("languageName", List.empty, "look up the name of this ISO language code"),
+    IdmlFunctionMetadata("languageName", List("targetLocale" -> "language code to look up the name in"), "look up the name of this ISO language code")
   )
 }
