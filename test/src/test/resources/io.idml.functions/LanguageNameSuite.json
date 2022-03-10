@@ -1,0 +1,56 @@
+[
+  {
+    "name": "languageName default locale",
+    "mapping": "output = input.languageName()",
+    "input": {"input": "en"},
+    "output": {"output": "English"}
+  },
+  {
+    "name": "languageName default locale with a 3-char input",
+    "mapping": "output = input.languageName()",
+    "input": {"input": "ban"},
+    "output": {"output": "Balinese"}
+  },
+  {
+    "name": "languageName with manual locale of en",
+    "mapping": "output = input.languageName(\"en\")",
+    "input": {"input": "da"},
+    "output": {"output": "Danish"}
+  },
+  {
+    "name": "languageName with a manual locale of danish",
+    "mapping": "output = input.languageName(\"da\")",
+    "input": {"input": "da"},
+    "output": {"output": "Dansk"}
+  },
+  {
+    "name": "languageName with a manual locale of chinese",
+    "mapping": "output = input.languageName(\"zh\")",
+    "input": {"input": "da"},
+    "output": {"output": "丹麦文"}
+  },
+  {
+    "name": "languageName with null input",
+    "mapping": "output = input.languageName()",
+    "input": {},
+    "output": {}
+  },
+  {
+    "name": "languageName with int input",
+    "mapping": "output = input.languageName()",
+    "input": {"input":  123},
+    "output": {}
+  },
+  {
+    "name": "languageName with invalid input",
+    "mapping": "output = input.languageName()",
+    "input": {"input":  "blargh"},
+    "output": {}
+  },
+  {
+    "name": "languageName with null input and a manual locale",
+    "mapping": "output = input.languageName(\"en\")",
+    "input": {},
+    "output": {}
+  }
+]
