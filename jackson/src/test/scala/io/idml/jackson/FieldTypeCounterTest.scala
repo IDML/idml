@@ -1,9 +1,9 @@
 package io.idml.jackson
 
 import io.idml.{FieldTypeCounter, IdmlValue}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class FieldTypeCounterTest extends FunSuite {
+class FieldTypeCounterTest extends AnyFunSuite {
 
   implicit def str2json(str: String): IdmlValue = {
     IdmlJackson.default.parse(str)

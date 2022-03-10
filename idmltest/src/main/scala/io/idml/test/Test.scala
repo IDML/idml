@@ -32,7 +32,7 @@ final case class PipelinedCode[T](
 )
 object PipelinedCode {
   implicit val functor: Functor[PipelinedCode] = new Functor[PipelinedCode] {
-    override def map[A, B](fa: PipelinedCode[A])(f: A => B): PipelinedCode[B] = fa.copy(database = fa.database.mapValues(f))
+    override def map[A, B](fa: PipelinedCode[A])(f: A => B): PipelinedCode[B] = fa.copy(database = fa.database.mapValues(f).toMap)
   }
   implicit val pipelinedCodeTraverse: Traverse[PipelinedCode] = new Traverse[PipelinedCode] {
     override def traverse[G[_], A, B](fa: PipelinedCode[A])(f: A => G[B])(implicit evidence$1: Applicative[G]): G[PipelinedCode[B]] =

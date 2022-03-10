@@ -52,20 +52,22 @@ object Main extends IOApp {
 
   def execute(injectedRunner: Option[Runner] = None): Command[IO[ExitCode]] = command.map {
     case (paths, filter, update, failures, dynamic, plugins, noReport, jdiff, threads) =>
-      val cs: Resource[IO, (ExecutionContext, ContextShift[IO])] =
-        threads
+      val cs: Resource[IO, (ContextShift[IO], Blocker)] = {
+        val pools = threads
           .map(n =>
             Resource.make(IO { Executors.newFixedThreadPool(n) })(p => IO { p.shutdown() }).map { p =>
               val ec: ExecutionContext = ExecutionContext.fromExecutor(p)
-              (ec, IO.contextShift(ec))
+              IO.contextShift(ec)
           })
-          .getOrElse(Resource.liftF(IO {
-            (ExecutionContext.global.asInstanceOf[ExecutionContext], IO.contextShift(ExecutionContext.global))
+          .getOrElse(Resource.eval(IO {
+            IO.contextShift(ExecutionContext.global)
           }))
+        (pools, Blocker[IO]).tupled
+      }
       cs.use {
-        case (ec, c) =>
+        case (c, b) =>
           implicit val ics: ContextShift[IO] = c
-          val runner                         = injectedRunner.getOrElse(new Runner(dynamic, plugins, jdiff, ec)(c))
+          val runner                         = injectedRunner.getOrElse(new Runner(dynamic, plugins, jdiff, b)(c))
           for {
             results <- if (update) paths.traverse(runner.updateTest(failures, filter)(c))
                       else paths.traverse(runner.runTest(failures, filter)(c))

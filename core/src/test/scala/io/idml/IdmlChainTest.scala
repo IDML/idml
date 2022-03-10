@@ -5,12 +5,13 @@ import org.mockito.Answers
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import org.scalatest.{FunSuite, MustMatchers}
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.collection.JavaConverters._
 
-class IdmlChainTest extends FunSuite with MockitoSugar with MustMatchers {
+class IdmlChainTest extends AnyFunSuite with MockitoSugar with Matchers {
 
   test("Can't create an empty chain") {
     intercept[IllegalArgumentException](new IdmlChain())

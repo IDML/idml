@@ -1,16 +1,15 @@
 package io.idml
 
 import java.net.URL
-
 import io.idml.datanodes._
 import io.idml.ast._
 import io.idml.functions.ApplyFunction
-import org.scalatest.FunSuite
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.mockito.MockitoSugar
 
 import scala.collection.mutable
 
-class UnmappedFieldsFinderTest extends FunSuite with MockitoSugar {
+class UnmappedFieldsFinderTest extends AnyFunSuite with MockitoSugar {
 
   test("Companion object throws rt exception if the state is missing") {
     intercept[RuntimeException](UnmappedFieldsFinder.fromContext(new IdmlContext()))

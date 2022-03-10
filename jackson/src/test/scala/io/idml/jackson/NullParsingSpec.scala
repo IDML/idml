@@ -1,9 +1,10 @@
 package io.idml.jackson
 
 import io.idml.IdmlNull
-import org.scalatest.{FunSuite, MustMatchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
-class NullParsingSpec extends FunSuite with MustMatchers {
+class NullParsingSpec extends AnyFunSuite with Matchers {
   import IdmlJackson.default._
   // Parsing
   test("parse(null)")(parse("null") must equal(IdmlNull))

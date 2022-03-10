@@ -1,12 +1,13 @@
 package io.idml.idmldoc
 
-import org.scalatest.{FlatSpec, MustMatchers, WordSpec}
 import cats.effect._
 import cats._
 import cats.implicits._
 import io.idml.doc.{Markdown, Runners}
+import org.scalatest.matchers.must
+import org.scalatest.wordspec.AnyWordSpec
 
-class IdmlDocSpec extends WordSpec with MustMatchers {
+class IdmlDocSpec extends AnyWordSpec with must.Matchers {
 
   "IdmlDoc" when {
     "running" should {

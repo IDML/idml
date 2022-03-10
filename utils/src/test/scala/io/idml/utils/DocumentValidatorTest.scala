@@ -1,11 +1,11 @@
 package io.idml.utils
 
 import io.idml.lang.DocumentParseException
-import org.scalatest.FunSuite
-import org.scalatest.MustMatchers
+import org.scalatest.matchers.must
+import org.scalatest.funsuite.AnyFunSuite
 
 /** This class ensures we valiate IDML documents correctly */
-class DocumentValidatorTest extends FunSuite with MustMatchers {
+class DocumentValidatorTest extends AnyFunSuite with must.Matchers {
 
   test("Accepts documents that are valid mappings") {
     DocumentValidator.validate("p = q")

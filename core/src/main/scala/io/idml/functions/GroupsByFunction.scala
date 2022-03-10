@@ -40,6 +40,7 @@ case class GroupsByFunction(expr: Node) extends IdmlFunction {
             })
             .groupBy(_._1)
             .toList
+            .sortBy(_._1)
             .map { case (k, v) => IObject("key" -> k, "values" -> IArray(v.map(_._2))) }
           IArray(vs.toBuffer[IdmlValue])
         }

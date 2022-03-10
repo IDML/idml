@@ -26,8 +26,8 @@ import io.idml.server.WebsocketServer
 import io.idml.utils.Tracer.Annotator
 
 import scala.util.{Failure, Success, Try}
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object IdmlTools {
   implicit val urlArgument = new Argument[URL] {
@@ -96,111 +96,110 @@ object IdmlTools {
           val analysisModule = if (config.traceFile.isDefined) Some(new Annotator(jsonModule)) else None
           val modules        = List(unmappedModule, analysisModule).flatten
 
-          for {
-            _ <- EitherT
-                  .cond[IO](!(config.traceFile.isDefined && config.files.length != 1), (), "When tracing please supply one mapping to run")
-            engine <- EitherT.liftF(IO {
-                       new IdmlBuilder(fr)
-                         .withListeners(modules: _*)
-                         .build()
-                     })
-            found <- EitherT(IO {
-                      val (exists, doesntExist) = config.files.partition(_.exists())
-                      if (doesntExist.nonEmpty) {
-                        doesntExist.map(f => s"Couldn't load mapping from $f").mkString("\n").asLeft
-                      } else {
-                        exists.asRight
-                      }
-                    })
-            strings <- EitherT.liftF(found.traverse { f =>
-                        fs2.io.file
-                          .readAll[IO](f.toPath, global, 2048)
-                          .through(fs2.text.utf8Decode[IO])
-                          .compile
-                          .foldMonoid
-                      })
-            compiled <- found.zip(strings).traverse {
-                         case (file, s) =>
-                           EitherT(IO {
-                             Either
-                               .catchOnly[DocumentParseException](engine.compile(s))
-                               .leftMap { c =>
-                                 s"Couldn't compile ${file.getName}: ${c.getMessage}"
-                               }
-                           })
-                       }
-            _ <- if (config.strict)
-                  found
-                    .zip(compiled)
-                    .traverse {
-                      case (file, m) =>
-                        EitherT(IO {
-                          Either
-                            .catchOnly[ClassificationException] {
-                              DocumentValidator.validate(m.asInstanceOf[IdmlMapping].nodes)
-                            }
-                            .leftMap { ce =>
-                              s"Couldn't validate ${file.getName}: ${ce.getMessage}"
-                            }
-                        })
-                    }
-                    .void
-                else EitherT.rightT[IO, String](())
-            // and we get to the main loop!
-            chain = engine.chain(compiled: _*)
-            _ <- fs2.io
-                  .stdin[IO](2048, global)
+          Blocker[IO].use { blocker => {
+            for {
+              _ <- EitherT
+                .cond[IO](!(config.traceFile.isDefined && config.files.length != 1), (), "When tracing please supply one mapping to run")
+              engine <- EitherT.liftF(IO {
+                new IdmlBuilder(fr)
+                  .withListeners(modules: _*)
+                  .build()
+              })
+              found <- EitherT(IO {
+                val (exists, doesntExist) = config.files.partition(_.exists())
+                if (doesntExist.nonEmpty) {
+                  doesntExist.map(f => s"Couldn't load mapping from $f").mkString("\n").asLeft
+                } else {
+                  exists.asRight
+                }
+              })
+              strings <- EitherT.liftF(found.traverse { f =>
+                fs2.io.file
+                  .readAll[IO](f.toPath, blocker, 2048)
                   .through(fs2.text.utf8Decode[IO])
-                  .through(fs2.text.lines)
-                  .filter(_.nonEmpty)
-                  .evalMap { line =>
-                    IO.fromEither(
-                      jsonModule.parseObjectEither(line).leftWiden[Throwable]
-                    )
+                  .compile
+                  .foldMonoid
+              })
+              compiled <- found.zip(strings).traverse {
+                case (file, s) =>
+                  EitherT(IO {
+                    Either
+                      .catchOnly[DocumentParseException](engine.compile(s))
+                      .leftMap { c =>
+                        s"Couldn't compile ${file.getName}: ${c.getMessage}"
+                      }
+                  })
+              }
+              _ <- if (config.strict)
+                found
+                  .zip(compiled)
+                  .traverse {
+                    case (file, m) =>
+                      EitherT(IO {
+                        Either
+                          .catchOnly[ClassificationException] {
+                            DocumentValidator.validate(m.asInstanceOf[IdmlMapping].nodes)
+                          }
+                          .leftMap { ce =>
+                            s"Couldn't validate ${file.getName}: ${ce.getMessage}"
+                          }
+                      })
                   }
-                  .evalTap { j =>
-                    IO {
-                      val result = engine.run(chain, j)
-                      if (config.pretty) {
-                        println(jsonModule.pretty(result))
-                      } else {
-                        println(jsonModule.compact(result))
-                      }
-                      result
-                    }.flatMap { result =>
-                      (config.traceFile, analysisModule) match {
-                        case (Some(outputFile), Some(annotator)) =>
-                          fs2.Stream
-                            .emit(annotator.render(strings.head))
-                            .covary[IO]
-                            .through(fs2.text.utf8Encode[IO])
-                            .through(
-                              fs2.io.file.writeAll(outputFile.toPath, global)
-                            )
-                            .compile
-                            .drain
-                        case _ =>
-                          IO.unit
-                      }
+                  .void
+              else EitherT.rightT[IO, String](())
+              // and we get to the main loop!
+              chain = engine.chain(compiled: _*)
+              _ <- fs2.io
+                .stdin[IO](2048, blocker)
+                .through(fs2.text.utf8Decode[IO])
+                .through(fs2.text.lines)
+                .filter(_.nonEmpty)
+                .evalMap { line =>
+                  IO.fromEither(
+                    jsonModule.parseObjectEither(line).leftWiden[Throwable]
+                  )
+                }
+                .evalTap { j =>
+                  IO {
+                    val result = engine.run(chain, j)
+                    if (config.pretty) {
+                      println(jsonModule.pretty(result))
+                    } else {
+                      println(jsonModule.compact(result))
+                    }
+                    result
+                  }.flatMap { result =>
+                    (config.traceFile, analysisModule) match {
+                      case (Some(outputFile), Some(annotator)) =>
+                        fs2.Stream
+                          .emit(annotator.render(strings.head))
+                          .covary[IO]
+                          .through(fs2.text.utf8Encode[IO])
+                          .through(
+                            fs2.io.file.writeAll(outputFile.toPath, blocker)
+                          )
+                          .compile
+                          .drain
+                      case _ =>
+                        IO.unit
                     }
                   }
-                  .compile
-                  .drain
-                  .attemptT
-                  .leftMap { e =>
-                    s"Couldn't process input: ${e.getMessage}"
-                  }
-          } yield ()
-        }
-        .map { et =>
-          et.leftSemiflatMap { error =>
-              IO {
-                System.err.println(error)
-                ExitCode.Error
-              }
+                }
+                .compile
+                .drain
+                .attemptT
+                .leftMap { e =>
+                  s"Couldn't process input: ${e.getMessage}"
+                }
+            } yield ()
+          }.leftSemiflatMap {error =>
+            IO {
+              System.err.println(error)
+              ExitCode.Error
             }
-            .as(ExitCode.Success)
+          }.as(ExitCode.Success)
             .merge
+          }
         }
     }
 }

@@ -1,16 +1,12 @@
 package io.idml.lang
 
 import java.nio.charset.Charset
-
 import com.google.common.io.Resources
 import org.antlr.v4.runtime._
-import org.scalatest.FunSuite
-import org.scalatest.MustMatchers
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
-/**
-  * Created by jon on 11/04/2014.
-  */
-class MappingTestBase extends FunSuite with MustMatchers {
+class MappingTestBase extends AnyFunSuite with Matchers {
 
   def test(filename: String) {
     super.test("Parsing " + filename) {

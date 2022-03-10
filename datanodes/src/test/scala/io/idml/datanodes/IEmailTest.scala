@@ -3,10 +3,11 @@ package io.idml.datanodes
 import javax.mail.internet.InternetAddress
 
 import io.idml.{CastFailed, IdmlNull, NoFields}
-import org.scalatest._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
 /** Test the behaviour of the PEmail class */
-class IEmailTest extends FunSuite with MustMatchers {
+class IEmailTest extends AnyFunSuite with Matchers {
 
   test("Empty strings cannot be turned into emails") {
     IString("").email() must equal(CastFailed)

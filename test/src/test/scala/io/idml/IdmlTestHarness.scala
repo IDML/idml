@@ -107,7 +107,7 @@ trait IdmlTestHarness {
         if (mappings.size != chain.items.size) {
           throw new IllegalArgumentException("Expected the chain to be an array of strings")
         }
-        executeSharedChainSuite(tests, mappings)
+        executeSharedChainSuite(tests, mappings.toSeq)
       case (_: IdmlNothing, _: IdmlNothing) =>
         executeSuite(tests)
     }
@@ -208,7 +208,7 @@ trait IdmlTestHarness {
           if (mappings.size != chain.items.size) {
             throw new IllegalArgumentException("Expected the chain to be an array of strings")
           }
-          executeChainTest(name, mappings, input, expected)
+          executeChainTest(name, mappings.toSeq, input, expected)
         case (l, r) =>
           throw new IllegalArgumentException(
             s"The test must contain either a mapping string or chain array, mapping was ${l.getClass} and chain was ${r.getClass}")

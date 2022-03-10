@@ -1,9 +1,10 @@
 package io.idml.hashing
 import io.idml.datanodes.{IInt, IObject, IString}
 import io.idml.{IdmlContext, IdmlValue}
-import org.scalatest.{FlatSpec, MustMatchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.must.Matchers
 
-class HashingSpec extends WordSpec with MustMatchers {
+class HashingSpec extends AnyWordSpec with Matchers {
 
   "HashingFunctionResolver" can {
     List("md5", "sha1", "sha256", "sha512", "murmurHash3", "cityHash", "xxHash32", "xxHash64").foreach { hash =>

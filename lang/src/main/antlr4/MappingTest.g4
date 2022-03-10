@@ -1,7 +1,5 @@
 grammar MappingTest;
 
-@header { package io.idml.lang; }
-
 document     : (testOptions | testMappings | testCase)* text?;
 
 // Grammar rules for interpreter actions

@@ -2,9 +2,10 @@ package io.idml.utils
 import io.idml.jackson.IdmlJackson
 import io.idml.utils.Tracer.Annotator
 import io.idml.{Idml, IdmlContext, IdmlJson, IdmlListener}
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.must
 
-class TracerSpec extends WordSpec with MustMatchers {
+class TracerSpec extends AnyWordSpec with must.Matchers {
 
   val json: IdmlJson = IdmlJackson.default
 

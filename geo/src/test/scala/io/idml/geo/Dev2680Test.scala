@@ -2,9 +2,9 @@ package io.idml.geo
 
 import io.idml.Idml
 import io.idml.jackson.IdmlJackson
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class Dev2680Test extends FunSuite {
+class Dev2680Test extends AnyFunSuite {
 
   test("DEV-2680: IndexOutOfBoundsException from empty field cleanup in Idml") {
     val ptolemy = Idml.autoBuilder().build()

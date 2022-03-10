@@ -2,11 +2,12 @@ package io.idml.jackson
 
 import io.idml.{IdmlNull, IdmlValue}
 import io.idml.datanodes.{IArray, IInt, IObject, IString}
-import org.scalatest.{FunSuite, MustMatchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
 import scala.collection.mutable
 
-class ObjectParsingSpec extends FunSuite with MustMatchers {
+class ObjectParsingSpec extends AnyFunSuite with Matchers {
   import IdmlJackson.default._
 
   // Parsing

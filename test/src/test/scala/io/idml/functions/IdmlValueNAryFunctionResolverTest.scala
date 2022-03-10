@@ -3,9 +3,9 @@ package io.idml.functions
 import io.idml.datanodes.IString
 import io.idml.IdmlValue
 import io.idml.ast.{ExecNavLiteral, Literal, Pipeline}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class IdmlValueNAryFunctionResolverTest extends FunSuite {
+class IdmlValueNAryFunctionResolverTest extends AnyFunSuite {
 
   val pv = classOf[IdmlValue]
 

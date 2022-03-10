@@ -2,9 +2,10 @@ package io.idml
 
 import io.idml.ast.AstGenerator
 import io.idml.datanodes.IString
-import org.scalatest.{FunSuite, MustMatchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
-class AstString extends FunSuite with MustMatchers {
+class AstString extends AnyFunSuite with Matchers {
   val ast = new AstGenerator(new FunctionResolverService)
 
   test("string literals") {

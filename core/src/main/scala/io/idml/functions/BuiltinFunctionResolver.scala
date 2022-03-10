@@ -3,8 +3,6 @@ package io.idml.functions
 import io.idml.datanodes.IString
 import io.idml.ast._
 
-import scala.reflect.runtime.{universe => ru}
-
 /** Resolves language builtins */
 class BuiltinFunctionResolver extends FunctionResolver {
   def resolve(name: String, args: List[Argument]): Option[IdmlFunction] =

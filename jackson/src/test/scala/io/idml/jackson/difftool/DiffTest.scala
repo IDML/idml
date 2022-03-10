@@ -3,9 +3,9 @@ package io.idml.jackson.difftool
 import io.idml.datanodes._
 import io.idml._
 import io.idml.jackson.IdmlJackson
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class DiffTest extends FunSuite {
+class DiffTest extends AnyFunSuite {
 
   /** Used to simplify tests */
   implicit def strToJson(str: String): IdmlValue = IdmlJackson.default.parse(str)

@@ -1,10 +1,11 @@
 package io.idml.datanodes
 
 import io.idml.{CastFailed, InvalidCaller, InvalidParameters}
-import org.scalatest._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
 /** Test the behaviour of the PString class */
-class IStringTest extends FunSuite with MustMatchers {
+class IStringTest extends AnyFunSuite with Matchers {
 
   // Equality
   test("string == string")(new IString("a string") must equal(new IString("a string")))

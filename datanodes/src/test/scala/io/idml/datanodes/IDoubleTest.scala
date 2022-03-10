@@ -1,9 +1,10 @@
 package io.idml.datanodes
 
-import org.scalatest._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
 /** Test the behaviour of the PDouble class */
-class IDoubleTest extends FunSuite with MustMatchers {
+class IDoubleTest extends AnyFunSuite with Matchers {
   // Equality
   test("float min == min")(new IDouble(Float.MinValue) must equal(new IDouble(Float.MinValue)))
   test("float max == max")(new IDouble(Float.MaxValue) must equal(new IDouble(Float.MaxValue)))

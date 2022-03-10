@@ -3,15 +3,16 @@ package io.idml.json
 import io.idml.{Idml, IdmlJson, IdmlValue}
 import io.idml.datanodes._
 import io.idml.functions.json.JsonFunctions
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class JsonFunctionSuite(name: String, jf: JsonFunctions) extends WordSpec with MustMatchers {
+class JsonFunctionSuite(name: String, jf: JsonFunctions) extends AnyWordSpec with Matchers {
   name should {
     "serialize objects" in {
-      jf.obj.serialize(IObject("v" -> IInt(123))) must equal(IString("""{"v":123}"""))
+      jf.obj.serialize(IObject("v" -> IInt(123))) should equal(IString("""{"v":123}"""))
     }
     "parse objects" in {
-      jf.obj.parseJson(IString("""{"v":123}""")) must equal(IObject("v" -> IInt(123)))
+      jf.obj.parseJson(IString("""{"v":123}""")) should equal(IObject("v" -> IInt(123)))
     }
     "be loaded automatically" in {
       val idml    = Idml.autoBuilder().build()
@@ -24,7 +25,7 @@ class JsonFunctionSuite(name: String, jf: JsonFunctions) extends WordSpec with M
           |anotherNumber = root.random(1, 100)
           |""".stripMargin)
       val result  = program.run(IObject("hello" -> IdmlValue("world"), "js" -> IString("{\"hello\": \"world\"}")))
-      result must equal(
+      result should equal(
         IObject(
           "alsoObject"    -> IString("""{"v":123}"""),
           "anotherNumber" -> IInt(80),

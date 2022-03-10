@@ -1,11 +1,12 @@
 package io.idml.jackson
 
 import io.idml.{FunctionResolverService, Idml, IdmlParser}
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.must.Matchers
 import JsonAstGenerator._
 import org.json4s._
 
-class JsonAstGeneratorTest extends WordSpec with MustMatchers {
+class JsonAstGeneratorTest extends AnyWordSpec with Matchers {
   val parser = new IdmlParser()
   val funcs  = new FunctionResolverService
 
