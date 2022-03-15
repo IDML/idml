@@ -12,6 +12,18 @@
     "output": {"output": "Balinese"}
   },
   {
+    "name": "languageName default locale with code of zh-Hans",
+    "mapping": "output = input.languageName()",
+    "input": {"input": "zh-Hans"},
+    "output": {"output": "Chinese (Simplified)"}
+  },
+  {
+    "name": "languageName default locale with code of zh-Hant",
+    "mapping": "output = input.languageName()",
+    "input": {"input": "zh-Hant"},
+    "output": {"output": "Chinese (Traditional)"}
+  },
+  {
     "name": "languageName with manual locale of en",
     "mapping": "output = input.languageName(\"en\")",
     "input": {"input": "da"},
@@ -28,6 +40,12 @@
     "mapping": "output = input.languageName(\"zh\")",
     "input": {"input": "da"},
     "output": {"output": "丹麦文"}
+  },
+  {
+    "name": "languageName with manual locale of en and code of zh-hans",
+    "mapping": "output = input.languageName(\"en\")",
+    "input": {"input": "zh-Hans"},
+    "output": {"output": "Chinese (Simplified)"}
   },
   {
     "name": "languageName with null input",
