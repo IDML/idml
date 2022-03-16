@@ -97,7 +97,7 @@ case class Field(name: String) extends Expression {
 }
 
 /** Expressions like **.x mean "find 'x' at any depth" */
-case object Any extends Expression {
+case object AnyExpr extends Expression {
   def invoke(ctx: IdmlContext) {
     ???
   }

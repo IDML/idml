@@ -1,9 +1,10 @@
 package io.idml.datanodes
 
-import org.scalatest._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
 /** Test the behaviour of the PInt class */
-class IIntTest extends FunSuite {
+class IIntTest extends AnyFunSuite {
 
   // Int equality
   test("PInt(int min) == PInt(int min)")(IInt(Int.MinValue) === IInt(Int.MinValue))

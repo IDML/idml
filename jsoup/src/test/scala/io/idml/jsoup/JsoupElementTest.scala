@@ -5,11 +5,12 @@ import io.idml.datanodes.{IDomElement, IDomText, IString}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.parser.Parser
-import org.scalatest.{FunSuite, MustMatchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
 import scala.language.implicitConversions
 
-class JsoupElementTest extends FunSuite with MustMatchers {
+class JsoupElementTest extends AnyFunSuite with Matchers {
 
   test("get(missing_tag) returns empty element") {
     IdmlJsoup.parseXml("<a>abc</a><b>def</b>").get("c").asInstanceOf[IDomElement].items.toList must equal(List.empty)

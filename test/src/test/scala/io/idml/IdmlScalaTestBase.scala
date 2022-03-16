@@ -1,15 +1,17 @@
 package io.idml
 
-import java.io.File
+import io.idml.circe.IdmlCirce
+import io.idml.jackson.IdmlJackson
 
+import java.io.File
 import io.idml.jackson.difftool.Diff
-import org.scalatest.FreeSpec
+import org.scalatest.freespec.AnyFreeSpec
 
 /**
   * The base class for IdmlTestHarness when integrated with ScalaTest. The dependency is not transient!
   */
 class IdmlScalaTestBase(directory: String, extension: String = "Suite.json", override val findUnmappedFields: Boolean = false)
-    extends FreeSpec
+    extends AnyFreeSpec
     with IdmlTestHarness {
 
   // Run the tests in a particular directory
@@ -46,8 +48,9 @@ class IdmlScalaTestBase(directory: String, extension: String = "Suite.json", ove
     * Use ScalaTest's own deep comparator and assertion
     */
   override def compareResults(expected: IdmlValue, actual: IdmlValue): Unit = {
+    val toJson = IdmlJackson.default.compact _
     if (expected != actual) {
-      fail(s"Results differ: ${Diff.pretty(expected, actual)}")
+      fail(s"Results differ: ${toJson(actual)} was not ${toJson(expected)}" )
     }
   }
 

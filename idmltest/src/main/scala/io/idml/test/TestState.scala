@@ -1,6 +1,7 @@
 package io.idml.test
 import cats.effect.ExitCode
 import cats._, cats.implicits._
+import cats.kernel.Order
 
 sealed trait TestState
 object TestState {
@@ -19,6 +20,12 @@ object TestState {
       case tss if tss.contains(Success) => Success
     }
   }
+  implicit val testStateOrdering: Ordering[TestState] = Order[Int].contramap[TestState] {
+    case Success => 0
+    case Failed  => 1
+    case Error   => 2
+    case Updated => 3
+  }.toOrdering
   case object Error   extends TestState
   case object Failed  extends TestState
   case object Success extends TestState

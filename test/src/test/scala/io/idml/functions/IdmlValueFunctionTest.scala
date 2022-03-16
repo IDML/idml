@@ -3,10 +3,10 @@ package io.idml.functions
 import io.idml.datanodes.IString
 import io.idml.IdmlValue
 import io.idml.ast.{ExecNavLiteral, Literal, Pipeline}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /** Verify the behaviour of IdmlValueFunction */
-class IdmlValueFunctionTest extends FunSuite {
+class IdmlValueFunctionTest extends AnyFunSuite {
 
   val pv = classOf[IdmlValue]
 

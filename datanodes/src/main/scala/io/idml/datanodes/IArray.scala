@@ -14,7 +14,7 @@ object IArray {
 
   /** Extractor for PArray */
   def unapply(value: IdmlValue): Option[Seq[IdmlValue]] = value match {
-    case arr: IArray => Some(arr.items)
+    case arr: IArray => Some(arr.items.toSeq)
     case _           => None
   }
 

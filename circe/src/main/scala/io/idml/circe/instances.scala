@@ -43,7 +43,7 @@ object instances {
         }: _*
       )
     case n: IdmlArray =>
-      Json.arr(n.items.filterNot(_.isInstanceOf[IdmlNothing]).map(rawIdmlCirceEncoder): _*)
+      Json.arr(n.items.filterNot(_.isInstanceOf[IdmlNothing]).map(rawIdmlCirceEncoder).toSeq: _*)
     case _: IdmlNothing => Json.Null
     case IdmlNull       => Json.Null
   }

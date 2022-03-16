@@ -2,10 +2,10 @@ package io.idml
 
 import io.idml.datanodes._
 import io.idml.lang.DocumentParseException
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /** Verifies the test harness */
-class IdmlTestHarnessTest extends FunSuite {
+class IdmlTestHarnessTest extends AnyFunSuite {
 
   /** Counts the number of tests we find */
   class TestCounter extends IdmlTestHarness {

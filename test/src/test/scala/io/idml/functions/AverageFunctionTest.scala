@@ -2,9 +2,9 @@ package io.idml.functions
 
 import io.idml.datanodes.{IArray, IDouble, ITrue}
 import io.idml.{IdmlContext, InvalidCaller, NoFields}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class AverageFunctionTest extends FunSuite {
+class AverageFunctionTest extends AnyFunSuite {
 
   test("when given a missing field it leaves it untouched") {
     val ctx = new IdmlContext(NoFields)

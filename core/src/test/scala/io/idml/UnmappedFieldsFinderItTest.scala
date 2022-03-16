@@ -1,10 +1,10 @@
 package io.idml
 
 import io.idml.datanodes._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import scala.collection.JavaConverters._
 
-class UnmappedFieldsFinderItTest extends FunSuite {
+class UnmappedFieldsFinderItTest extends AnyFunSuite {
 
   val listener = new UnmappedFieldsFinder
   val idml     = Idml.autoBuilder().withListener(listener).build()

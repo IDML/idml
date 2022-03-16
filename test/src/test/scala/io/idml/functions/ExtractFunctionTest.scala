@@ -3,9 +3,9 @@ package io.idml.functions
 import io.idml.datanodes._
 import io.idml.ast.{ExecNavRelative, Field, Pipeline}
 import io.idml.{IdmlContext, InvalidCaller, NoFields}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class ExtractFunctionTest extends FunSuite {
+class ExtractFunctionTest extends AnyFunSuite {
 
   def extract = ExtractFunction(Pipeline(List(ExecNavRelative, Field("a"))))
 

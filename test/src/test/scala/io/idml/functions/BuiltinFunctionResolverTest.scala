@@ -2,9 +2,9 @@ package io.idml.functions
 
 import io.idml.datanodes.IString
 import io.idml.ast._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class BuiltinFunctionResolverTest extends FunSuite {
+class BuiltinFunctionResolverTest extends AnyFunSuite {
 
   val stringLiteral = ExecNavLiteral(Literal(IString("my_block")))
   val stringPipl    = Pipeline(List(stringLiteral))

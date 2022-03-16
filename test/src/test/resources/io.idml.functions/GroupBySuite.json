@@ -9,19 +9,19 @@
     "name": "groupBy should always use string keys",
     "mapping": "output = input.groupBy(if this > 5 then 1 else 2)",
     "input": {"input": [1,2,3,4,5,6,7,8,9,10]},
-    "output": {"output": {"2": [1,2,3,4,5], "1": [6,7,8,9,10]}}
+    "output": {"output": { "2": [1,2,3,4,5], "1": [6,7,8,9,10]}}
   },
   {
     "name": "groupBy should output things usable via values",
     "mapping": "output = input.groupBy(if this > 5 then true else false).values().extract(this.min())",
     "input": {"input": [1,2,3,4,5,6,7,8,9,10]},
-    "output": {"output": [1,6]}
+    "output": {"output": [6,1]}
   },
   {
     "name": "groupBy should output things usable via keys",
     "mapping": "output = input.groupBy(if this > 5 then true else false).keys()",
     "input": {"input": [1,2,3,4,5,6,7,8,9,10]},
-    "output": {"output": ["false", "true"]}
+    "output": {"output": ["true", "false"]}
   },
   {
     "name": "groupBy should be able to group on an array",

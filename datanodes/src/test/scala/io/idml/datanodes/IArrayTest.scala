@@ -1,12 +1,13 @@
 package io.idml.datanodes
 
 import io.idml._
-import org.scalatest._
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
 import scala.collection.mutable
 
 /** Test the behaviour of the PArray class */
-class IArrayTest extends FunSuite with MustMatchers {
+class IArrayTest extends AnyFunSuite with Matchers {
 
   // Equality
   test("empty == empty")(empty must equal(empty))

@@ -1,11 +1,12 @@
 package io.idml.circe
 
 import io.idml.datanodes._
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import io.circe.syntax._
 import io.idml.circe.instances._
 
-class IdmlCirceSpec extends WordSpec with MustMatchers {
+class IdmlCirceSpec extends AnyWordSpec with Matchers {
 
   "IdmlCirce" should {
     "work" in {

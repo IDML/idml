@@ -13,5 +13,5 @@ antlr4Dependency in Antlr4 :=
 
 libraryDependencies ++= Seq(
   "com.google.guava" % "guava"      % "27.0-jre", // Apache License 2
-  "org.scalatest"    %% "scalatest" % "3.0.4" % Test // Apache License 2
+  "org.scalatest"    %% "scalatest" % "3.2.8" % Test // Apache License 2
 )

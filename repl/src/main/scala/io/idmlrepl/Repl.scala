@@ -1,10 +1,9 @@
 package io.idmlrepl
 
 import java.nio.file.{Files, Paths}
-
 import cats._
 import cats.data.EitherT
-import cats.effect.{ContextShift, ExitCode, Sync}
+import cats.effect.{Blocker, ContextShift, ExitCode, Sync}
 import cats.implicits._
 import cats.mtl._
 import cats.mtl.implicits._
@@ -44,10 +43,9 @@ object JLine {
 }
 
 // The pure implementation of the REPL logic
-class Repl[F[_]: Sync: ContextShift](jline: JLine[F])(implicit mode: MonadState[F, ReplMode],
+class Repl[F[_]: Sync: ContextShift](jline: JLine[F], blocker: Blocker)(implicit mode: MonadState[F, ReplMode],
                                                       data: MonadState[F, IdmlObject],
-                                                      exit: FunctorRaise[F, ExitCode],
-                                                      blocker: ExecutionContext) {
+                                                      exit: FunctorRaise[F, ExitCode]) {
   object Load {
     def unapply(s: String): Option[String] =
       if (s.startsWith(".load "))

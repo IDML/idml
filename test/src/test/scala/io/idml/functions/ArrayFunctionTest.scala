@@ -3,11 +3,12 @@ package io.idml.functions
 import io.idml.datanodes.{IArray, IObject}
 import io.idml.{IdmlContext, IdmlValue, InvalidCaller}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
-import org.scalatest.{FunSuite, MustMatchers}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.must.Matchers
 
 /**  */
-class ArrayFunctionTest extends FunSuite with MustMatchers with MockitoSugar {
+class ArrayFunctionTest extends AnyFunSuite with Matchers with MockitoSugar {
 
   val sizeTwoArray = IArray(IObject(), IObject())
 

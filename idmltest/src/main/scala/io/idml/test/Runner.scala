@@ -13,7 +13,9 @@ import io.circe.{Decoder, Encoder, Json}
 import io.circe.generic.auto._
 import io.circe.syntax._
 import fs2._
-import gnieh.diffson.circe._
+import diffson._
+import diffson.lcs._
+import diffson.circe._
 import diffable.TestDiff
 import Test._
 
@@ -21,17 +23,17 @@ import scala.concurrent.ExecutionContext
 import scala.util.Try
 
 class TestUtils[F[_]: Sync] {
-  def readAll(ec: ExecutionContext)(p: Path)(implicit cs: ContextShift[F]): F[String] =
-    fs2.io.file.readAll[F](p, ec, 2048).through(fs2.text.utf8Decode[F]).compile.foldMonoid
+  def readAll(b: Blocker)(p: Path)(implicit cs: ContextShift[F]): F[String] =
+    fs2.io.file.readAll[F](p, b, 2048).through(fs2.text.utf8Decode[F]).compile.foldMonoid
   def parseJ(s: String): F[Json]    = Sync[F].fromEither(parseJson(s))
   def parseY(s: String): F[Json]    = Sync[F].fromEither(parseYaml(s))
   def as[T: Decoder](j: Json): F[T] = Sync[F].fromEither(j.as[T])
   def refToPath(parent: Path, r: Ref): F[Path] = Sync[F].fromTry(
     Try { parent.toAbsolutePath.getParent.resolve(r.`$ref`) }
   )
-  def writeAll(ec: ExecutionContext)(p: Path)(s: Stream[F, String])(implicit cs: ContextShift[F]): F[Unit] =
+  def writeAll(b: Blocker)(p: Path)(s: Stream[F, String])(implicit cs: ContextShift[F]): F[Unit] =
     s.through(fs2.text.utf8Encode[F])
-      .to(fs2.io.file.writeAll(p, ec, List(StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)))
+      .through(fs2.io.file.writeAll(p, b, List(StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)))
       .compile
       .drain
   def print(a: Any): F[Unit]         = Sync[F].delay { println(a) }
@@ -40,14 +42,14 @@ class TestUtils[F[_]: Sync] {
   def blue[T <: Any](t: T): F[Unit]  = print(fansi.Color.Cyan(t.toString))
 }
 
-class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolean, blockingEc: ExecutionContext)(
+class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolean, blocker: Blocker)(
     implicit cs: ContextShift[IO])
     extends RunnerUtils(dynamic, plugins)
     with CirceEitherEncoders {
 
   def load(test: Path): IO[Either[Tests[List[Json]], Tests[Json]]] =
     for {
-      text   <- readAll(blockingEc)(test)
+      text   <- readAll(blocker)(test)
       j      <- parseJ(text)
       single = j.as[Tests[Json]].map(_.asRight[Tests[List[Json]]])
       multi  = j.as[Tests[List[Json]]].map(_.asLeft[Tests[Json]])
@@ -56,13 +58,13 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
   def resolve[T: Decoder](path: Path, tests: Tests[T]): IO[List[ResolvedTest[T]]] =
     tests.tests.traverse(
       _.resolve(
-        refToPath(path, _).flatMap(readAll(blockingEc)),
+        refToPath(path, _).flatMap(readAll(blocker)),
         parseJ
       ))
   def updateResolve[T: Decoder](path: Path, tests: Tests[T]): IO[List[UpdatableTest[T]]] =
     tests.tests.traverse(
       _.updateResolve(
-        refToPath(path, _).flatMap(readAll(blockingEc)),
+        refToPath(path, _).flatMap(readAll(blocker)),
         parseJ
       ))
 
@@ -94,7 +96,9 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                    _.map {
                      case (resolved, output) =>
                        IdmlUtils[T].inspectOutput(resolved, output, if (jdiff) { (j1: Json, j2: Json) =>
-                         JsonDiff.simpleDiff(j1, j2, true).toString()
+                         implicit val lcs = new Patience[Json](true)
+                         import diffson.jsonpatch.lcsdiff._
+                         diff(j1, j2).ops.asJson.spaces2
                        } else { (j1: Json, j2: Json) =>
                          TestDiff.generateDiff(j1, j2)
                        })
@@ -149,13 +153,13 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                         { r =>
                           for {
                             p           <- refToPath(path, r)
-                            oldcontents <- readAll(blockingEc)(p).attempt.map(_.leftMap(_ => "").merge)
+                            oldcontents <- readAll(blocker)(p).attempt.map(_.leftMap(_ => "").merge)
                             contents    = runner.toString(result)
                             status <- IO
                                        .pure(contents === oldcontents)
                                        .ifM(
                                          IO.pure(failedOnly).ifM(IO.unit, green(s"${u.name} unchanged")).as(TestState.success),
-                                         blue(s"${u.name} updated") *> writeAll(blockingEc)(p)(Stream.emit(contents)).as(TestState.updated)
+                                         blue(s"${u.name} updated") *> writeAll(blocker)(p)(Stream.emit(contents)).as(TestState.updated)
                                        )
                           } yield (status, u.original.get)
                         },
@@ -181,7 +185,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
                  .pure[IO]
                  .ifM(
                    blue(s"flushing update to ${path.getFileName}")
-                     *> writeAll(blockingEc)(path)(Stream.emit(spaces2butDropNulls.pretty(Tests(u.map(_.merge._2)).asJson)))
+                     *> writeAll(blocker)(path)(Stream.emit(spaces2butDropNulls.print(Tests(u.map(_.merge._2)).asJson)))
                        .as(TestState.updated),
                    failedOnly.pure[IO].ifM(IO.unit, green(s"${path.getFileName} unchanged, not flushing file")).as(TestState.success)
                  )
@@ -197,6 +201,7 @@ class Runner(dynamic: Boolean, plugins: Option[NonEmptyList[URL]], jdiff: Boolea
         .groupBy(identity)
         .mapValues(_.size)
         .toList
+        .sortBy(_._1)
         .map {
           case (s, count) =>
             (count > 0)

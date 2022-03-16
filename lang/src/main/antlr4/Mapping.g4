@@ -1,7 +1,5 @@
 grammar Mapping;
 
-@header { package io.idml.lang; }
-
 document : section* |
            mapping*;
 

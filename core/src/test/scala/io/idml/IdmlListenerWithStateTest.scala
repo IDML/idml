@@ -1,10 +1,10 @@
 package io.idml
 
 import java.util.concurrent.atomic.AtomicInteger
-import org.scalatest.FunSuite
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.mockito.MockitoSugar
 
-class IdmlListenerWithStateTest extends FunSuite with MockitoSugar {
+class IdmlListenerWithStateTest extends AnyFunSuite with MockitoSugar {
 
   /** A test implementation. Typically this would be a more complex object than an integer */
   class TestImpl extends IdmlListenerWithState[AtomicInteger] {

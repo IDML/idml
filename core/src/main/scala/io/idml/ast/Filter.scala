@@ -66,7 +66,7 @@ case class Not(pred: Predicate) extends Predicate {
     !pred.predicate(ctx, cursor)
 }
 
-case object Underscore extends Predicate {
+case object UnderscorePred extends Predicate {
   def predicate(ctx: IdmlContext, cursor: IdmlValue): Boolean = true
 }
 

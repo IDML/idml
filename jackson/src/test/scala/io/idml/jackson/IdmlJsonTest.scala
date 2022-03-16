@@ -1,12 +1,11 @@
-package io.idml.jackson.difftool
+package io.idml.jackson
 
 import java.nio.charset.Charset
 
 import io.idml.IdmlJson
-import io.idml.jackson.IdmlJackson
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class IdmlJsonTest extends FunSuite {
+class IdmlJsonTest extends AnyFunSuite {
 
   test("scala literal is equivalent to pile-of-poo byte array (sanity check)") {
     // The 'pile of poo', a 4-byte unicode character http://www.fileformat.info/info/unicode/char/1F4A9/index.htm
