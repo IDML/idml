@@ -9,7 +9,7 @@ object LanguageNameFunctions {
 
   private def lookupLanguageWithLocale(code: String, targetLocale: Option[String]): IdmlValue = {
     val lang = Locale.forLanguageTag(code)
-    targetLocale.fold(lang.getDisplayLanguage)(t => lang.getDisplayLanguage(Locale.forLanguageTag(t))) match {
+    targetLocale.fold(lang.getDisplayName)(t => lang.getDisplayName(Locale.forLanguageTag(t))) match {
       // Java can just return the original input if it didn't know, and we'll blank that out
       // if you do want the java behaviour, use (code.languageName() | code)
       case result if result == code => MissingField
