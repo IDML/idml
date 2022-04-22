@@ -8,7 +8,7 @@ libraryDependencies ++= List(
   "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.13.0",
 )
 
-mainClass in Compile := Some("IdmlTool")
+mainClass in Compile := Some("io.idml.tool.IdmlTool")
 
 enablePlugins(SbtProguard)
 
