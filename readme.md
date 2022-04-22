@@ -13,10 +13,11 @@ IDML has been developed and maintained by [DataSift](https://datasift.com) (now 
 
 If you're a member of the `io.idml` organisation on sonatype you can perform a release with these commands:
 
-1. `++ publishSigned`
-2. `sonatypePrepare`
-3. `sonatypeBundleUpload`
-4. `sonatypeRelease`
+1. add `default-key $KEYID` to `~/.gnupg/gpg.conf` to specify the key to release with
+2. `++ publishSigned`
+3. `sonatypePrepare`
+4. `sonatypeBundleUpload`
+5. `sonatypeRelease`
 
 
 ## Special Thanks
