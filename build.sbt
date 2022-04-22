@@ -35,6 +35,7 @@ lazy val commonSettings = Seq(
   publishTo                 := sonatypePublishTo.value,
   licenses                  := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
   sonatypeProjectHosting    := Some(GitHubHosting("idml", "idml", "opensource@meltwater.com")),
+  sonatypeCredentialHost    := "s01.oss.sonatype.org", // for newer sonatype accounts keep this uncommented
   developers                := List(
     Developer(
       id = "andimiller",
