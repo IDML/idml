@@ -37,7 +37,10 @@ lazy val commonSettings = Seq(
 
   licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
   sonatypeProjectHosting := Some(GitHubHosting("idml", "idml", "opensource@meltwater.com")),
-  developers := List(Developer(id = "andimiller", name = "Andi Miller", email = "andi@andimiller.net", url = url("http://andimiller.net"))),
+  developers := List(
+	  Developer(id = "andimiller", name = "Andi Miller", email = "andi@andimiller.net", url = url("http://andimiller.net")),
+	  Developer(id = "team.robin", name = "Team Robin", email = "teamrobin@meltwater.com", url = url("https://meltwater.com"))
+		  ),
   scalacOptions += "-target:jvm-1.8",
   Docker / version := version.value,
   Docker / dockerUsername := Some("idml"),
