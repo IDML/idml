@@ -9,7 +9,7 @@ name := "idml-parent"
 
 organization := "io.idml"
 
-publishTo := sonatypePublishTo.value
+publishTo := sonatypePublishToBundle.value
 
 publishMavenStyle := true
 
@@ -32,7 +32,7 @@ lazy val commonSettings = Seq(
   crossScalaVersions        := supportedScalaVersions,
   isSnapshot                := false,
   publishArtifact           := true,
-  publishTo                 := sonatypePublishTo.value,
+  publishTo                 := sonatypePublishToBundle.value,
   licenses                  := Seq("MIT" -> url("https://opensource.org/licenses/MIT")),
   sonatypeProjectHosting    := Some(GitHubHosting("idml", "idml", "opensource@meltwater.com")),
   sonatypeCredentialHost    := "s01.oss.sonatype.org", // for newer sonatype accounts keep this uncommented
