@@ -16,18 +16,28 @@ class IdmlValueFunctionResolverTest extends AnyFunSuite {
   }
 
   test("return a function if a 0-arity method can be found") {
-    assert(new IdmlValueFunctionResolver().resolve("int", Nil) === Some(IdmlValueFunction(pv.getMethod("int"), Nil)))
+    assert(
+      new IdmlValueFunctionResolver().resolve("int", Nil) === Some(
+        IdmlValueFunction(pv.getMethod("int"), Nil)))
   }
 
   test("return a function if a 1-arity function can be found") {
-    assert(new IdmlValueFunctionResolver()
-      .resolve("default", List(pipl)) === Some(IdmlValueFunction(pv.getMethod("default", classOf[IdmlValue]), List(pipl), isNAry = false)))
+    assert(
+      new IdmlValueFunctionResolver()
+        .resolve("default", List(pipl)) === Some(
+        IdmlValueFunction(pv.getMethod("default", classOf[IdmlValue]), List(pipl), isNAry = false))
+    )
   }
 
   test("return a function if a 2-arity function can be found") {
     assert(
       new IdmlValueFunctionResolver()
         .resolve("slice", List(pipl, pipl)) === Some(
-        IdmlValueFunction(pv.getMethod("slice", classOf[IdmlValue], classOf[IdmlValue]), List(pipl, pipl), isNAry = false)))
+        IdmlValueFunction(
+          pv.getMethod("slice", classOf[IdmlValue], classOf[IdmlValue]),
+          List(pipl, pipl),
+          isNAry = false)
+      )
+    )
   }
 }

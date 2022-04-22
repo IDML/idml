@@ -1,27 +1,44 @@
 package io.idml
 
 import io.idml.datanodes.CompositeValue
-import io.idml.ast.{Assignment, ExecNav, ExecNavAbsolute, ExecNavRelative, ExecNavVariable, Field, IdmlFunction, Maths, Pipeline}
+import io.idml.ast.{
+  Assignment,
+  ExecNav,
+  ExecNavAbsolute,
+  ExecNavRelative,
+  ExecNavVariable,
+  Field,
+  IdmlFunction,
+  Maths,
+  Pipeline
+}
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
 
 /** Used to encapsulate the type of path and the path */
-class UnmappedFieldsPath(val navType: ExecNav,
-                         val path: mutable.Queue[String] = new mutable.Queue[String](),
-                         var isComposite: Boolean = false)
+class UnmappedFieldsPath(
+    val navType: ExecNav,
+    val path: mutable.Queue[String] = new mutable.Queue[String](),
+    var isComposite: Boolean = false
+)
 
 /** The unmapped fields state */
-class UnmappedFields(var unmappedFields: IdmlValue = IdmlNull,
-                     val pathStack: mutable.Stack[UnmappedFieldsPath] = mutable.Stack(),
-                     val pathParts: mutable.ListBuffer[List[String]] = mutable.ListBuffer())
+class UnmappedFields(
+    var unmappedFields: IdmlValue = IdmlNull,
+    val pathStack: mutable.Stack[UnmappedFieldsPath] = mutable.Stack(),
+    val pathParts: mutable.ListBuffer[List[String]] = mutable.ListBuffer()
+)
 
 /** Extract the state from the context */
 object UnmappedFieldsFinder {
   def fromContext(ctx: IdmlContext): UnmappedFields =
     ctx.state
-      .getOrElse(classOf[UnmappedFieldsFinder],
-                 throw new RuntimeException("Couldn't find state in the context. Are you sure this extension is activated?"))
+      .getOrElse(
+        classOf[UnmappedFieldsFinder],
+        throw new RuntimeException(
+          "Couldn't find state in the context. Are you sure this extension is activated?")
+      )
       .asInstanceOf[UnmappedFields]
 }
 
@@ -102,11 +119,12 @@ class UnmappedFieldsFinder extends IdmlListenerWithState[UnmappedFields] {
           state(ctx).pathStack.push(new UnmappedFieldsPath(ExecNavVariable))
         case ExecNavRelative :: tail =>
           // For relative paths we want to ensure the 'isComposite' flag cascades down to earlier levels
-          val s = state(ctx)
+          val s                      = state(ctx)
           val isInsideCompositeValue =
             s.pathStack.headOption.exists(_.isComposite)
-          s.pathStack.push(new UnmappedFieldsPath(ExecNavRelative, isComposite = isInsideCompositeValue))
-        case _ => ()
+          s.pathStack.push(
+            new UnmappedFieldsPath(ExecNavRelative, isComposite = isInsideCompositeValue))
+        case _                       => ()
       }
     } catch {
       case e: Exception => logger.warn("error in enterPipl", e)
@@ -123,7 +141,7 @@ class UnmappedFieldsFinder extends IdmlListenerWithState[UnmappedFields] {
           popRelativePath(ctx)
         case ExecNavVariable :: tail =>
           popVariablePath(ctx)
-        case _ => ()
+        case _                       => ()
       }
     } catch {
       case e: Exception => logger.error("error in exitPipl", e)
@@ -135,13 +153,15 @@ class UnmappedFieldsFinder extends IdmlListenerWithState[UnmappedFields] {
     try {
       val s = state(ctx)
       require(s.pathStack.nonEmpty, StackWasEmpty)
-      require(s.pathStack.last.navType == ExecNavRelative, s"Expected relative path end, got ${s.pathStack.last.navType}")
+      require(
+        s.pathStack.last.navType == ExecNavRelative,
+        s"Expected relative path end, got ${s.pathStack.last.navType}")
 
       val result = s.pathStack.foldLeft(List[String]()) {
         case (prev, item) if item.navType == ExecNavRelative && !item.isComposite =>
           // Join every non-composite relative path part into a single path
           item.path.toList ++ prev
-        case (prev, _) =>
+        case (prev, _)                                                            =>
           // Ignore other paths types (absolute, literal)
           prev
       }
@@ -160,10 +180,12 @@ class UnmappedFieldsFinder extends IdmlListenerWithState[UnmappedFields] {
   /** Called at end the of an absolute path */
   protected def popAbsolutePath(ctx: IdmlContext): Unit = {
     try {
-      val s = state(ctx)
+      val s      = state(ctx)
       require(s.pathStack.nonEmpty, StackWasEmpty)
       val result = s.pathStack.pop()
-      require(result.navType == ExecNavAbsolute, s"Expected absolute path end, got ${result.navType}")
+      require(
+        result.navType == ExecNavAbsolute,
+        s"Expected absolute path end, got ${result.navType}")
 
       // Add the result to the paths field
       if (result.path.nonEmpty) {
@@ -177,10 +199,12 @@ class UnmappedFieldsFinder extends IdmlListenerWithState[UnmappedFields] {
   /** Called at end the of a variable path */
   protected def popVariablePath(ctx: IdmlContext): Unit = {
     try {
-      val s = state(ctx)
+      val s      = state(ctx)
       require(s.pathStack.nonEmpty, StackWasEmpty)
       val result = s.pathStack.pop()
-      require(result.navType == ExecNavVariable, s"Expected variable path end, got ${result.navType}")
+      require(
+        result.navType == ExecNavVariable,
+        s"Expected variable path end, got ${result.navType}")
       // Do nothing, we don't care about variables
     } catch {
       case e: Exception => logger.warn("error in popVariablePath", e)

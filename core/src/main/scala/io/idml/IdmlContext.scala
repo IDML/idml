@@ -8,16 +8,18 @@ import scala.collection.mutable
 import scala.collection.JavaConverters._
 
 /** The interpreter's state object */
-case class IdmlContext( /** The mappings document */
-                       @BeanProperty var doc: Document,
-                       /** The root of the input object */
-                       @BeanProperty var input: IdmlValue,
-                       /** The root of the output object */
-                       @BeanProperty var output: IdmlObject,
-                       /** The list of listeners that hook in to events around the system */
-                       var listeners: List[IdmlListener],
-                       /** A bag of state that can be used by listeners */
-                       val state: mutable.Map[Any, Any]) {
+case class IdmlContext(
+    /** The mappings document */
+    @BeanProperty var doc: Document,
+    /** The root of the input object */
+    @BeanProperty var input: IdmlValue,
+    /** The root of the output object */
+    @BeanProperty var output: IdmlObject,
+    /** The list of listeners that hook in to events around the system */
+    var listeners: List[IdmlListener],
+    /** A bag of state that can be used by listeners */
+    val state: mutable.Map[Any, Any]
+) {
 
   def this(input: IdmlValue, output: IdmlObject, listeners: List[IdmlListener]) {
     this(Document.empty, input, output, listeners, mutable.Map())
@@ -52,11 +54,14 @@ case class IdmlContext( /** The mappings document */
     state.asJava
   }
 
-  /** The current right-hand side value as we traverse the input. Effectively "this" for the node methods */
+  /** The current right-hand side value as we traverse the input. Effectively "this" for the node
+    * methods
+    */
   var cursor: IdmlValue = input
 
-  /** The pointer to the right-hand side. This changes depending on whether we're assigning, reassigning and whether
-    * we are inside a call to apply() */
+  /** The pointer to the right-hand side. This changes depending on whether we're assigning,
+    * reassigning and whether we are inside a call to apply()
+    */
   var scope: IdmlValue = input
 
   def enterAssignment(assign: Assignment): Unit = {

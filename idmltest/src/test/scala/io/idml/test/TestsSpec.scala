@@ -32,7 +32,7 @@ class TestsSpec extends AnyWordSpec with must.Matchers with CirceEitherEncoders 
       )
     ),
     Right(Json.obj()),
-    None,
+    None
   )
 
   "the Tests encoder and decoder" should {

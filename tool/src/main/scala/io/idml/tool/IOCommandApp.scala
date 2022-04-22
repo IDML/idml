@@ -23,8 +23,9 @@ trait IOCommandApp[T] extends IOApp {
     Command(name, header, helpFlag)(showVersion orElse commandLine.map(main))
   }
 
-  override def run(args: List[String]): IO[ExitCode] = command.parse(PlatformApp.ambientArgs getOrElse args, sys.env) match {
-    case Left(help) => IO { System.err.println(help); ExitCode.Error }
-    case Right(r)   => r
-  }
+  override def run(args: List[String]): IO[ExitCode] =
+    command.parse(PlatformApp.ambientArgs getOrElse args, sys.env) match {
+      case Left(help) => IO { System.err.println(help); ExitCode.Error }
+      case Right(r)   => r
+    }
 }

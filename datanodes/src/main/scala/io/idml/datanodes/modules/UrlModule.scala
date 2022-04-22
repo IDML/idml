@@ -10,9 +10,10 @@ import scala.collection.mutable
 import scala.util.Try
 
 object UrlModule {
-  val regex =
+  val regex                                          =
     Pattern.compile(
-      """\b((?:https?://|www\d{0,3}\.|[a-z0-9.\-]+\.[a-z]{2,4}/)(?:[^\p{Z}\s()<>]+|\(([^\p{Z}\s()<>]+|(\([^\p{Z}\s()<>]+\)))*\))+(?:\(([^\p{Z}\s()<>]+|(\([^\p{Z}\s()<>]+\)))*\)|[^\p{Z}\s!()\[\]{};:\'\".,<>?«»“”‘’]))""")
+      """\b((?:https?://|www\d{0,3}\.|[a-z0-9.\-]+\.[a-z]{2,4}/)(?:[^\p{Z}\s()<>]+|\(([^\p{Z}\s()<>]+|(\([^\p{Z}\s()<>]+\)))*\))+(?:\(([^\p{Z}\s()<>]+|(\([^\p{Z}\s()<>]+\)))*\)|[^\p{Z}\s!()\[\]{};:\'\".,<>?«»“”‘’]))"""
+    )
   def findAllIn(p: Pattern)(s: String): List[String] = {
     val m       = p.matcher(s)
     val results = mutable.Buffer.empty[String]
@@ -29,18 +30,23 @@ trait UrlModule {
 
   import UrlModule._
 
-  def urls(): IdmlValue = this match {
-    case s: IdmlString =>
-      new IArray(findAllIn(regex)(s.value).flatMap(u => Try(new IUrl(new URL(u))).toOption).toBuffer[IdmlValue])
-    case _ => CastUnsupported
-  }
+  def urls(): IdmlValue =
+    this match {
+      case s: IdmlString =>
+        new IArray(
+          findAllIn(regex)(s.value)
+            .flatMap(u => Try(new IUrl(new URL(u))).toOption)
+            .toBuffer[IdmlValue])
+      case _             => CastUnsupported
+    }
 
   /** Construct a new URL by parsing a string */
-  def url(): IdmlValue = this match {
-    case _: IUrl | _: IdmlNothing => this
-    case n: IdmlString =>
-      Try(new URL(n.value)).map(new IUrl(_)).getOrElse(CastFailed)
-    case _ => CastUnsupported
-  }
+  def url(): IdmlValue =
+    this match {
+      case _: IUrl | _: IdmlNothing => this
+      case n: IdmlString            =>
+        Try(new URL(n.value)).map(new IUrl(_)).getOrElse(CastFailed)
+      case _                        => CastUnsupported
+    }
 
 }

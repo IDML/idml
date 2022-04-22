@@ -15,12 +15,14 @@ class FunctionResolverService {
   /** Function resolver */
   protected val loader = ServiceLoader.load(classOf[FunctionResolver], getClass.getClassLoader)
 
-  /**
-    * Create a new function given name and arguments
+  /** Create a new function given name and arguments
     *
-    * @param name The name of the function
-    * @param args The executable arguments list
-    * @return The new function
+    * @param name
+    *   The name of the function
+    * @param args
+    *   The executable arguments list
+    * @return
+    *   The new function
     */
   def resolve(name: String, args: List[Argument]): IdmlFunction = {
     var result: Option[IdmlFunction] = None
@@ -34,7 +36,8 @@ class FunctionResolverService {
       val nxt = resolvers.next()
       result = nxt.resolve(name, args)
     }
-    result.getOrElse(throw new UnknownFunctionException(s"Unsupported function '$name' with ${args.size} params"))
+    result.getOrElse(
+      throw new UnknownFunctionException(s"Unsupported function '$name' with ${args.size} params"))
   }
 
   def orElse(other: FunctionResolverService): FunctionResolverService = {
@@ -43,10 +46,11 @@ class FunctionResolverService {
 }
 
 object FunctionResolverService {
-  def orElse(a: FunctionResolverService, b: FunctionResolverService): FunctionResolverService = new FunctionResolverService {
-    override def resolve(name: String, args: List[Argument]): IdmlFunction =
-      Try { a.resolve(name, args) }.toEither.leftMap { e1 =>
-        b.resolve(name, args)
-      }.merge
-  }
+  def orElse(a: FunctionResolverService, b: FunctionResolverService): FunctionResolverService =
+    new FunctionResolverService {
+      override def resolve(name: String, args: List[Argument]): IdmlFunction =
+        Try { a.resolve(name, args) }.toEither.leftMap { e1 =>
+          b.resolve(name, args)
+        }.merge
+    }
 }

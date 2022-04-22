@@ -46,7 +46,9 @@ object FunctionReport extends App {
   }
 
   def printMethod(method: Method): Unit = {
-    println(f"${method.getDeclaringClass.getSimpleName}\t${method.getName}(${argList(method)})") // scalastyle:ignore
+    println(
+      f"${method.getDeclaringClass.getSimpleName}\t${method.getName}(${argList(method)})"
+    ) // scalastyle:ignore
   }
 
   println("Module\tFunction") // scalastyle:ignore

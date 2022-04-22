@@ -39,36 +39,45 @@ class PValueComparisonTest extends AnyFunSuite with must.Matchers {
     intercept[IllegalArgumentException](assertEqual(IArray(), IArray(IString("a"))))
     intercept[IllegalArgumentException](assertEqual(IArray(IString("a")), IArray(IString("b"))))
     intercept[IllegalArgumentException](assertEqual(IArray(IInt(1)), IArray(IInt(2))))
-    intercept[IllegalArgumentException](assertEqual(IArray(IDouble(123.456)), IArray(IDouble(789.101))))
+    intercept[IllegalArgumentException](
+      assertEqual(IArray(IDouble(123.456)), IArray(IDouble(789.101))))
     intercept[IllegalArgumentException](assertEqual(IArray(ITrue), IArray(IFalse)))
   }
 
   test("Rejects arrays with different cardinality") {
-    intercept[IllegalArgumentException](assertEqual(IArray(IString("a"), IString("a")), IArray(IString("a"))))
-    intercept[IllegalArgumentException](assertEqual(IArray(IString("a")), IArray(IString("a"), IString("a"))))
+    intercept[IllegalArgumentException](
+      assertEqual(IArray(IString("a"), IString("a")), IArray(IString("a"))))
+    intercept[IllegalArgumentException](
+      assertEqual(IArray(IString("a")), IArray(IString("a"), IString("a"))))
   }
 
   test("Accepts equal objects") {
     assertEqual(IObject(), IObject())
-    assertEqual(IObject("a" -> IString("a")), IObject("a"     -> IString("a")))
-    assertEqual(IObject("a" -> IInt(1)), IObject("a"          -> IInt(1)))
+    assertEqual(IObject("a" -> IString("a")), IObject("a" -> IString("a")))
+    assertEqual(IObject("a" -> IInt(1)), IObject("a" -> IInt(1)))
     assertEqual(IObject("a" -> IDouble(123.456)), IObject("a" -> IDouble(123.456)))
-    assertEqual(IObject("a" -> ITrue), IObject("a"            -> ITrue))
+    assertEqual(IObject("a" -> ITrue), IObject("a" -> ITrue))
   }
 
   test("Rejects objects with different values") {
     intercept[IllegalArgumentException](assertEqual(IObject(), IObject("a" -> IString("b"))))
-    intercept[IllegalArgumentException](assertEqual(IObject("a"            -> IString("a")), IObject("a" -> IString("b"))))
-    intercept[IllegalArgumentException](assertEqual(IObject("a"            -> IInt(1)), IObject("a" -> IArray(IInt(2)))))
-    intercept[IllegalArgumentException](assertEqual(IObject("a"            -> IDouble(123.456)), IObject("a" -> IDouble(789.101))))
-    intercept[IllegalArgumentException](assertEqual(IObject("a"            -> ITrue), IObject("a" -> IFalse)))
+    intercept[IllegalArgumentException](
+      assertEqual(IObject("a" -> IString("a")), IObject("a" -> IString("b"))))
+    intercept[IllegalArgumentException](
+      assertEqual(IObject("a" -> IInt(1)), IObject("a" -> IArray(IInt(2)))))
+    intercept[IllegalArgumentException](
+      assertEqual(IObject("a" -> IDouble(123.456)), IObject("a" -> IDouble(789.101))))
+    intercept[IllegalArgumentException](assertEqual(IObject("a" -> ITrue), IObject("a" -> IFalse)))
   }
 
   test("Rejects objects with different keys") {
     intercept[IllegalArgumentException](assertEqual(IObject(), IObject("a" -> IString("b"))))
-    intercept[IllegalArgumentException](assertEqual(IObject("a"            -> IString("a")), IObject("b" -> IString("b"))))
-    intercept[IllegalArgumentException](assertEqual(IObject("a"            -> IInt(1)), IObject("b" -> IArray(IInt(2)))))
-    intercept[IllegalArgumentException](assertEqual(IObject("a"            -> IDouble(123.456)), IObject("b" -> IDouble(789.101))))
-    intercept[IllegalArgumentException](assertEqual(IObject("a"            -> ITrue), IObject("b" -> IFalse)))
+    intercept[IllegalArgumentException](
+      assertEqual(IObject("a" -> IString("a")), IObject("b" -> IString("b"))))
+    intercept[IllegalArgumentException](
+      assertEqual(IObject("a" -> IInt(1)), IObject("b" -> IArray(IInt(2)))))
+    intercept[IllegalArgumentException](
+      assertEqual(IObject("a" -> IDouble(123.456)), IObject("b" -> IDouble(789.101))))
+    intercept[IllegalArgumentException](assertEqual(IObject("a" -> ITrue), IObject("b" -> IFalse)))
   }
 }

@@ -19,6 +19,11 @@ class IdmlValueNAryFunctionResolverTest extends AnyFunSuite {
     assert(
       new IdmlValueNaryFunctionResolver()
         .resolve("format", List(pipl)) === Some(
-        IdmlValueFunction(pv.getMethod("format", classOf[Seq[IdmlValue]]), List(pipl), isNAry = true)))
+        IdmlValueFunction(
+          pv.getMethod("format", classOf[Seq[IdmlValue]]),
+          List(pipl),
+          isNAry = true)
+      )
+    )
   }
 }

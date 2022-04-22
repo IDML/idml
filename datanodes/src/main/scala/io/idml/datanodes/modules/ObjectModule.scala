@@ -12,14 +12,16 @@ trait ObjectModule {
   /** Remove a field by name */
   def remove(path: String) {}
 
-  def values(): IdmlValue = this match {
-    case o: IdmlObject => IArray(o.fields.values.toBuffer)
-    case _             => InvalidCaller
-  }
+  def values(): IdmlValue =
+    this match {
+      case o: IdmlObject => IArray(o.fields.values.toBuffer)
+      case _             => InvalidCaller
+    }
 
-  def keys(): IdmlValue = this match {
-    case o: IdmlObject => IArray(o.fields.keys.map(IString.apply).toBuffer[IdmlValue])
-    case _             => InvalidCaller
-  }
+  def keys(): IdmlValue =
+    this match {
+      case o: IdmlObject => IArray(o.fields.keys.map(IString.apply).toBuffer[IdmlValue])
+      case _             => InvalidCaller
+    }
 
 }

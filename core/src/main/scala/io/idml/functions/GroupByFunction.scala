@@ -31,21 +31,22 @@ case class GroupByFunction(expr: Node) extends IdmlFunction {
     ctx.cursor match {
       case nothing: IdmlNothing =>
         nothing
-      case array: IdmlArray =>
+      case array: IdmlArray     =>
         val results = {
           val vs = array.items
             .flatMap(x =>
               extractOpt(ctx, x).map { v =>
                 v.toStringValue -> x
-            })
+              })
             .groupBy(_._1)
             .mapValues(_.map(_._2))
             .mapValues(IArray(_))
-            .toList.sortBy(_._1)
+            .toList
+            .sortBy(_._1)
           IObject(mutable.ListMap[String, IdmlValue](vs: _*))
         }
         ctx.cursor = results
-      case _ =>
+      case _                    =>
         ctx.cursor = InvalidCaller
     }
 

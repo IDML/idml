@@ -22,41 +22,47 @@ trait SchemaModule {
 
   // scalastyle:off method.name
   /** Transform this field into an object */
-  def `object`(): IdmlValue = this match {
-    case _: IdmlObject | _: IdmlNothing => this
-    case _                              => CastUnsupported
-  }
+  def `object`(): IdmlValue =
+    this match {
+      case _: IdmlObject | _: IdmlNothing => this
+      case _                              => CastUnsupported
+    }
   // scalastyle:on method.name
 
   /** Transform this field into a floating-point number */
-  def float(): IdmlValue = this match {
-    case _: IdmlDouble | _: IdmlNothing => this
-    case _                              => CastUnsupported
-  }
+  def float(): IdmlValue =
+    this match {
+      case _: IdmlDouble | _: IdmlNothing => this
+      case _                              => CastUnsupported
+    }
 
   /** Transform this field into a natural number */
-  def int(): IdmlValue = this match {
-    case _: IdmlInt | _: IdmlNothing => this
-    case _                           => CastUnsupported
-  }
+  def int(): IdmlValue =
+    this match {
+      case _: IdmlInt | _: IdmlNothing => this
+      case _                           => CastUnsupported
+    }
 
   /** Transform this field into a boolean */
-  def bool(): IdmlValue = this match {
-    case _: IdmlBool | _: IdmlNothing => this
-    case _                            => CastUnsupported
-  }
+  def bool(): IdmlValue =
+    this match {
+      case _: IdmlBool | _: IdmlNothing => this
+      case _                            => CastUnsupported
+    }
 
   /** Transform this field into a float */
-  def double(): IdmlValue = this match {
-    case _: IdmlDouble | _: IdmlNothing => this
-    case _                              => CastUnsupported
-  }
+  def double(): IdmlValue =
+    this match {
+      case _: IdmlDouble | _: IdmlNothing => this
+      case _                              => CastUnsupported
+    }
 
   /** Transform this field into an array */
-  def array(): IdmlValue = this match {
-    case _: IdmlArray | _: IdmlNothing => this
-    case _                             => CastUnsupported
-  }
+  def array(): IdmlValue =
+    this match {
+      case _: IdmlArray | _: IdmlNothing => this
+      case _                             => CastUnsupported
+    }
 
   /** Extract the underlying float value for this node if it has one, otherwise return a default */
   def toFloatValue: Float = toFloatOption.getOrElse(0f)
@@ -67,7 +73,8 @@ trait SchemaModule {
   /** Extract the underlying long value for this node if it has one, otherwise return a default */
   def toLongValue: Long = toLongOption.getOrElse(0L)
 
-  /** Extract the underlying boolean value for this node if it has one, otherwise return a default */
+  /** Extract the underlying boolean value for this node if it has one, otherwise return a default
+    */
   def toBoolValue: Boolean = toBoolOption.getOrElse(false)
 
   /** Extract the underlying double value for this node if it has one, otherwise return a default */
@@ -140,14 +147,16 @@ trait SchemaModule {
   def isFloat: IBool = IBool(this.isInstanceOf[IdmlDouble])
 
   /** This is a form of type coercion similar to php's empty(..) function; false, null, missing
-    * values, empty arrays and objects all return true for isEmpty */
+    * values, empty arrays and objects all return true for isEmpty
+    */
   def isEmpty: IBool = IBool(isFalseValue || isNullValue || isNothingValue)
 
   /** Annotate any missing fields. This is useful later on for processes like schema matching */
-  def required(): IdmlValue = this match {
-    case reason: IdmlNothing => FailedRequirement(reason)
-    case success: Any        => success
-  }
+  def required(): IdmlValue =
+    this match {
+      case reason: IdmlNothing => FailedRequirement(reason)
+      case success: Any        => success
+    }
 
   /** If the value is missing then use a default value instead */
   def default(value: IdmlValue): IdmlValue =
@@ -160,6 +169,6 @@ trait SchemaModule {
   def deepCopy: IdmlValue = this
 
   /** Convert to Json */
-  //def json: String = IdmlJson.compact(this)
+  // def json: String = IdmlJson.compact(this)
 }
 // scalastyle:on number.of.methods

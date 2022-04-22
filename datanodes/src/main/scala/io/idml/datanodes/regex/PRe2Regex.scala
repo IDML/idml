@@ -7,7 +7,7 @@ import scala.collection.mutable.ListBuffer
 class PRe2Regex(regex: String) extends PRegexLike(regex) {
   private val pattern = Pattern.compile(regex)
 
-  override def matches(target: String): List[List[String]] = {
+  override def matches(target: String): List[List[String]]          = {
     val r       = pattern.matcher(target)
     val builder = ListBuffer.empty[List[String]]
     while (r.find()) {
@@ -18,7 +18,7 @@ class PRe2Regex(regex: String) extends PRegexLike(regex) {
     }
     builder.toList
   }
-  override def `match`(target: String): List[String] = {
+  override def `match`(target: String): List[String]                = {
     val r = pattern.matcher(target)
     if (r.matches()) {
       val results = 1 to r.groupCount() map { i =>
@@ -31,5 +31,6 @@ class PRe2Regex(regex: String) extends PRegexLike(regex) {
   }
   override def split(target: String): List[String]                  = pattern.split(target).toList
   override def isMatch(target: String): Boolean                     = pattern.matches(target)
-  override def replace(target: String, replacement: String): String = pattern.matcher(target).replaceAll(replacement)
+  override def replace(target: String, replacement: String): String =
+    pattern.matcher(target).replaceAll(replacement)
 }

@@ -12,9 +12,10 @@ class JsoupFunctionResolver extends FunctionResolver {
       case _                  => None
     }
   }
-  override def providedFunctions(): List[IdmlFunctionMetadata] = List(
-    IdmlFunctionMetadata("stripTags", List.empty, "remove XML tags from this string"),
-    IdmlFunctionMetadata("parseXml", List.empty, "parse this string as XML"),
-    IdmlFunctionMetadata("parseHtml", List.empty, "parse this string as HTML")
-  )
+  override def providedFunctions(): List[IdmlFunctionMetadata]                   =
+    List(
+      IdmlFunctionMetadata("stripTags", List.empty, "remove XML tags from this string"),
+      IdmlFunctionMetadata("parseXml", List.empty, "parse this string as XML"),
+      IdmlFunctionMetadata("parseHtml", List.empty, "parse this string as HTML")
+    )
 }

@@ -1,3 +1,5 @@
+package io.idml.tool
+
 import java.io.File
 
 import cats._
@@ -17,7 +19,10 @@ object DeclineHelpers {
           .valid(new File(string))
           .ensure(NonEmptyList.of(s"Invalid File: $string does not exist."))(_.exists())
           .ensure(NonEmptyList.of(s"Invalid File: $string cannot be read."))(_.canRead())
-      } catch { case npe: NullPointerException => Validated.invalidNel(s"Invalid File: $string (${npe.getMessage})") }
+      } catch {
+        case npe: NullPointerException =>
+          Validated.invalidNel(s"Invalid File: $string (${npe.getMessage})")
+      }
 
     override def defaultMetavar: String = "file"
   }

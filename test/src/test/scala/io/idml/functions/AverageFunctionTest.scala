@@ -37,7 +37,8 @@ class AverageFunctionTest extends AnyFunSuite {
   }
 
   test("when given a bounding box with non-equal points it outputs the average lat and long") {
-    val ctx = new IdmlContext(IArray(IDouble(-4.2392826), IDouble(-4.2392826), IDouble(-3.9925988), IDouble(-3.9925988)))
+    val ctx = new IdmlContext(
+      IArray(IDouble(-4.2392826), IDouble(-4.2392826), IDouble(-3.9925988), IDouble(-3.9925988)))
     AverageFunction.invoke(ctx)
     assert(ctx.cursor === IDouble(-4.1159407))
   }

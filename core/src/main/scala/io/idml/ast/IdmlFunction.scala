@@ -19,7 +19,8 @@ trait IdmlFunction extends Expression {
   protected def findBlock(ctx: IdmlContext, block: String) = {
     // TODO: The 'late binding' approach adds slight overhead. Wiring the block up after the full document has been
     // parsed will eliminate the additional hashmap calls
-    ctx.doc.blocks.getOrElse(block, throw new UnknownBlockException(s"Section '$block' is not defined"))
+    ctx.doc.blocks
+      .getOrElse(block, throw new UnknownBlockException(s"Section '$block' is not defined"))
   }
 
   /** Apply a block to each item in an array */

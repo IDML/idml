@@ -14,7 +14,8 @@ import org.scalatest.wordspec.AnyWordSpec
 
 class ConfigurationDslSpec extends AnyWordSpec with must.Matchers {
 
-  val parse: String => Either[String, ConfigurationMapping] = Pipeline.Parser.apply[Either[String, *]](_)
+  val parse: String => Either[String, ConfigurationMapping] =
+    Pipeline.Parser.apply[Either[String, *]](_)
   "The DSL parser" should {
     "parse single mappings" in {
       parse("abc") must equal(Right(SingleMapping("abc")))

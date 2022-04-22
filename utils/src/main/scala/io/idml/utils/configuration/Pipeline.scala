@@ -10,29 +10,31 @@ import higherkindness.droste._
 import higherkindness.droste.macros._
 import higherkindness.droste.scheme._
 
-/**
-  * A small DSL that can be used to combine mappings, examples look like this:
-  * a|b # a piped into b
+/** A small DSL that can be used to combine mappings, examples look like this: a|b # a piped into b
   * a+b # a and b run on the same input then merged
   *
-  * Note: | takes precedence over + so in `a|b+c` the `b` and `c` mappings are combined, and fed the output from `a`
+  * Note: | takes precedence over + so in `a|b+c` the `b` and `c` mappings are combined, and fed the
+  * output from `a`
   */
 object Pipeline {
   @deriveFixedPoint sealed trait ConfigurationMapping
   object ConfigurationMapping {
-    final case class SingleMapping(name: String)                                   extends ConfigurationMapping
-    final case class Merged(lhs: ConfigurationMapping, rhs: ConfigurationMapping)  extends ConfigurationMapping
-    final case class Chained(lhs: ConfigurationMapping, rhs: ConfigurationMapping) extends ConfigurationMapping
+    final case class SingleMapping(name: String) extends ConfigurationMapping
+    final case class Merged(lhs: ConfigurationMapping, rhs: ConfigurationMapping)
+        extends ConfigurationMapping
+    final case class Chained(lhs: ConfigurationMapping, rhs: ConfigurationMapping)
+        extends ConfigurationMapping
 
   }
   import ConfigurationMapping._
   import ConfigurationMapping.fixedpoint._
 
-  val printer: AlgebraM[Eval, ConfigurationMappingF, String] = AlgebraM[Eval, ConfigurationMappingF, String] {
-    case SingleMappingF(value) => Eval.later(value)
-    case MergedF(l, r)         => Eval.later(s"($l + $r)")
-    case ChainedF(l, r)        => Eval.later(s"($l | $r)")
-  }
+  val printer: AlgebraM[Eval, ConfigurationMappingF, String] =
+    AlgebraM[Eval, ConfigurationMappingF, String] {
+      case SingleMappingF(value) => Eval.later(value)
+      case MergedF(l, r)         => Eval.later(s"($l + $r)")
+      case ChainedF(l, r)        => Eval.later(s"($l | $r)")
+    }
 
   object Lexer {
     sealed trait Token
@@ -46,7 +48,8 @@ object Pipeline {
     val plus  = char('+').as(Plus).widen[Token]
 
     val lexer                                                                                  = many1(text | (pipe | plus))
-    def lex[M[_]](s: String)(implicit AE: ApplicativeError[M, String]): M[NonEmptyList[Token]] = AE.fromEither(lexer.parseOnly(s).either)
+    def lex[M[_]](s: String)(implicit AE: ApplicativeError[M, String]): M[NonEmptyList[Token]] =
+      AE.fromEither(lexer.parseOnly(s).either)
   }
 
   object Parser {
@@ -64,16 +67,21 @@ object Pipeline {
     object SplitAtFirstPipe extends SplitAtFirstX[Lexer.Token](Lexer.Pipe)
     object SplitAtFirstPlus extends SplitAtFirstX[Lexer.Token](Lexer.Plus)
 
-    def parser[M[_]](implicit AE: ApplicativeError[M, String]) = CoalgebraM[M, ConfigurationMappingF, List[Lexer.Token]] { tokens =>
-      val mode = tokens.find(_ == Lexer.Pipe).orElse(tokens.find(_ == Lexer.Plus))
-      (mode, tokens) match {
-        case (None, Lexer.Text(t) :: Nil)               => AE.pure[ConfigurationMappingF[List[Lexer.Token]]](SingleMappingF(t))
-        case (Some(Lexer.Pipe), SplitAtFirstPipe(l, r)) => AE.pure[ConfigurationMappingF[List[Lexer.Token]]](ChainedF(l, r))
-        case (Some(Lexer.Plus), SplitAtFirstPlus(l, r)) => AE.pure[ConfigurationMappingF[List[Lexer.Token]]](MergedF(l, r))
-        case _                                          => AE.raiseError(s"Parse error, unexpected tokens: $tokens")
+    def parser[M[_]](implicit AE: ApplicativeError[M, String]) =
+      CoalgebraM[M, ConfigurationMappingF, List[Lexer.Token]] { tokens =>
+        val mode = tokens.find(_ == Lexer.Pipe).orElse(tokens.find(_ == Lexer.Plus))
+        (mode, tokens) match {
+          case (None, Lexer.Text(t) :: Nil)               =>
+            AE.pure[ConfigurationMappingF[List[Lexer.Token]]](SingleMappingF(t))
+          case (Some(Lexer.Pipe), SplitAtFirstPipe(l, r)) =>
+            AE.pure[ConfigurationMappingF[List[Lexer.Token]]](ChainedF(l, r))
+          case (Some(Lexer.Plus), SplitAtFirstPlus(l, r)) =>
+            AE.pure[ConfigurationMappingF[List[Lexer.Token]]](MergedF(l, r))
+          case _                                          => AE.raiseError(s"Parse error, unexpected tokens: $tokens")
+        }
       }
-    }
-    def parse[M[_]: Monad](tokens: NonEmptyList[Lexer.Token])(implicit AE: ApplicativeError[M, String]): M[ConfigurationMapping] =
+    def parse[M[_]: Monad](tokens: NonEmptyList[Lexer.Token])(implicit
+        AE: ApplicativeError[M, String]): M[ConfigurationMapping] =
       anaM(parser[M]).apply(tokens.toList)
 
     def apply[M[_]](s: String)(implicit ME: MonadError[M, String]): M[ConfigurationMapping] =

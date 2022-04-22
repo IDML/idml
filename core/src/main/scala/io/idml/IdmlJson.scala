@@ -6,8 +6,7 @@ import io.idml.datanodes.IObject
 import cats._
 import cats.implicits._
 
-/**
-  * Interface for any JSON parser which can work with the IDML datanodes hierarchy
+/** Interface for any JSON parser which can work with the IDML datanodes hierarchy
   */
 trait IdmlJson {
 
@@ -16,7 +15,8 @@ trait IdmlJson {
   def parse(in: String): IdmlValue
 
   /* Scala-friendly version of parse which uses an Either */
-  def parseEither(in: String): Either[IdmlJsonReadingException, IdmlValue] = Either.catchOnly[IdmlJsonReadingException](parse(in))
+  def parseEither(in: String): Either[IdmlJsonReadingException, IdmlValue] =
+    Either.catchOnly[IdmlJsonReadingException](parse(in))
 
   /** Take a json string and transform it into a DataNode hierarchy, if it's an object */
   @throws[IdmlJsonReadingException]("if the JSON doesn't parse")
@@ -41,7 +41,8 @@ trait IdmlJson {
 
 object IdmlJson {
   @throws[NoSuchElementException]("if there isn't an available implementation")
-  def load(): IdmlJson     = ServiceLoader.load(classOf[IdmlJson], getClass.getClassLoader).iterator().next()
+  def load(): IdmlJson     =
+    ServiceLoader.load(classOf[IdmlJson], getClass.getClassLoader).iterator().next()
   def newObject(): IObject = IObject()
 }
 

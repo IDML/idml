@@ -11,13 +11,14 @@ class IUrl(url: URL) extends IdmlString with CompositeValue {
   val value: String = url.toString
 
   /** Override get(..) to provide custom field accessors */
-  override def get(name: String): IdmlValue = name match {
-    case "host"     => IdmlValue(url.getHost)
-    case "protocol" => IdmlValue(url.getProtocol)
-    case "query"    => IdmlValue(url.getQuery)
-    case "path"     => IdmlValue(url.getPath)
-    case _          => MissingField
-  }
+  override def get(name: String): IdmlValue =
+    name match {
+      case "host"     => IdmlValue(url.getHost)
+      case "protocol" => IdmlValue(url.getProtocol)
+      case "query"    => IdmlValue(url.getQuery)
+      case "path"     => IdmlValue(url.getPath)
+      case _          => MissingField
+    }
 
   override def toString: String = value
 }

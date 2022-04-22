@@ -21,7 +21,7 @@ class DiffSerializer extends PValueSerializer {
           serialize(r, json, provider)
           json.writeRaw("</added>")
         }
-      case _ =>
+      case _                                  =>
         super.serialize(value, json, provider)
     }
   }

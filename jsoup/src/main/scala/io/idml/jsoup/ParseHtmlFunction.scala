@@ -11,7 +11,7 @@ object ParseHtmlFunction extends IdmlFunction {
     ctx.cursor = ctx.cursor match {
       case IString(str) =>
         IdmlJsoup.parseHtml(str)
-      case _ =>
+      case _            =>
         InvalidCaller
     }
   }

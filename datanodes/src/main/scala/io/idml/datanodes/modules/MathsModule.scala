@@ -16,7 +16,8 @@ trait MathsModule {
 
   private def doRound(sd: IdmlValue, mode: RoundingMode): IdmlValue = {
     (this.toDoubleOption, sd) match {
-      case (Some(d), i: IInt) => IDouble(BigDecimal(d.doubleValue()).underlying().setScale(i.value.toInt, mode).doubleValue)
+      case (Some(d), i: IInt) =>
+        IDouble(BigDecimal(d.doubleValue()).underlying().setScale(i.value.toInt, mode).doubleValue)
       case (None, _)          => InvalidCaller
       case (Some(_), _)       => InvalidParameters
     }
@@ -25,7 +26,8 @@ trait MathsModule {
   private def doSigRound(sd: IdmlValue, mode: RoundingMode): IdmlValue = {
     (this.toDoubleOption, sd) match {
       case (Some(_), i: IInt) if i.value < 1 => InvalidParameters
-      case (Some(d), i: IInt)                => IDouble(BigDecimal(d.doubleValue()).round(new MathContext(i.value.toInt, mode)).doubleValue)
+      case (Some(d), i: IInt)                =>
+        IDouble(BigDecimal(d.doubleValue()).round(new MathContext(i.value.toInt, mode)).doubleValue)
       case (None, _)                         => InvalidCaller
       case (Some(_), _)                      => InvalidParameters
     }
@@ -40,17 +42,15 @@ trait MathsModule {
             IInt(Longs.fromByteArray(array))
           else
             IString(java.lang.Long.toUnsignedString(Longs.fromByteArray(array)))
-        }.recoverWith {
-            case _: IllegalArgumentException =>
-              Try {
-                if (signed)
-                  IInt(Ints.fromByteArray(array).toLong)
-                else
-                  IString(java.lang.Integer.toUnsignedString(Ints.fromByteArray(array)))
-              }
+        }.recoverWith { case _: IllegalArgumentException =>
+          Try {
+            if (signed)
+              IInt(Ints.fromByteArray(array).toLong)
+            else
+              IString(java.lang.Integer.toUnsignedString(Ints.fromByteArray(array)))
           }
-          .getOrElse(IdmlNull)
-      case _ => InvalidCaller
+        }.getOrElse(IdmlNull)
+      case _          => InvalidCaller
     }
   }
 
@@ -68,43 +68,49 @@ trait MathsModule {
 
   def sigfig(sd: IdmlValue): IdmlValue = doSigRound(sd, RoundingMode.HALF_UP)
 
-  private def extractDouble(v: IdmlValue): Option[Double] = v match {
-    case IInt(i)    => Some(i.toDouble)
-    case IDouble(d) => Some(d)
-    case _          => None
-  }
+  private def extractDouble(v: IdmlValue): Option[Double] =
+    v match {
+      case IInt(i)    => Some(i.toDouble)
+      case IDouble(d) => Some(d)
+      case _          => None
+    }
 
-  def log(): IdmlValue = extractDouble(this) match {
-    case Some(d) if d <= 0.0 => InvalidCaller
-    case Some(d)             => IDouble(java.lang.Math.log(d))
-    case None                => InvalidCaller
-  }
+  def log(): IdmlValue =
+    extractDouble(this) match {
+      case Some(d) if d <= 0.0 => InvalidCaller
+      case Some(d)             => IDouble(java.lang.Math.log(d))
+      case None                => InvalidCaller
+    }
 
-  def abs(): IdmlValue = this match {
-    case IInt(i)    => IInt(java.lang.Math.abs(i))
-    case IDouble(d) => IDouble(java.lang.Math.abs(d))
-    case _          => InvalidCaller
-  }
+  def abs(): IdmlValue =
+    this match {
+      case IInt(i)    => IInt(java.lang.Math.abs(i))
+      case IDouble(d) => IDouble(java.lang.Math.abs(d))
+      case _          => InvalidCaller
+    }
 
-  def pow(e: IdmlValue): IdmlValue = (extractDouble(this), extractDouble(e)) match {
-    case (Some(l), Some(r)) => IDouble(java.lang.Math.pow(l, r))
-    case (None, _)          => InvalidCaller
-    case (_, None)          => InvalidParameters
-  }
+  def pow(e: IdmlValue): IdmlValue =
+    (extractDouble(this), extractDouble(e)) match {
+      case (Some(l), Some(r)) => IDouble(java.lang.Math.pow(l, r))
+      case (None, _)          => InvalidCaller
+      case (_, None)          => InvalidParameters
+    }
 
-  def exp(): IdmlValue = extractDouble(this) match {
-    case Some(d) => IDouble(java.lang.Math.exp(d))
-    case None    => InvalidCaller
-  }
+  def exp(): IdmlValue =
+    extractDouble(this) match {
+      case Some(d) => IDouble(java.lang.Math.exp(d))
+      case None    => InvalidCaller
+    }
 
-  def sqrt(): IdmlValue = extractDouble(this) match {
-    case Some(d) => IDouble(Math.sqrt(d))
-    case None    => InvalidCaller
-  }
+  def sqrt(): IdmlValue =
+    extractDouble(this) match {
+      case Some(d) => IDouble(Math.sqrt(d))
+      case None    => InvalidCaller
+    }
 
   def /(target: IdmlValue): IdmlValue = {
     this match {
-      case i: IInt =>
+      case i: IInt    =>
         target match {
           case ti: IInt if ti.value == 0    => InvalidParameters
           case td: IDouble if td.value == 0 => InvalidParameters
@@ -118,13 +124,13 @@ trait MathsModule {
           case td: IDouble => IDouble(d.value / td.value)
           case _           => InvalidParameters
         }
-      case _ => InvalidCaller
+      case _          => InvalidCaller
     }
   }
 
   def *(target: IdmlValue): IdmlValue = {
     this match {
-      case i: IInt =>
+      case i: IInt    =>
         target match {
           case ti: IInt    => IInt(i.value * ti.value)
           case td: IDouble => IDouble(i.value * td.value)
@@ -136,19 +142,19 @@ trait MathsModule {
           case td: IDouble => IDouble(d.value * td.value)
           case _           => InvalidParameters
         }
-      case _ => InvalidCaller
+      case _          => InvalidCaller
     }
   }
 
   def +(target: IdmlValue): IdmlValue = {
     this match {
-      case i: IInt =>
+      case i: IInt       =>
         target match {
           case ti: IInt    => IInt(i.value + ti.value)
           case td: IDouble => IDouble(i.value + td.value)
           case _           => InvalidParameters
         }
-      case d: IDouble =>
+      case d: IDouble    =>
         target match {
           case ti: IInt    => IDouble(d.value + ti.value)
           case td: IDouble => IDouble(d.value + td.value)
@@ -161,13 +167,13 @@ trait MathsModule {
           case td: IDouble    => IString(s.value + td.value.toString)
           case _              => InvalidParameters
         }
-      case _ => InvalidCaller
+      case _             => InvalidCaller
     }
   }
 
   def -(target: IdmlValue): IdmlValue = {
     this match {
-      case i: IInt =>
+      case i: IInt    =>
         target match {
           case ti: IInt    => IInt(i.value - ti.value)
           case td: IDouble => IDouble(i.value - td.value)
@@ -179,7 +185,7 @@ trait MathsModule {
           case td: IDouble => IDouble(d.value - td.value)
           case _           => InvalidParameters
         }
-      case _ => InvalidCaller
+      case _          => InvalidCaller
     }
   }
 }

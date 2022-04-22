@@ -12,15 +12,22 @@ class ObjectParsingSpec extends AnyFunSuite with Matchers {
 
   // Parsing
   test("parse empty")(parse("{}") must equal(IObject()))
-  test("parse with primitives")(parse("""{"s": "abc", "i": 123, "f": 123.4, "n":null}""") must equal(withPrimitives))
-  test("parse with nested objects")(parse("""{"o": {"s": "abc", "i": 123, "f": 123.4, "n": null}}""") must equal(withNestedObjects))
-  test("parse with nested arrays")(parse("""{"a": ["abc", 123, 123.4, null]}""") must equal(withNestedArrays))
+  test("parse with primitives")(
+    parse("""{"s": "abc", "i": 123, "f": 123.4, "n":null}""") must equal(withPrimitives))
+  test("parse with nested objects")(
+    parse("""{"o": {"s": "abc", "i": 123, "f": 123.4, "n": null}}""") must equal(withNestedObjects))
+  test("parse with nested arrays")(
+    parse("""{"a": ["abc", 123, 123.4, null]}""") must equal(withNestedArrays))
 
   // Generation
   test("generate empty")(parse("{}") must equal(pc(IObject())))
-  test("generate with primitives")(parse("""{"s": "abc", "i": 123, "f": 123.4, "n":null}""") must equal(pc(withPrimitives)))
-  test("generate with nested objects")(parse("""{"o": {"s": "abc", "i": 123, "f": 123.4, "n": null}}""") must equal(pc(withNestedObjects)))
-  test("generate with nested arrays")(parse("""{"a": ["abc", 123, 123.4, null]}""") must equal(pc(withNestedArrays)))
+  test("generate with primitives")(
+    parse("""{"s": "abc", "i": 123, "f": 123.4, "n":null}""") must equal(pc(withPrimitives)))
+  test("generate with nested objects")(
+    parse("""{"o": {"s": "abc", "i": 123, "f": 123.4, "n": null}}""") must equal(
+      pc(withNestedObjects)))
+  test("generate with nested arrays")(
+    parse("""{"a": ["abc", 123, 123.4, null]}""") must equal(pc(withNestedArrays)))
 
   /*
   // serialize
@@ -44,7 +51,8 @@ class ObjectParsingSpec extends AnyFunSuite with Matchers {
         "i" -> IdmlValue(123),
         "f" -> IdmlValue(123.4),
         "n" -> IdmlNull
-      ))
+      )
+    )
 
   def withNestedObjects =
     new IObject(
@@ -55,7 +63,10 @@ class ObjectParsingSpec extends AnyFunSuite with Matchers {
             "i" -> IdmlValue(123),
             "f" -> IdmlValue(123.4),
             "n" -> IdmlNull
-          ))))
+          )
+        )
+      )
+    )
 
   def withNestedArrays =
     new IObject(
@@ -66,5 +77,8 @@ class ObjectParsingSpec extends AnyFunSuite with Matchers {
             IdmlValue(123),
             IdmlValue(123.4),
             IdmlNull
-          ))))
+          )
+        )
+      )
+    )
 }

@@ -14,12 +14,14 @@ class IEmailTest extends AnyFunSuite with Matchers {
   }
 
   test("Parse a plain email address") {
-    IString("andi.miller@datasift.com").email() must equal(new IEmail(new InternetAddress("andi.miller@datasift.com")))
+    IString("andi.miller@datasift.com").email() must equal(
+      new IEmail(new InternetAddress("andi.miller@datasift.com")))
   }
 
   test("Parse an email address wtih a name") {
     IString("Andi Miller <andi.miller@datasift.com>").email() must equal(
-      new IEmail(new InternetAddress("Andi Miller <andi.miller@datasift.com>")))
+      new IEmail(new InternetAddress("Andi Miller <andi.miller@datasift.com>"))
+    )
   }
 
   test("Apply email() to an empty array") {
@@ -27,7 +29,8 @@ class IEmailTest extends AnyFunSuite with Matchers {
   }
 
   test("Apply email() to an array with a single address") {
-    IArray(IString("andi.miller@datasift.com")).email() must equal(IArray(new IEmail(new InternetAddress("andi.miller@datasift.com"))))
+    IArray(IString("andi.miller@datasift.com")).email() must equal(
+      IArray(new IEmail(new InternetAddress("andi.miller@datasift.com"))))
   }
 
   test("Apply email() to an array with an invalid address") {
@@ -38,7 +41,8 @@ class IEmailTest extends AnyFunSuite with Matchers {
       IArray(
         CastFailed,
         new IEmail(new InternetAddress("andi.miller@datasift.com"))
-      ))
+      )
+    )
   }
 
   test("Parse an array with multiple emails") {

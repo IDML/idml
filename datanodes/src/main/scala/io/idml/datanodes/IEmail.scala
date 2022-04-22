@@ -35,13 +35,14 @@ class IEmail(email: InternetAddress) extends IdmlString with CompositeValue {
     s"${getClass.getSimpleName}(${email.toString})"
 
   /** Override get(..) to provide custom field accessors */
-  override def get(name: String): IdmlValue = name match {
-    case "address"  => IdmlValue(addressValue)
-    case "name"     => IdmlValue(nameValue)
-    case "domain"   => IdmlValue(domainValue)
-    case "username" => IdmlValue(usernameValue)
-    case _          => MissingField
-  }
+  override def get(name: String): IdmlValue =
+    name match {
+      case "address"  => IdmlValue(addressValue)
+      case "name"     => IdmlValue(nameValue)
+      case "domain"   => IdmlValue(domainValue)
+      case "username" => IdmlValue(usernameValue)
+      case _          => MissingField
+    }
 
   /** Split out the username and domain */
   protected val splitPoint = email.getAddress.lastIndexOf('@')

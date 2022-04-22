@@ -24,7 +24,7 @@ object AutoComplete {
       .flatMap {
         case o: IObject =>
           o.fields.keys.toList
-        case _ =>
+        case _          =>
           List.empty
       }
       .toSet
@@ -32,21 +32,23 @@ object AutoComplete {
 }
 
 class AnalysisModule extends FunctionResolver {
-  override def providedFunctions(): List[IdmlFunctionMetadata] = List.empty // we don't reveal this module to discoverability
-  override def resolve(name: String, args: List[Argument]): Option[IdmlFunction] = (name, args) match {
-    case ("analyse", Nil) => Some(AnalyseFunction)
-    case _                => None
-  }
+  override def providedFunctions(): List[IdmlFunctionMetadata] =
+    List.empty // we don't reveal this module to discoverability
+  override def resolve(name: String, args: List[Argument]): Option[IdmlFunction] =
+    (name, args) match {
+      case ("analyse", Nil) => Some(AnalyseFunction)
+      case _                => None
+    }
 }
 
 object AnalyseFunction extends IdmlFunction {
   case object AnalysisState
 
-  override def name: String = "analyse"
+  override def name: String                   = "analyse"
   override def invoke(ctx: IdmlContext): Unit = {
     List(ctx.cursor, ctx.scope, ctx.input).find(_ != IdmlNull).foreach { r =>
       ctx.state.get(AnalysisState).get.asInstanceOf[mutable.Buffer[IdmlValue]].append(r.deepCopy)
     }
   }
-  override def args: List[Pipeline] = List.empty
+  override def args: List[Pipeline]           = List.empty
 }

@@ -23,7 +23,9 @@ class BuiltinFunctionResolverTest extends AnyFunSuite {
   }
 
   test("resolves extract(string)") {
-    assert(new BuiltinFunctionResolver().resolve("extract", stringArgs) === Some(ExtractFunction(stringPipl)))
+    assert(
+      new BuiltinFunctionResolver().resolve("extract", stringArgs) === Some(
+        ExtractFunction(stringPipl)))
   }
 
   test("no matches") {

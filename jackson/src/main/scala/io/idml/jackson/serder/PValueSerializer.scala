@@ -1,6 +1,16 @@
 package io.idml.jackson.serder
 
-import io.idml.{IdmlArray, IdmlBool, IdmlDouble, IdmlInt, IdmlNothing, IdmlNull, IdmlObject, IdmlString, IdmlValue}
+import io.idml.{
+  IdmlArray,
+  IdmlBool,
+  IdmlDouble,
+  IdmlInt,
+  IdmlNothing,
+  IdmlNull,
+  IdmlObject,
+  IdmlString,
+  IdmlValue
+}
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.{JsonSerializer, SerializerProvider}
 import io.idml.datanodes.IDomElement

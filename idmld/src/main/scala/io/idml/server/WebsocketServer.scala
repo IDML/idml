@@ -43,9 +43,11 @@ object WebsocketServer {
   case class Complete(in: List[IdmlObject], idml: String, position: Int)
 
   val functions =
-    (StaticFunctionResolverService.defaults(IdmlCirce).asScala ++ List(new JsoupFunctionResolver,
-                                                                       new HashingFunctionResolver,
-                                                                       new GeoFunctionResolver(IdmlCirce))).toList
+    (StaticFunctionResolverService.defaults(IdmlCirce).asScala ++ List(
+      new JsoupFunctionResolver,
+      new HashingFunctionResolver,
+      new GeoFunctionResolver(IdmlCirce)
+    )).toList
       .flatMap { f =>
         f.providedFunctions().filterNot(_.name.startsWith("$"))
       }
@@ -64,7 +66,7 @@ object WebsocketServer {
     HttpRoutes.of[IO] {
       case GET -> Root / "functions" / partial =>
         Ok(functions.filter(_.name.startsWith(partial)).asJson)
-      case req @ POST -> Root / "completion" =>
+      case req @ POST -> Root / "completion"   =>
         req
           .as[Complete]
           .map { c =>
@@ -75,12 +77,12 @@ object WebsocketServer {
           .flatMap(Ok(_))
 
       case req @ GET -> Root =>
-        val queue = fs2.concurrent.Queue.unbounded[IO, WebSocketFrame]
+        val queue                                               = fs2.concurrent.Queue.unbounded[IO, WebSocketFrame]
         val echoReply: Pipe[IO, WebSocketFrame, WebSocketFrame] = _.collect {
           case Text(msg, _) => Text("You sent the server: " + msg)
           case _            => Text("Something new")
         }
-        val main: Pipe[IO, WebSocketFrame, Response] = _.flatMap {
+        val main: Pipe[IO, WebSocketFrame, Response]            = _.flatMap {
           _ match {
             case Text(msg, _) =>
               Stream.eval(
@@ -113,7 +115,8 @@ object WebsocketServer {
                     .merge
                 }
               )
-            case _ => Stream.emit(Response(None, Some(List("Please send your request as Text")))).covary[IO]
+            case _            =>
+              Stream.emit(Response(None, Some(List("Please send your request as Text")))).covary[IO]
           }
         }
 

@@ -10,13 +10,12 @@ case class Wildcard(tail: Pipeline) extends Expression {
 
   def invokeForObject(ctx: IdmlContext, obj: IdmlObject) {
     val res = mutable.Map[String, IdmlValue]()
-    obj.fields foreach {
-      case (key, value) =>
-        ctx.cursor = value
-        tail.eval(ctx) match {
-          case n: IdmlNothing => ()
-          case n: Any         => res(key) = n
-        }
+    obj.fields foreach { case (key, value) =>
+      ctx.cursor = value
+      tail.eval(ctx) match {
+        case n: IdmlNothing => ()
+        case n: Any         => res(key) = n
+      }
     }
     ctx.cursor = new IObject(res)
   }

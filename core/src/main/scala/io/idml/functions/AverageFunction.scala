@@ -10,13 +10,13 @@ case object AverageFunction extends IdmlFunction0 {
 
   protected def apply(cursor: IdmlValue): IdmlValue = {
     cursor match {
-      case nothing: IdmlNothing =>
+      case nothing: IdmlNothing                     =>
         nothing
       case array: IdmlArray if array.items.size > 0 =>
         // FIXME: turn Idml into a numeric and replace this with sum()
         val sum = array.items.reduce((l, r) => l.+(r))
         sum / IDouble(array.items.size)
-      case other: Any => InvalidCaller
+      case other: Any                               => InvalidCaller
     }
   }
 }

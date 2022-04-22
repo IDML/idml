@@ -12,12 +12,12 @@ object JsoupConverter {
 
   // Recursive implementation of the tree transform that uses Eval to be stack-safe
   private def go(el: Element): Eval[IDomElement] = {
-    val name = el.tagName()
-    val attrs = el.attributes().asList().asScala.map { a => a.getKey -> a.getValue}.toMap
+    val name     = el.tagName()
+    val attrs    = el.attributes().asList().asScala.map { a => a.getKey -> a.getValue }.toMap
     val children = el.childNodes().asScala.toList.traverse {
       case t: TextNode => Eval.now(Some(IDomText(t.getWholeText)))
-      case e: Element => go(e).map(Some(_))
-      case _ => Eval.now(None)
+      case e: Element  => go(e).map(Some(_))
+      case _           => Eval.now(None)
     }
     children.map { c =>
       IDomElement(name, attrs, c.flatten)

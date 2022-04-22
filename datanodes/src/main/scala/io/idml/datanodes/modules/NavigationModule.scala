@@ -14,39 +14,42 @@ trait NavigationModule {
   def get(name: String): IdmlValue = NoFields
 
   /** It's possible to get an item by its index or field name */
-  def get(index: IdmlValue): IdmlValue = index match {
-    case str: IdmlString => get(str.toStringValue)
-    case int: IdmlInt    => get(int.toIntValue)
-    case _               => InvalidParameters
-  }
+  def get(index: IdmlValue): IdmlValue =
+    index match {
+      case str: IdmlString => get(str.toStringValue)
+      case int: IdmlInt    => get(int.toIntValue)
+      case _               => InvalidParameters
+    }
 
   def deleted(): IdmlValue = Deleted
 
   /** Nested path removal. Will leave empty arrays and objects lingering */
   @tailrec
-  final def remove(path: List[String]): Unit = path match {
-    case Nil =>
-      throw new IllegalArgumentException("Cannot remove an empty path")
-    case head :: Nil  => remove(head)
-    case head :: tail => get(head).remove(tail)
-  }
+  final def remove(path: List[String]): Unit =
+    path match {
+      case Nil          =>
+        throw new IllegalArgumentException("Cannot remove an empty path")
+      case head :: Nil  => remove(head)
+      case head :: tail => get(head).remove(tail)
+    }
 
   /** Remove a path. Will remove empty arrays and objects */
-  final def removeWithoutEmpty(path: List[String]): Unit = path match {
-    case Nil =>
-      throw new IllegalArgumentException("Cannot remove an empty path")
-    case head :: Nil => remove(head)
-    case head :: tail =>
-      val child = get(head)
+  final def removeWithoutEmpty(path: List[String]): Unit =
+    path match {
+      case Nil          =>
+        throw new IllegalArgumentException("Cannot remove an empty path")
+      case head :: Nil  => remove(head)
+      case head :: tail =>
+        val child = get(head)
 
-      // Apply the remove method recursively
-      child.remove(tail)
+        // Apply the remove method recursively
+        child.remove(tail)
 
-      // Don't leave an empty array or object lingering
-      if (child.isEmpty.value) {
-        remove(head)
-      }
-  }
+        // Don't leave an empty array or object lingering
+        if (child.isEmpty.value) {
+          remove(head)
+        }
+    }
 
   /** It's possible to slice a range of values by index */
   def slice(from: Option[Int], to: Option[Int]): IdmlValue = NoIndex

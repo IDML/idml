@@ -19,7 +19,7 @@ class DiffTest extends AnyFunSuite {
     val result = Diff.compare(left, right)
     assert(result === expected)
     // uncomment me to generate examples
-    //println(Diff.pretty(result))
+    // println(Diff.pretty(result))
   }
 
   test("isDiff and createDiff relationship - isDiff(createDiff(x)) == true") {
@@ -86,16 +86,18 @@ class DiffTest extends AnyFunSuite {
     check(left, right, expected)
   }
 
-  test("nested objects - {x: {y: A}} vs {x: {z: B}} == {x: {y: [__DIFF__, A, _], z: [__DIFF__, _, B}}") {
+  test(
+    "nested objects - {x: {y: A}} vs {x: {z: B}} == {x: {y: [__DIFF__, A, _], z: [__DIFF__, _, B}}") {
     val left     = "{x: {y: 'a'}}"
     val right    = "{x: {z: 'b'}}"
-    val expected = IObject("x" -> IObject("y" -> diff("'a'", MissingField), "z" -> diff(MissingField, "'b'")))
+    val expected =
+      IObject("x" -> IObject("y" -> diff("'a'", MissingField), "z" -> diff(MissingField, "'b'")))
     check(left, right, expected)
   }
 
   test("nested objects - {x: {y: A, z: B}} vs {x: {z: B}} == {x: {y: [__DIFF__, A, _], z: B}") {
-    val left  = "{x: {y: 'a', z: 'b'}}"
-    val right = "{x: {z: 'b'}}"
+    val left     = "{x: {y: 'a', z: 'b'}}"
+    val right    = "{x: {z: 'b'}}"
     val expected =
       IObject("x" -> IObject("y" -> diff("'a'", MissingField), "z" -> "'b'"))
     check(left, right, expected)
@@ -149,8 +151,8 @@ class DiffTest extends AnyFunSuite {
   }
 
   test("arrays and arrays - [a, b, c] vs [a, x, c]") {
-    val left  = IArray(IString("a"), IString("b"), IString("c"))
-    val right = IArray(IString("a"), IString("x"), IString("c"))
+    val left     = IArray(IString("a"), IString("b"), IString("c"))
+    val right    = IArray(IString("a"), IString("x"), IString("c"))
     val expected =
       IArray(IString("a"), diff(IString("b"), IString("x")), IString("c"))
     check(left, right, expected)
@@ -164,24 +166,24 @@ class DiffTest extends AnyFunSuite {
   }
 
   test("nested arrays - [[a, b]] vs [[a]]") {
-    val left  = IArray(IArray(IString("a"), IString("b")))
-    val right = IArray(IArray(IString("a")))
+    val left     = IArray(IArray(IString("a"), IString("b")))
+    val right    = IArray(IArray(IString("a")))
     val expected =
       IArray(IArray(IString("a"), diff(IString("b"), MissingIndex)))
     check(left, right, expected)
   }
 
   test("nested arrays - [[a]] vs [[a, b]]") {
-    val left  = IArray(IArray(IString("a"), IString("b")))
-    val right = IArray(IArray(IString("a")))
+    val left     = IArray(IArray(IString("a"), IString("b")))
+    val right    = IArray(IArray(IString("a")))
     val expected =
       IArray(IArray(IString("a"), diff(IString("b"), MissingIndex)))
     check(left, right, expected)
   }
 
   test("nested arrays - [[a], [b]] vs [[a], [b, c]]") {
-    val left  = IArray(IArray(IString("a")), IArray(IString("b")))
-    val right = IArray(IArray(IString("a")), IArray(IString("b"), IString("c")))
+    val left     = IArray(IArray(IString("a")), IArray(IString("b")))
+    val right    = IArray(IArray(IString("a")), IArray(IString("b"), IString("c")))
     val expected =
       IArray(IArray(IString("a")), IArray(IString("b"), diff(MissingIndex, IString("c"))))
     check(left, right, expected)
@@ -211,7 +213,8 @@ class DiffTest extends AnyFunSuite {
         |    "y"<removed> : "a"</removed>,
         |    "z" : "b"
         |  }
-        |}""".stripMargin)
+        |}""".stripMargin
+    )
   }
 
 }

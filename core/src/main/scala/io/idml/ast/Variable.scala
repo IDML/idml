@@ -15,19 +15,21 @@ case class Variable(dest: List[String], exps: Pipeline) extends Rule {
 
   /** Make a variable assignment */
   def invoke(ctx: IdmlContext) {
-    val variableStorage = ctx.state.getOrElseUpdate(Variable.stateKey, IObject()).asInstanceOf[IdmlObject]
+    val variableStorage =
+      ctx.state.getOrElseUpdate(Variable.stateKey, IObject()).asInstanceOf[IdmlObject]
 
     exps.invoke(ctx)
     ctx.cursor match {
-      case Deleted =>
+      case Deleted             =>
         delete(variableStorage, dest)
       case reason: IdmlNothing => ()
-      case value: Any =>
+      case value: Any          =>
         assign(variableStorage, dest, value.deepCopy)
     }
   }
 
-  /** Traverse a JsonNode tree with a list of path parts with the ultimate goal of assigning a value */
+  /** Traverse a JsonNode tree with a list of path parts with the ultimate goal of assigning a value
+    */
   @tailrec
   final protected def assign(current: IdmlObject, path: List[String], value: IdmlValue) {
     path match {
@@ -42,7 +44,8 @@ case class Variable(dest: List[String], exps: Pipeline) extends Rule {
     current.fields(key) = value
   }
 
-  /** Traverse a JsonNode tree with a list of path parts with the ultimate goal of deleting a value */
+  /** Traverse a JsonNode tree with a list of path parts with the ultimate goal of deleting a value
+    */
   @tailrec
   final protected def delete(current: IdmlObject, path: List[String]) {
     path match {

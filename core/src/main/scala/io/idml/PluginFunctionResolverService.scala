@@ -5,7 +5,8 @@ import java.util.ServiceLoader
 
 import io.idml.functions.FunctionResolver
 
-/** A factory for functions that utilizes the Java ServiceLoader pattern, with a custom classloader */
+/** A factory for functions that utilizes the Java ServiceLoader pattern, with a custom classloader
+  */
 class PluginFunctionResolverService(urls: Array[URL]) extends FunctionResolverService {
 
   // make a classloader with the URLs we got given

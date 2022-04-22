@@ -29,7 +29,7 @@ case class ArrayFunction(expr: Node) extends IdmlFunction {
           ctx.cursor
         }
         ctx.cursor = IArray(results)
-      case _ =>
+      case _                =>
         ctx.cursor = InvalidCaller
     }
 

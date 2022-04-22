@@ -31,10 +31,10 @@ object Main {
         |
       """.stripMargin)
           s     <- jline.readLine(cyan("# "))
-          _ <- s match {
-                case "start" => Chapter1(new TutorialAlg[IO](jline))
-                case _       => IO.unit
-              }
+          _     <- s match {
+                     case "start" => Chapter1(new TutorialAlg[IO](jline))
+                     case _       => IO.unit
+                   }
         } yield ExitCode.Success
       )
     }

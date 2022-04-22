@@ -31,13 +31,13 @@ case class GroupsByFunction(expr: Node) extends IdmlFunction {
     ctx.cursor match {
       case nothing: IdmlNothing =>
         nothing
-      case array: IdmlArray =>
+      case array: IdmlArray     =>
         val results = {
           val vs = array.items
             .flatMap(x =>
               extractOpt(ctx, x).map { v =>
                 v -> x
-            })
+              })
             .groupBy(_._1)
             .toList
             .sortBy(_._1)
@@ -45,7 +45,7 @@ case class GroupsByFunction(expr: Node) extends IdmlFunction {
           IArray(vs.toBuffer[IdmlValue])
         }
         ctx.cursor = results
-      case _ =>
+      case _                    =>
         ctx.cursor = InvalidCaller
     }
 

@@ -12,36 +12,38 @@ trait ExecNodeVisitor {
   case class ExecDocContext(doc: Document)                          extends ExecNodeContext
   case class ExecBlockContext(block: Block, parent: ExecDocContext) extends ExecNodeContext
 
-  trait ExecRuleContext extends ExecNodeContext {
+  trait ExecRuleContext                                                    extends ExecNodeContext {
     def rule: Rule; def parent: ExecBlockContext
   }
-  case class ExecAssignContext(rule: Assignment, parent: ExecBlockContext)     extends ExecRuleContext
-  case class ExecReassignContext(rule: Reassignment, parent: ExecBlockContext) extends ExecRuleContext
-  case class ExecVariableContext(rule: Variable, parent: ExecBlockContext)     extends ExecRuleContext
+  case class ExecAssignContext(rule: Assignment, parent: ExecBlockContext) extends ExecRuleContext
+  case class ExecReassignContext(rule: Reassignment, parent: ExecBlockContext)
+      extends ExecRuleContext
+  case class ExecVariableContext(rule: Variable, parent: ExecBlockContext) extends ExecRuleContext
 
   case class ExecPiplContext(pipl: Pipeline, parent: ExecRuleContext) extends ExecNodeContext
 
-  trait ExecExprContext extends ExecNodeContext {
+  trait ExecExprContext                                                   extends ExecNodeContext {
     def expr: Expression
     def parent: ExecPiplContext
   }
-  case class ExecAnyContext(parent: ExecPiplContext) extends ExecExprContext {
+  case class ExecAnyContext(parent: ExecPiplContext)                      extends ExecExprContext {
     def expr: AnyExpr.type = AnyExpr
   }
-  case class ExecIndexContext(expr: Index, parent: ExecPiplContext)               extends ExecExprContext
-  case class ExecNavContext(expr: ExecNav, parent: ExecPiplContext)               extends ExecExprContext
-  case class ExecPathContext(expr: Field, parent: ExecPiplContext)                extends ExecExprContext
-  case class ExecSliceContext(expr: Slice, parent: ExecPiplContext)               extends ExecExprContext
-  case class ExecBlockInvokeContext(expr: ApplyFunction, parent: ExecPiplContext) extends ExecExprContext
-  case class ExecFuncContext(expr: IdmlFunction, parent: ExecPiplContext)         extends ExecExprContext
-  case class ExecCoalesceContext(expr: Coalesce, parent: ExecPiplContext)         extends ExecExprContext
-  case class ExecWildcardContext(expr: Wildcard, parent: ExecPiplContext)         extends ExecExprContext
-  case class ExecFilterContext(expr: Filter, parent: ExecPiplContext)             extends ExecExprContext
-  case class ExecMathsContext(expr: Maths, parent: ExecPiplContext)               extends ExecExprContext
-  case class ExecIfContext(expr: If, parent: ExecPiplContext)                     extends ExecExprContext
-  case class ExecMatchContext(expr: Match, parent: ExecPiplContext)               extends ExecExprContext
-  case class ExecArrayContext(expr: AstArray, parent: ExecPiplContext)            extends ExecExprContext
-  case class ExecObjectContext(expr: AstObject, parent: ExecPiplContext)          extends ExecExprContext
+  case class ExecIndexContext(expr: Index, parent: ExecPiplContext)       extends ExecExprContext
+  case class ExecNavContext(expr: ExecNav, parent: ExecPiplContext)       extends ExecExprContext
+  case class ExecPathContext(expr: Field, parent: ExecPiplContext)        extends ExecExprContext
+  case class ExecSliceContext(expr: Slice, parent: ExecPiplContext)       extends ExecExprContext
+  case class ExecBlockInvokeContext(expr: ApplyFunction, parent: ExecPiplContext)
+      extends ExecExprContext
+  case class ExecFuncContext(expr: IdmlFunction, parent: ExecPiplContext) extends ExecExprContext
+  case class ExecCoalesceContext(expr: Coalesce, parent: ExecPiplContext) extends ExecExprContext
+  case class ExecWildcardContext(expr: Wildcard, parent: ExecPiplContext) extends ExecExprContext
+  case class ExecFilterContext(expr: Filter, parent: ExecPiplContext)     extends ExecExprContext
+  case class ExecMathsContext(expr: Maths, parent: ExecPiplContext)       extends ExecExprContext
+  case class ExecIfContext(expr: If, parent: ExecPiplContext)             extends ExecExprContext
+  case class ExecMatchContext(expr: Match, parent: ExecPiplContext)       extends ExecExprContext
+  case class ExecArrayContext(expr: AstArray, parent: ExecPiplContext)    extends ExecExprContext
+  case class ExecObjectContext(expr: AstObject, parent: ExecPiplContext)  extends ExecExprContext
 
   def visit(doc: Document) {
     visitDoc(ExecDocContext(doc))
@@ -89,7 +91,7 @@ trait ExecNodeVisitor {
 
   def createExprContext(expr: Expression, ctx: ExecPiplContext): ExecExprContext = {
     expr match {
-      case AnyExpr                 => ExecAnyContext(ctx)
+      case AnyExpr             => ExecAnyContext(ctx)
       case expr: Index         => ExecIndexContext(expr, ctx)
       case expr: ExecNav       => ExecNavContext(expr, ctx)
       case expr: Field         => ExecPathContext(expr, ctx)

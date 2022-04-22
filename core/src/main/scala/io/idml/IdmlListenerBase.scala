@@ -2,8 +2,7 @@ package io.idml
 
 import io.idml.ast.{Assignment, Field, IdmlFunction, Maths, Pipeline}
 
-/**
-  * The implements all the IdmlListener methods with stubs. Extend at will
+/** The implements all the IdmlListener methods with stubs. Extend at will
   */
 class IdmlListenerBase extends IdmlListener {
   override def exitAssignment(ctx: IdmlContext, assignment: Assignment): Unit = ()

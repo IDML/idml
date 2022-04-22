@@ -11,11 +11,12 @@ trait IdmlInt extends IdmlValue {
   /** The natural number for this IdmlValue */
   def value: Long
 
-  override def equals(o: Any): Boolean = o match {
-    case n: IdmlDouble => n.value == value
-    case n: IdmlInt    => n.value == value
-    case _             => false
-  }
+  override def equals(o: Any): Boolean =
+    o match {
+      case n: IdmlDouble => n.value == value
+      case n: IdmlInt    => n.value == value
+      case _             => false
+    }
 
   override def string(): IString = IString(value.toString)
 

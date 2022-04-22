@@ -16,18 +16,18 @@ case class SetSizeFunction(arg: Pipeline) extends IdmlFunction {
     arg.eval(ctx).toIntOption.filter(_ >= 0) match {
       case Some(maxSize) =>
         ctx.cursor = ctx.cursor match {
-          case nothing: IdmlNothing =>
+          case nothing: IdmlNothing                                                       =>
             nothing
-          case array: IdmlArray =>
+          case array: IdmlArray                                                           =>
             array.slice(None, Some(maxSize))
           case string: IdmlString if string.value == "" || string.value.length <= maxSize =>
             string
-          case string: IdmlString =>
+          case string: IdmlString                                                         =>
             IString(string.value.substring(0, maxSize))
-          case other: Any =>
+          case other: Any                                                                 =>
             InvalidCaller
         }
-      case None =>
+      case None          =>
         ctx.cursor = InvalidParameters
     }
   }

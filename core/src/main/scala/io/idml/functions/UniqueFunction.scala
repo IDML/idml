@@ -31,7 +31,7 @@ case class UniqueFunction(expr: Node) extends IdmlFunction {
     ctx.cursor match {
       case nothing: IdmlNothing =>
         nothing
-      case array: IdmlArray =>
+      case array: IdmlArray     =>
         val results: mutable.Buffer[IdmlValue] =
           array.items
             .flatMap(x => extractOpt(ctx, x).map(x -> _))
@@ -51,7 +51,7 @@ case class UniqueFunction(expr: Node) extends IdmlFunction {
         } else {
           ctx.cursor = NoFields
         }
-      case _ =>
+      case _                    =>
         ctx.cursor = InvalidCaller
     }
 

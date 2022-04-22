@@ -44,25 +44,30 @@ class UnmappedFieldsFinderItTest extends AnyFunSuite {
     assert(ctx.output === IObject("unmapped" -> IObject("a" -> IObject("b" -> ITrue))))
   }
 
-  test("If a field isn't mapped then it should be in the unmapped field namespace - depth two, with overlap") {
+  test(
+    "If a field isn't mapped then it should be in the unmapped field namespace - depth two, with overlap") {
     pendingUntilFixed {
-      val ctx =
+      val ctx   =
         new IdmlContext(IObject("a" -> IObject("b" -> ITrue, "c" -> IFalse)))
       val chain = idml.chain(idml.compile("x.y = a.b"))
       idml.evaluate(chain, ctx)
-      assert(ctx.output === IObject("x" -> IObject("y" -> ITrue), "unmapped" -> IObject("a" -> IObject("c" -> IFalse))))
+      assert(
+        ctx.output === IObject(
+          "x"        -> IObject("y" -> ITrue),
+          "unmapped" -> IObject("a" -> IObject("c" -> IFalse))))
     }
   }
 
   test("Fields are treated as mapped if functions are called on them successfully") {
-    val ctx =
+    val ctx   =
       new IdmlContext(IObject("a" -> IObject("b" -> IString("1234"))))
     val chain = idml.chain(idml.compile("x.y = a.b.int()"))
     idml.evaluate(chain, ctx)
     assert(
       ctx.output === IObject(
         "x" -> IObject("y" -> IInt(1234))
-      ))
+      )
+    )
   }
 
   test("Fields are not treated as mapped if functions are called on them unsuccessfully") {
@@ -72,59 +77,69 @@ class UnmappedFieldsFinderItTest extends AnyFunSuite {
     assert(
       ctx.output === IObject(
         "unmapped" -> IObject("a" -> IObject("b" -> IString(":D")))
-      ))
+      )
+    )
   }
 
   test("Function parameters are treated as mapped, one parameter") {
-    val ctx = new IdmlContext(IObject("a" -> IObject("b" -> IString("abc %s"), "c" -> IString("123"))))
+    val ctx   =
+      new IdmlContext(IObject("a" -> IObject("b" -> IString("abc %s"), "c" -> IString("123"))))
     val chain =
       idml.chain(idml.compile("x.y = a.b.format(root.a.c)"))
     idml.evaluate(chain, ctx)
     assert(
       ctx.output === IObject(
         "x" -> IObject("y" -> IString("abc 123"))
-      ))
+      )
+    )
   }
 
   test("Function parameters are treated as mapped, two parameters") {
-    val ctx = new IdmlContext(
+    val ctx   = new IdmlContext(
       IObject(
         "a" -> IObject(
           "b" -> IString("%s abc %s"),
           "c" -> IString("123"),
           "d" -> IString("def")
-        )))
+        )
+      )
+    )
     val chain = idml.chain(idml.compile("x.y = a.b.format(root.a.c, root.a.d)"))
     idml.evaluate(chain, ctx)
     assert(
       ctx.output === IObject(
         "x" -> IObject("y" -> IString("123 abc def"))
-      ))
+      )
+    )
   }
 
   test("Function parameters are treated as unmapped if the function failed") {
-    val ctx = new IdmlContext(IObject("a" -> IObject("b" -> ITrue, "c" -> IString("123"))))
+    val ctx   = new IdmlContext(IObject("a" -> IObject("b" -> ITrue, "c" -> IString("123"))))
     val chain =
       idml.chain(idml.compile("x.y = a.b.format(root.a.c)"))
     idml.evaluate(chain, ctx)
     assert(
       ctx.output === IObject(
         "unmapped" -> IObject("a" -> IObject("b" -> ITrue, "c" -> IString("123")))
-      ))
+      )
+    )
   }
 
   test("Function parameters are treated as unmapped if the whole expression failed") {
-    val ctx = new IdmlContext(IObject("a" -> IObject("b" -> IString("abc %s"), "c" -> IString("123"))))
+    val ctx   =
+      new IdmlContext(IObject("a" -> IObject("b" -> IString("abc %s"), "c" -> IString("123"))))
     val chain =
       idml.chain(idml.compile("x.y = a.b.format(root.a.c).int()"))
     idml.evaluate(chain, ctx)
     assert(
       ctx.output === IObject(
         "unmapped" -> IObject("a" -> IObject("b" -> IString("abc %s"), "c" -> IString("123")))
-      ))
+      )
+    )
   }
 
-  test("Composite values are treated as mapped, regardless of whether their sub-components are referred to") {
+  test(
+    "Composite values are treated as mapped, regardless of whether their sub-components are referred to") {
     val ctx   = new IdmlContext(IObject("a" -> IObject("b" -> IString("http://localhost/"))))
     val chain = idml.chain(idml.compile("x.y = a.b.url().host"))
     idml.evaluate(chain, ctx)
@@ -188,5 +203,5 @@ class UnmappedFieldsFinderItTest extends AnyFunSuite {
       pending
     }
 
- */
+   */
 }

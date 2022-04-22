@@ -13,10 +13,11 @@ case class Pipeline(exps: List[Expression]) extends Argument {
   def ::(prepend: Pipeline): Pipeline = copy(prepend.exps ::: exps)
 
   /** Helper to join two or more lists */
-  def ::(prepend: Iterable[Node]): Pipeline = prepend.foldLeft(this) {
-    case (p, expr: Expression) => expr :: p
-    case (p, pipl: Pipeline)   => pipl :: p
-  }
+  def ::(prepend: Iterable[Node]): Pipeline =
+    prepend.foldLeft(this) {
+      case (p, expr: Expression) => expr :: p
+      case (p, pipl: Pipeline)   => pipl :: p
+    }
   // scalastyle:on method.name
 
   def validate() {
@@ -33,16 +34,17 @@ case class Pipeline(exps: List[Expression]) extends Argument {
   }
 
   /** A recursive function that applies the pathTracker visitor functions */
-  def invoke(ctx: IdmlContext, exps: List[Expression]): Unit = exps match {
-    case Nil => ()
-    case exp :: tail =>
-      ctx.enterPipl(this)
+  def invoke(ctx: IdmlContext, exps: List[Expression]): Unit =
+    exps match {
+      case Nil         => ()
+      case exp :: tail =>
+        ctx.enterPipl(this)
 
-      exp.invoke(ctx)
-      invoke(ctx, tail)
+        exp.invoke(ctx)
+        invoke(ctx, tail)
 
-      ctx.exitPipl(this)
-  }
+        ctx.exitPipl(this)
+    }
 
   /** Run a pipl */
   def invoke(ctx: IdmlContext) {
@@ -51,8 +53,9 @@ case class Pipeline(exps: List[Expression]) extends Argument {
 }
 
 object LiteralValue {
-  def unapply(pipl: Pipeline): Option[IdmlValue] = pipl match {
-    case Pipeline(List(ExecNavLiteral(Literal(value)))) => Some(value)
-    case _                                              => None
-  }
+  def unapply(pipl: Pipeline): Option[IdmlValue] =
+    pipl match {
+      case Pipeline(List(ExecNavLiteral(Literal(value)))) => Some(value)
+      case _                                              => None
+    }
 }

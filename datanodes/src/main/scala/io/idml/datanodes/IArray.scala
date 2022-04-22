@@ -13,10 +13,11 @@ object IArray {
   }
 
   /** Extractor for PArray */
-  def unapply(value: IdmlValue): Option[Seq[IdmlValue]] = value match {
-    case arr: IArray => Some(arr.items.toSeq)
-    case _           => None
-  }
+  def unapply(value: IdmlValue): Option[Seq[IdmlValue]] =
+    value match {
+      case arr: IArray => Some(arr.items.toSeq)
+      case _           => None
+    }
 
   def of(arr: Array[IdmlValue]): IArray = {
     IArray(arr.toBuffer)

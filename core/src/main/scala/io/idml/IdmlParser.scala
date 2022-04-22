@@ -6,8 +6,7 @@ import io.idml.lang.{DocumentParseException, MappingLexer, MappingParser, ThrowC
 import io.idml.ast.AstGenerator
 import org.antlr.v4.runtime.{ANTLRInputStream, CommonTokenStream}
 
-/**
-  * Parses Idml documents
+/** Parses Idml documents
   */
 class IdmlParser {
 
@@ -39,7 +38,7 @@ class IdmlParser {
     parser.removeErrorListeners()
     parser.addErrorListener(new ThrowConsoleErrorListener)
     parser.setBuildParseTree(true)
-    val inner =
+    val inner  =
       new AstGenerator(funcs).visitDocument(parser.document())
     new IdmlMapping(inner)
   }

@@ -18,9 +18,10 @@ trait RegexModule {
             .map { inner =>
               IArray(inner.map(IString.apply).toBuffer[IdmlValue])
             }
-            .toBuffer[IdmlValue])
-      case (IString(_), _) => InvalidParameters
-      case _               => InvalidCaller
+            .toBuffer[IdmlValue]
+        )
+      case (IString(_), _)          => InvalidParameters
+      case _                        => InvalidCaller
     }
   }
 
@@ -35,10 +36,11 @@ trait RegexModule {
                 .getRegex(s.value)
                 .`match`(t.value)
                 .map { IString }
-                .toBuffer[IdmlValue])
-          case _ => InvalidParameters
+                .toBuffer[IdmlValue]
+            )
+          case _          => InvalidParameters
         }
-      case _ => InvalidCaller
+      case _          => InvalidCaller
     }
   }
   // scalastyle:on method.name
@@ -53,10 +55,11 @@ trait RegexModule {
                 .getRegex(s.value)
                 .split(t.value)
                 .map { IString }
-                .toBuffer[IdmlValue])
-          case _ => InvalidParameters
+                .toBuffer[IdmlValue]
+            )
+          case _          => InvalidParameters
         }
-      case _ => InvalidCaller
+      case _          => InvalidCaller
     }
   }
 
@@ -66,9 +69,9 @@ trait RegexModule {
         regex match {
           case s: IString =>
             IBool(PRegexFactory.getRegex(s.value).isMatch(t.value))
-          case _ => InvalidParameters
+          case _          => InvalidParameters
         }
-      case _ => InvalidCaller
+      case _          => InvalidCaller
     }
   }
 
@@ -80,11 +83,11 @@ trait RegexModule {
             regex match {
               case s: IString =>
                 IString(PRegexFactory.getRegex(s.value).replace(t.value, rep.value))
-              case _ => InvalidParameters
+              case _          => InvalidParameters
             }
-          case _ => InvalidParameters
+          case _            => InvalidParameters
         }
-      case _ => InvalidCaller
+      case _          => InvalidCaller
     }
   }
 

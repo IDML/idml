@@ -12,10 +12,12 @@ trait IdmlArray extends IdmlValue with CompositeValue {
   def items: mutable.Buffer[IdmlValue]
 
   /** Compare the items in this array to another array */
-  override def equals(o: Any): Boolean = o match {
-    case n: IdmlArray => n.items.filterNot(_.isNothing.value) == items.filterNot(_.isNothing.value)
-    case _            => false
-  }
+  override def equals(o: Any): Boolean =
+    o match {
+      case n: IdmlArray =>
+        n.items.filterNot(_.isNothing.value) == items.filterNot(_.isNothing.value)
+      case _            => false
+    }
 
   /** Return the hashcode for this array. Equal to the underlying items array */
   override def hashCode(): Int = items.hashCode()
@@ -54,5 +56,6 @@ trait IdmlArray extends IdmlValue with CompositeValue {
     Try(items(wrapIndex(index, items.size))).getOrElse(MissingIndex)
   }
 
-  override def toStringOption: Option[String] = Some("[" + items.flatMap(_.toStringOption).mkString(",") + "]")
+  override def toStringOption: Option[String] = Some(
+    "[" + items.flatMap(_.toStringOption).mkString(",") + "]")
 }

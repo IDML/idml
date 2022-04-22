@@ -24,10 +24,10 @@ class IdmlValueFunctionResolver extends FunctionResolver {
         } catch {
           case _: NoSuchMethodException => None
         }
-      case _ => None
+      case _                                         => None
     }
 
-  lazy val functions = classOf[IdmlValue]
+  lazy val functions                                           = classOf[IdmlValue]
     .getMethods()
     .filter(_.getReturnType == classOf[IdmlValue])
     .map { m =>

@@ -25,15 +25,15 @@ class AutoCompleteSpec extends AnyFlatSpec with should.Matchers {
     AutoComplete.complete(idml)(in, doc, cursor) should contain theSameElementsAs List("a", "b")
   }
   "complete" should "complete within a map" in {
-    val in = IObject("xs" -> IArray(IObject("a" -> IInt(1)), IObject("b" -> IInt(2))))
+    val in     = IObject("xs" -> IArray(IObject("a" -> IInt(1)), IObject("b" -> IInt(2))))
     println(IdmlJackson.default.compact(in))
     val doc    = "result = root.xs.map()"
     val cursor = doc.length - 1
     AutoComplete.complete(idml)(in, doc, cursor) should contain theSameElementsAs List("a", "b")
   }
   "complete" should "complete between blocks" in {
-    val in = IObject("a" -> IObject("b" -> IObject("c" -> IString("d"))))
-    val doc =
+    val in     = IObject("a" -> IObject("b" -> IObject("c" -> IString("d"))))
+    val doc    =
       """[main]
         |foo = 42
         |result = a.apply("a")

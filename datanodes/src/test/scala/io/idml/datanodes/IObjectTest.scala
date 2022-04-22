@@ -26,7 +26,8 @@ class IObjectTest extends AnyFunSuite with Matchers {
         "i" -> IdmlValue(123),
         "f" -> IdmlValue(123.4),
         "n" -> IdmlNull
-      ))
+      )
+    )
 
   def withNestedObjects =
     new IObject(
@@ -37,7 +38,10 @@ class IObjectTest extends AnyFunSuite with Matchers {
             "i" -> IdmlValue(123),
             "f" -> IdmlValue(123.4),
             "n" -> IdmlNull
-          ))))
+          )
+        )
+      )
+    )
 
   def withNestedArrays =
     new IObject(
@@ -48,7 +52,10 @@ class IObjectTest extends AnyFunSuite with Matchers {
             IdmlValue(123),
             IdmlValue(123.4),
             IdmlNull
-          ))))
+          )
+        )
+      )
+    )
 
   // deepmerge
   val inner1 = IObject("b" -> IInt(2))
@@ -56,7 +63,8 @@ class IObjectTest extends AnyFunSuite with Matchers {
   val outer1 = IObject("a" -> inner1)
   val outer2 = IObject("a" -> inner2)
 
-  test("deepmerge should merge objects")(outer1.deepMerge(outer2) must equal(IObject("a" -> IObject("b" -> IInt(2), "c" -> IInt(3)))))
+  test("deepmerge should merge objects")(
+    outer1.deepMerge(outer2) must equal(IObject("a" -> IObject("b" -> IInt(2), "c" -> IInt(3)))))
 
   val one = IInt(1)
   val two = IInt(2)
@@ -65,12 +73,15 @@ class IObjectTest extends AnyFunSuite with Matchers {
     x(IArray(one, two, one)) deepMerge x(IArray(two, two, one)) must equal(x(IArray(two, two, one)))
   }
   test("deepmerge should merge arrays where left is longer") {
-    x(IArray(one, two, one, two)) deepMerge x(IArray(two, two, one)) must equal(x(IArray(two, two, one)))
+    x(IArray(one, two, one, two)) deepMerge x(IArray(two, two, one)) must equal(
+      x(IArray(two, two, one)))
   }
   test("deepmerge should merge arrays where right is longer") {
-    x(IArray(one, two, one)) deepMerge x(IArray(two, two, one, one)) must equal(x(IArray(two, two, one, one)))
+    x(IArray(one, two, one)) deepMerge x(IArray(two, two, one, one)) must equal(
+      x(IArray(two, two, one, one)))
   }
   test("deepmerge should merge arrays with objects in") {
-    x(IArray(x(one), x(two), x(one))) deepMerge x(IArray(x(two), x(two), x(one))) must equal(x(IArray(x(two), x(two), x(one))))
+    x(IArray(x(one), x(two), x(one))) deepMerge x(IArray(x(two), x(two), x(one))) must equal(
+      x(IArray(x(two), x(two), x(one))))
   }
 }

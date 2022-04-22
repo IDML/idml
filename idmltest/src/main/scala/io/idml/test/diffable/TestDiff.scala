@@ -12,26 +12,34 @@ import fansi.Color._
 
 object TestDiff {
   implicit class RethrowableEither[T](e: Either[Throwable, T]) {
-    def rethrow: T = e match {
-      case Left(t)  => throw t
-      case Right(v) => v
-    }
+    def rethrow: T =
+      e match {
+        case Left(t)  => throw t
+        case Right(v) => v
+      }
   }
 
   def generateDiff(got: Json, wanted: Json, context: Int = 2): String = {
-    (print(got), print(wanted)).bisequence.map {
-      case (gots, wanteds) =>
-        val gotLines    = gots.linesWithSeparators.map(_.stripLineEnd).toList.asJava
-        val wantedLines = wanteds.linesWithSeparators.map(_.stripLineEnd).toList.asJava
-        val patch       = DiffUtils.diff(gotLines, wantedLines)
-        val unified     = DiffUtils.generateUnifiedDiff("output.json", "expected-output.json", gotLines, patch, context)
+    (print(got), print(wanted)).bisequence.map { case (gots, wanteds) =>
+      val gotLines    = gots.linesWithSeparators.map(_.stripLineEnd).toList.asJava
+      val wantedLines = wanteds.linesWithSeparators.map(_.stripLineEnd).toList.asJava
+      val patch       = DiffUtils.diff(gotLines, wantedLines)
+      val unified     = DiffUtils.generateUnifiedDiff(
+        "output.json",
+        "expected-output.json",
+        gotLines,
+        patch,
+        context)
 
-        val colourer = colourUnifiedDiffLine(Red, Blue, Magenta)
-        unified.asScala.map(colourer).mkString("\n")
+      val colourer = colourUnifiedDiffLine(Red, Blue, Magenta)
+      unified.asScala.map(colourer).mkString("\n")
     }.rethrow
   }
 
-  def colourUnifiedDiffLine(old: EscapeAttr, expected: EscapeAttr, info: EscapeAttr): String => String = {
+  def colourUnifiedDiffLine(
+      old: EscapeAttr,
+      expected: EscapeAttr,
+      info: EscapeAttr): String => String = {
     (_: String) match {
       case s if s.startsWith("---") => old(s)
       case s if s.startsWith("+++") => expected(s)

@@ -15,6 +15,7 @@ class IdmlValueTest extends AnyFunSuite with Matchers {
   test("companion - long")(IdmlValue(v = Long.MaxValue) must equal(new IInt(Long.MaxValue)))
   test("companion - int")(IdmlValue(v = Int.MaxValue) must equal(new IInt(Int.MaxValue)))
   test("companion - float")(IdmlValue(v = Float.MaxValue) must equal(new IDouble(Float.MaxValue)))
-  test("companion - double")(IdmlValue(v = Double.MaxValue - 1000) must equal(new IDouble(Double.MaxValue - 1000)))
+  test("companion - double")(
+    IdmlValue(v = Double.MaxValue - 1000) must equal(new IDouble(Double.MaxValue - 1000)))
 
 }

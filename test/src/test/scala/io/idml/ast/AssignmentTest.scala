@@ -10,11 +10,12 @@ import org.scalatestplus.mockito.MockitoSugar
 
 class AssignmentTest extends AnyFunSuite with MockitoSugar {
 
-  def updateCursor(value: IdmlValue): Answer[Unit] = new Answer[Unit] {
-    override def answer(invocation: InvocationOnMock) = {
-      invocation.getArguments()(0).asInstanceOf[IdmlContext].cursor = value
+  def updateCursor(value: IdmlValue): Answer[Unit] =
+    new Answer[Unit] {
+      override def answer(invocation: InvocationOnMock) = {
+        invocation.getArguments()(0).asInstanceOf[IdmlContext].cursor = value
+      }
     }
-  }
 
   test("Invokes right hand side expression") {
     val pipl   = mock[Pipeline]

@@ -15,10 +15,11 @@ trait IdmlString extends IdmlValue {
   def value: String
 
   /** Compare a string to something else */
-  override def equals(o: Any): Boolean = o match {
-    case n: IdmlString => n.value == value
-    case _             => false
-  }
+  override def equals(o: Any): Boolean =
+    o match {
+      case n: IdmlString => n.value == value
+      case _             => false
+    }
 
   /** Try to parse this string as a float */
   override def float(): IdmlValue with Product with Serializable = {

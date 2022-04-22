@@ -20,7 +20,7 @@ class IdmlValueNaryFunctionResolver extends FunctionResolver {
         } catch {
           case _: NoSuchMethodException => None
         }
-      case _ => None
+      case _                                         => None
 
     }
   override def providedFunctions(): List[IdmlFunctionMetadata] = List.empty // todo

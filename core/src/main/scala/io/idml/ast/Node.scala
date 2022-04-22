@@ -9,7 +9,7 @@ import scala.collection.mutable
 trait Node {
   def invoke(ctx: IdmlContext)
 
-  /** Call invoke in a closed context. Useful for pipls  */
+  /** Call invoke in a closed context. Useful for pipls */
   def eval(ctx: IdmlContext): IdmlValue = {
     val tmp = ctx.cursor
     invoke(ctx)
@@ -29,7 +29,9 @@ trait Node {
   }
 }
 
-/** The document. This contains all the executable blocks. Invoking it is an implicit call to the main block */
+/** The document. This contains all the executable blocks. Invoking it is an implicit call to the
+  * main block
+  */
 case class Document(blocks: Map[String, Block]) extends Node {
   val main = blocks.getOrElse(Document.Main, throw new IllegalArgumentException("missing main"))
 
@@ -56,10 +58,10 @@ case class Block(name: String, rules: List[Rule]) extends Node {
 /** A single executable line */
 trait Rule extends Node {
 
-  /** Navigate to the next node in the tree  */
+  /** Navigate to the next node in the tree */
   protected def navigateToNext(current: IdmlObject, key: String): IdmlObject =
     current.fields.get(key) match {
-      case None =>
+      case None               =>
         // This object doesn't exist, let's create it
         val next = IObject()
         current.fields(key) = next
@@ -67,7 +69,7 @@ trait Rule extends Node {
       case Some(obj: IObject) =>
         // We've been here before, return the object
         obj
-      case Some(other) =>
+      case Some(other)        =>
         // Question: What's the desired behaviour when we're given a = 1 and then a.b = 1; right now we replace the
         // primitive with an object, effectively throwing away the value but we could just as easily reintroduce it as
         // if the rule was rewritten to a.value = 1 or reject the mapping entirely.

@@ -18,7 +18,7 @@ class MappingTestBase extends AnyFunSuite with Matchers {
 
       lexer.removeErrorListeners()
       parser.removeErrorListeners()
-      //parser.addErrorListener(new DiagnosticErrorListener)
+      // parser.addErrorListener(new DiagnosticErrorListener)
       parser.addErrorListener(new ThrowConsoleErrorListener)
 
       parser.document()

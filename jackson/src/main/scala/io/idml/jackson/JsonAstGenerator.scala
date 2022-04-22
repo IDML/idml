@@ -9,16 +9,14 @@ import io.idml.datanodes.{IBool, IDouble, IInt, IString}
 import io.idml.functions.{ArrayFunction, IdmlFunction0, IdmlValueFunction, SetSizeFunction}
 import org.json4s.jackson.Json4sScalaModule
 
-/**
-  * Provides functions for turning parsed IDML documents into JSON
+/** Provides functions for turning parsed IDML documents into JSON
   */
 object JsonAstGenerator {
   val OM = new ObjectMapper()
   OM.registerModule(IdmlAstSerializers.ptolemyAstModule)
   OM.registerModule(Json4sScalaModule)
 
-  /**
-    * Turn a parsed IdmlMapping into a JSON string
+  /** Turn a parsed IdmlMapping into a JSON string
     * @param p
     * @return
     */
@@ -26,21 +24,18 @@ object JsonAstGenerator {
     OM.writeValueAsString(p)
   }
 
-  /**
-    * Implicit extension to IdmlMapping to provide .toJson
-    * Usage:
-    *  import io.idml.jackson.JsonAstGenerator._
-    *  ...
-    *  ptolemy.fromString("foo = bar").toJson
-    * @param m mapping to wrap
+  /** Implicit extension to IdmlMapping to provide .toJson Usage: import
+    * io.idml.jackson.JsonAstGenerator._ ... ptolemy.fromString("foo = bar").toJson
+    * @param m
+    *   mapping to wrap
     */
   implicit class SerializableIdmlMapping(m: IdmlMapping) {
     def toJson: String = generateJson(m)
   }
 }
 
-/**
-  * Implements serializes that are capable of turning a parsed IDML document into a JSON representation
+/** Implements serializes that are capable of turning a parsed IDML document into a JSON
+  * representation
   */
 object IdmlAstSerializers {
   val ptolemyAstModule: SimpleModule = new SimpleModule("IdmlAst")
@@ -52,7 +47,7 @@ object IdmlAstSerializers {
         jgen.writeObject(block)
       }
     }
-    override def handledType(): Class[IdmlMapping] = classOf[IdmlMapping]
+    override def handledType(): Class[IdmlMapping]                                            = classOf[IdmlMapping]
   }
   ptolemyAstModule.addSerializer(new IdmlAstSerializers.IdmlMappingSerializer)
 
@@ -66,7 +61,7 @@ object IdmlAstSerializers {
             jgen.writeObjectField("operation", "reassignment")
             jgen.writeObjectField("destination", re.dest.mkString("."))
             jgen.writeObject(re.exps)
-          case as: Assignment =>
+          case as: Assignment   =>
             jgen.writeObjectField("operation", "assignment")
             jgen.writeObjectField("destination", as.dest.mkString("."))
             jgen.writeObject(as.exps)
@@ -75,7 +70,7 @@ object IdmlAstSerializers {
       }
       jgen.writeEndArray()
     }
-    override def handledType(): Class[Block] = classOf[Block]
+    override def handledType(): Class[Block]                                            = classOf[Block]
   }
   ptolemyAstModule.addSerializer(new IdmlAstSerializers.IdmlBlockSerializer)
 
@@ -93,29 +88,32 @@ object IdmlAstSerializers {
       p.exps.foreach {
         case vf: IdmlValueFunction if TYPEFUNCTIONS.contains(vf.name) =>
           jgen.writeObjectField("type", vf.name)
-        case vf: IdmlFunction0 if TYPEFUNCTIONS.contains(vf.name) =>
+        case vf: IdmlFunction0 if TYPEFUNCTIONS.contains(vf.name)     =>
           jgen.writeObjectField("type", vf.name)
-        case vf: IdmlValueFunction =>
+        case vf: IdmlValueFunction                                    =>
           ptolemyValueFunction(jgen, sp, vf)
-        case ssf: SetSizeFunction => // the size function doesn't work like anything else, so it's got a special case
+        case ssf: SetSizeFunction                                     => // the size function doesn't work like anything else, so it's got a special case
           jgen.writeObjectField(ssf.name, ssf.arg)
-        case af: ArrayFunction => // the array function takes another function so it needs to be a special case too
+        case af: ArrayFunction                                        => // the array function takes another function so it needs to be a special case too
           arrayFunction(jgen, af)
-        case enl: ExecNavLiteral =>
+        case enl: ExecNavLiteral                                      =>
           execNavLiteral(jgen, enl)
-        case _ =>
+        case _                                                        =>
           throw new Exception("Unsupported pipeline type for this serializer")
       }
     }
 
-    private def ptolemyValueFunction(jgen: JsonGenerator, sp: SerializerProvider, vf: IdmlValueFunction): Unit = {
+    private def ptolemyValueFunction(
+        jgen: JsonGenerator,
+        sp: SerializerProvider,
+        vf: IdmlValueFunction): Unit = {
       vf.args.length match {
         case l: Any if l == 0 =>
           jgen.writeObjectField(vf.name, true)
         case l: Any if l == 1 =>
           jgen.writeFieldName(vf.name)
           serialize(vf.args.head, jgen, sp)
-        case l: Any if l > 1 =>
+        case l: Any if l > 1  =>
           jgen.writeArrayFieldStart(vf.name)
           vf.args.foreach(serialize(_, jgen, sp))
           jgen.writeEndArray()
@@ -131,15 +129,15 @@ object IdmlAstSerializers {
 
     private def execNavLiteral(jgen: JsonGenerator, enl: ExecNavLiteral): Unit = {
       enl.literal.value match {
-        case i: IInt =>
+        case i: IInt    =>
           jgen.writeObject(i.value)
         case s: IString =>
           jgen.writeObject(s.value)
-        case b: IBool =>
+        case b: IBool   =>
           jgen.writeObject(b.value)
         case d: IDouble =>
           jgen.writeObject(d.value)
-        case _ =>
+        case _          =>
           throw new scala.Exception("Unsupported literal used inside JSON AST")
       }
     }

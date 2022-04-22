@@ -7,7 +7,8 @@ import scala.collection.JavaConverters._
 abstract class Mapping {
   def run(ctx: IdmlContext): IdmlContext
   def run(input: IdmlValue): IdmlObject                     = run(new IdmlContext(input, IObject())).output
-  def run(input: IdmlValue, output: IdmlObject): IdmlObject = run(new IdmlContext(input, output)).output
+  def run(input: IdmlValue, output: IdmlObject): IdmlObject = run(
+    new IdmlContext(input, output)).output
 }
 
 object Mapping {
@@ -23,7 +24,8 @@ object Mapping {
         m.run(ctx)
         ctx.output.asInstanceOf[IObject]
       }
-      ctx.output = NonEmptyList.fromList(result).map(_.reduceLeft(_ deepMerge _)).getOrElse(IObject())
+      ctx.output =
+        NonEmptyList.fromList(result).map(_.reduceLeft(_ deepMerge _)).getOrElse(IObject())
       ctx
     }
 }

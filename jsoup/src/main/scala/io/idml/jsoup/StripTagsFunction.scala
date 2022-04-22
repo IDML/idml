@@ -16,11 +16,15 @@ object StripTagsFunction extends IdmlFunction {
       case IString(str) =>
         IString(
           Parser.unescapeEntities(
-            Jsoup.clean(str, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false)),
+            Jsoup.clean(
+              str,
+              "",
+              Whitelist.none(),
+              new Document.OutputSettings().prettyPrint(false)),
             false
           )
         )
-      case _ =>
+      case _            =>
         InvalidCaller
     }
   }

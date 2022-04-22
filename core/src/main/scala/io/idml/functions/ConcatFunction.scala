@@ -25,7 +25,7 @@ case class ConcatFunction(sep: String) extends IdmlFunction {
           }
           .map(IString.apply)
           .getOrElse(MissingField)
-      case _ => InvalidCaller
+      case _             => InvalidCaller
     }
   }
 }

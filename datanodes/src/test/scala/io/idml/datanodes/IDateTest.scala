@@ -10,10 +10,10 @@ import org.scalatest.matchers.must.Matchers
 class IDateTest extends AnyFunSuite with Matchers {
   DateTimeZone.setDefault(DateTimeZone.UTC)
 
-  val nowMs      = 1414755054310L
-  val now        = new DateTime(nowMs)
-  val format1    = "yyyy.MM.dd G 'at' HH:mm:ss z"
-  val format1Val = "2001.07.04 AD at 12:08:56 PDT"
+  val nowMs         = 1414755054310L
+  val now           = new DateTime(nowMs)
+  val format1       = "yyyy.MM.dd G 'at' HH:mm:ss z"
+  val format1Val    = "2001.07.04 AD at 12:08:56 PDT"
   val format1Parser =
     new DateTimeFormatterBuilder().appendPattern(format1).toFormatter
 
@@ -23,10 +23,11 @@ class IDateTest extends AnyFunSuite with Matchers {
 
   test("must be able to parse custom format")(
     pDate.date(new IString(format1)).asInstanceOf[IDate].dateVal
-      must equal(new IDate(format1Parser.parseDateTime(format1Val), format1Parser).dateVal))
+      must equal(new IDate(format1Parser.parseDateTime(format1Val), format1Parser).dateVal)
+  )
 
   test("Any custom formatted date is correctly parsed and translated to GMT") {
-    //formattedOutput = formattedInput.date("yyyy.MM.dd G 'at' HH:mm:ss z")
+    // formattedOutput = formattedInput.date("yyyy.MM.dd G 'at' HH:mm:ss z")
     println(pDate.date(new IString(format1)).asInstanceOf[IDate].value)
   }
 
@@ -42,14 +43,15 @@ class IDateTest extends AnyFunSuite with Matchers {
     val nowLong = 1414755054310L
     val parsed  = IString(nowLong.toString)
     val actual  = parsed.millis()
-    //make sure the parsed value is actually a PString
+    // make sure the parsed value is actually a PString
     assert(classOf[IString] isAssignableFrom parsed.getClass)
-    //Once we have our PDate, verify we got the right object out and the underlying date object has the same timestamp
+    // Once we have our PDate, verify we got the right object out and the underlying date object has the same timestamp
     assert(classOf[IDate] isAssignableFrom actual.getClass)
     actual.asInstanceOf[IDate].dateVal.equals(new DateTime(nowLong)) must equal(true)
   }
 
-  test("parse millis timestamp")(IString(nowMs.toString).millis() must equal(new IDate(now, DateModule.DefaultDateFormat)))
+  test("parse millis timestamp")(
+    IString(nowMs.toString).millis() must equal(new IDate(now, DateModule.DefaultDateFormat)))
 
   test("Parse timezone offsets") {
     import io.idml.datanodes.modules.DateModule._

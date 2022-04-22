@@ -22,30 +22,47 @@ class IArrayTest extends AnyFunSuite with Matchers {
 
   // empty
   test("empty things should say they're empty")(IArray().empty() must equal(IBool(true)))
-  test("non-empty things should not say they're empty")(IArray(IInt(1)).empty() must equal(IBool(false)))
+  test("non-empty things should not say they're empty")(
+    IArray(IInt(1)).empty() must equal(IBool(false)))
 
   // combinations
   test("combinations should work")(
     IArray(IInt(1), IInt(2), IInt(3)).combinations(IInt(2))
-      must equal(IArray(IArray(IInt(1), IInt(2)), IArray(IInt(1), IInt(3)), IArray(IInt(2), IInt(3)))))
+      must equal(
+        IArray(IArray(IInt(1), IInt(2)), IArray(IInt(1), IInt(3)), IArray(IInt(2), IInt(3))))
+  )
 
   // flatten
-  test("array flatten")(IArray(IArray(IInt(1)), IArray(IInt(2))).flatten() must equal(IArray(IInt(1), IInt(2))))
+  test("array flatten")(
+    IArray(IArray(IInt(1)), IArray(IInt(2))).flatten() must equal(IArray(IInt(1), IInt(2))))
   test("array flattening on an uneven array")(
-    IArray(IArray(IInt(1), IInt(2)), IInt(3)).flatten() must equal(IArray(IInt(1), IInt(2), IInt(3))))
+    IArray(IArray(IInt(1), IInt(2)), IInt(3)).flatten() must equal(
+      IArray(IInt(1), IInt(2), IInt(3)))
+  )
 
   // combineAll
   test("array combineAll")(
-    IArray(IArray(IInt(1)), IArray(IInt(2)), IArray(IInt(3))).combineAll() must equal(IArray(IInt(1), IInt(2), IInt(3))))
+    IArray(IArray(IInt(1)), IArray(IInt(2)), IArray(IInt(3))).combineAll() must equal(
+      IArray(IInt(1), IInt(2), IInt(3)))
+  )
   test("object combineAll")(
-    IArray(IObject("a" -> IInt(1)), IObject("b" -> IInt(2)), IObject("a" -> IInt(3))).combineAll() must equal(
-      IObject("a" -> IInt(3), "b" -> IInt(2))))
-  test("string combineAll")(IArray(IString("hello"), IString("world")).combineAll() must equal(IString("helloworld")))
-  test("int combineAll")(IArray(IInt(1), IInt(2), IInt(3), IInt(4)).combineAll() must equal(IInt(10)))
-  test("double combineAll")(IArray(IDouble(1.1), IDouble(2.1)).combineAll() must equal(IDouble(3.2)))
-  test("combineAll should fail on an array with multiple types")(IArray(IString("hello"), IInt(2)).combineAll() must equal(InvalidCaller))
+    IArray(IObject("a" -> IInt(1)), IObject("b" -> IInt(2)), IObject("a" -> IInt(3)))
+      .combineAll() must equal(
+      IObject("a" -> IInt(3), "b" -> IInt(2))
+    )
+  )
+  test("string combineAll")(
+    IArray(IString("hello"), IString("world")).combineAll() must equal(IString("helloworld")))
+  test("int combineAll")(
+    IArray(IInt(1), IInt(2), IInt(3), IInt(4)).combineAll() must equal(IInt(10)))
+  test("double combineAll")(
+    IArray(IDouble(1.1), IDouble(2.1)).combineAll() must equal(IDouble(3.2)))
+  test("combineAll should fail on an array with multiple types")(
+    IArray(IString("hello"), IInt(2)).combineAll() must equal(InvalidCaller))
   test("combineAll should work with a nothing")(
-    IArray(IString("hello"), Filtered, IString("world")).combineAll must equal(IString("helloworld")))
+    IArray(IString("hello"), Filtered, IString("world")).combineAll must equal(
+      IString("helloworld"))
+  )
 
   // Test data
   def withPrimitives =
@@ -55,7 +72,8 @@ class IArrayTest extends AnyFunSuite with Matchers {
         IdmlValue(123),
         IdmlValue(123.4),
         IdmlNull
-      ))
+      )
+    )
 
   def withNestedObjects =
     new IArray(
@@ -66,7 +84,10 @@ class IArrayTest extends AnyFunSuite with Matchers {
             "i" -> IdmlValue(123),
             "f" -> IdmlValue(123.4),
             "n" -> IdmlNull
-          ))))
+          )
+        )
+      )
+    )
 
   def withNestedArrays = new IArray(mutable.ListBuffer(withPrimitives))
 

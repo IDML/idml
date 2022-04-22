@@ -9,12 +9,14 @@ class DocumentParseException(str: String, ex: Exception = null) extends Exceptio
 
 /** Causes an antlr parser or lexer to throw an exception when an error is encountered */
 class ThrowConsoleErrorListener extends ConsoleErrorListener {
-  override def syntaxError(recognizer: Recognizer[_, _],
-                           offendingSymbol: AnyRef,
-                           line: Int,
-                           charPositionInLine: Int,
-                           msg: String,
-                           ex: RecognitionException) {
+  override def syntaxError(
+      recognizer: Recognizer[_, _],
+      offendingSymbol: AnyRef,
+      line: Int,
+      charPositionInLine: Int,
+      msg: String,
+      ex: RecognitionException
+  ) {
     throw new DocumentParseException("Line " + line + ":" + charPositionInLine + " " + msg, ex)
   }
 }

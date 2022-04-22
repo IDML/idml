@@ -30,9 +30,9 @@ case class IObject(fields: mutable.Map[String, IdmlValue]) extends IdmlObject {
 
   private def internalDeepMerge(a: IdmlValue, b: IdmlValue): IdmlValue = {
     (a, b) match {
-      case (a: IArray, b: IArray) =>
-        val acopy = a.deepCopy
-        val bcopy = b.deepCopy
+      case (a: IArray, b: IArray)         =>
+        val acopy   = a.deepCopy
+        val bcopy   = b.deepCopy
         val results = acopy.items.indices
           .flatMap { i =>
             Try { bcopy.items(i) }.toOption.map { bv =>
@@ -46,18 +46,19 @@ case class IObject(fields: mutable.Map[String, IdmlValue]) extends IdmlObject {
         val keys  = a.fields.keySet ++ b.fields.keySet
         val acopy = a.deepCopy.asInstanceOf[IdmlObject]
         val bcopy = b.deepCopy.asInstanceOf[IdmlObject]
-        val fs = keys.toList.map(k => (k, acopy.fields.get(k), bcopy.fields.get(k))).map {
+        val fs    = keys.toList.map(k => (k, acopy.fields.get(k), bcopy.fields.get(k))).map {
           case (k, Some(v1), Some(v2)) =>
             k -> internalDeepMerge(v1, v2)
-          case (k, Some(v1), None) =>
+          case (k, Some(v1), None)     =>
             k -> v1
-          case (k, None, Some(v2)) =>
+          case (k, None, Some(v2))     =>
             k -> v2
-          case (_, None, None) =>
-            throw new Throwable("This can't happen because we only iterated keys that are in both objects")
+          case (_, None, None)         =>
+            throw new Throwable(
+              "This can't happen because we only iterated keys that are in both objects")
         }
         IObject(fs: _*)
-      case (a: IdmlValue, b: IdmlValue) =>
+      case (a: IdmlValue, b: IdmlValue)   =>
         b
     }
   }

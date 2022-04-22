@@ -15,7 +15,8 @@ case class FilterFunction(expr: Node) extends IdmlFunction {
     ctx.scope = item
     ctx.cursor = item
     expr.invoke(ctx)
-    if (ctx.cursor.isInstanceOf[IdmlNothing] || ctx.cursor == Filtered || ctx.cursor.toBoolOption.contains(false)) {
+    if (ctx.cursor.isInstanceOf[IdmlNothing] || ctx.cursor == Filtered || ctx.cursor.toBoolOption
+        .contains(false)) {
       None
     } else {
       Some(ctx.cursor)
@@ -31,7 +32,7 @@ case class FilterFunction(expr: Node) extends IdmlFunction {
     ctx.cursor match {
       case nothing: IdmlNothing =>
         nothing
-      case array: IdmlArray =>
+      case array: IdmlArray     =>
         val results: mutable.Buffer[IdmlValue] =
           array.items.flatMap(x => filterOpt(ctx, x))
         if (results.nonEmpty) {
@@ -39,9 +40,9 @@ case class FilterFunction(expr: Node) extends IdmlFunction {
         } else {
           ctx.cursor = NoFields
         }
-      case v: IdmlValue =>
+      case v: IdmlValue         =>
         ctx.cursor = filterOpt(ctx, v).getOrElse(Filtered)
-      case _ =>
+      case _                    =>
         ctx.cursor = InvalidCaller
     }
 

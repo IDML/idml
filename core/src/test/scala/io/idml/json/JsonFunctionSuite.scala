@@ -24,7 +24,8 @@ class JsonFunctionSuite(name: String, jf: JsonFunctions) extends AnyWordSpec wit
           |number = root.random()
           |anotherNumber = root.random(1, 100)
           |""".stripMargin)
-      val result  = program.run(IObject("hello" -> IdmlValue("world"), "js" -> IString("{\"hello\": \"world\"}")))
+      val result  = program.run(
+        IObject("hello" -> IdmlValue("world"), "js" -> IString("{\"hello\": \"world\"}")))
       result should equal(
         IObject(
           "alsoObject"    -> IString("""{"v":123}"""),
@@ -33,7 +34,8 @@ class JsonFunctionSuite(name: String, jf: JsonFunctions) extends AnyWordSpec wit
           "object"        -> IObject("hello" -> IString("world")),
           "uuid3"         -> IString("7471b180-e84d-33a4-b395-33354a28479c"),
           "uuid5"         -> IString("a55bb9b5-e633-5876-b34c-39c5ece44ba9")
-        ))
+        )
+      )
     }
   }
 }

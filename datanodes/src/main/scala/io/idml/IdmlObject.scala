@@ -10,10 +10,11 @@ abstract class IdmlObject extends IdmlValue {
   /** The underlying field container for this object */
   def fields: mutable.Map[String, IdmlValue]
 
-  override def equals(o: Any): Boolean = o match {
-    case n: IdmlObject => n.fields == fields
-    case _             => false
-  }
+  override def equals(o: Any): Boolean =
+    o match {
+      case n: IdmlObject => n.fields == fields
+      case _             => false
+    }
 
   override def hashCode(): Int = fields.hashCode()
 
@@ -39,6 +40,12 @@ abstract class IdmlObject extends IdmlValue {
   // scalastyle:on method.name
 
   override def toStringOption: Option[String] =
-    Some("{" + fields.toList.sortBy(_._1).flatMap { case (k, v) => v.toStringOption.map(k -> _) }.map { case (k, v) => s""""$k":$v""" }.mkString(",") + "}")
+    Some(
+      "{" + fields.toList
+        .sortBy(_._1)
+        .flatMap { case (k, v) => v.toStringOption.map(k -> _) }
+        .map { case (k, v) => s""""$k":$v""" }
+        .mkString(",") + "}"
+    )
 
 }

@@ -20,7 +20,7 @@ trait Predicate extends Argument {
 case class Filter(pred: Predicate) extends Expression {
 
   protected def invokeOnArray(ctx: IdmlContext): Unit = {
-    val array = ctx.cursor.asInstanceOf[IdmlArray]
+    val array   = ctx.cursor.asInstanceOf[IdmlArray]
     val results = array.items.filter { item =>
       ctx.scope = item
       pred.predicate(ctx, item)
@@ -79,10 +79,11 @@ case class Exists(exps: Pipeline) extends Predicate {
 /** Check to see if a substring exists */
 case class Substring(left: Pipeline, right: Pipeline, cs: Boolean) extends Predicate {
 
-  protected def str(value: IdmlValue): String = value match {
-    case s: IdmlString => s.value
-    case _             => ""
-  }
+  protected def str(value: IdmlValue): String =
+    value match {
+      case s: IdmlString => s.value
+      case _             => ""
+    }
 
   def predicate(ctx: IdmlContext, cursor: IdmlValue): Boolean = {
     val lvalue = str(left.eval(ctx, cursor))
@@ -113,11 +114,11 @@ case class NotEquals(left: Pipeline, right: Pipeline, cs: Boolean) extends Predi
 case class In(left: Pipeline, right: Pipeline, cs: Boolean) extends Predicate {
   def predicate(ctx: IdmlContext, cursor: IdmlValue): Boolean = {
     (left.eval(ctx), right.eval(ctx)) match {
-      case (l: IdmlValue, r: IdmlArray) =>
+      case (l: IdmlValue, r: IdmlArray)   =>
         r.items.contains(l)
       case (l: IdmlString, r: IdmlString) =>
         r.value.split(',').contains(l.value)
-      case _ => false
+      case _                              => false
     }
   }
 }

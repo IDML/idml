@@ -26,21 +26,22 @@ object DocumentClassifier {
 
     def classifyDocument(): DocumentType = {
       (assignments, reassignments) match {
-        case (a, r) if (r > 0 && a == 0) => SchemaDocumentType
-        case (a, r) if (r > 0 && a > 0)  => MixedDocumentType
-        case (a, r) if (r == 0 && a > 0) => MappingDocumentType
+        case (a, r) if (r > 0 && a == 0)  => SchemaDocumentType
+        case (a, r) if (r > 0 && a > 0)   => MixedDocumentType
+        case (a, r) if (r == 0 && a > 0)  => MappingDocumentType
         case (a, r) if (r == 0 && a == 0) =>
           throw new ClassificationException("Document contained no assignments or reassignments")
-        case _ =>
+        case _                            =>
           throw new ClassificationException("Unable to classify document")
       }
     }
   }
 
-  /**
-    * Classify an Document tree as a Mapping, Schema or Mixed document
-    * @param doc parsed Document tree
-    * @return any subclass of DocumentType
+  /** Classify an Document tree as a Mapping, Schema or Mixed document
+    * @param doc
+    *   parsed Document tree
+    * @return
+    *   any subclass of DocumentType
     */
   def classify(doc: Document): DocumentType = {
     val visitor = new DocumentClassifierVisitor()

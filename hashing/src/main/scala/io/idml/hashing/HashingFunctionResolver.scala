@@ -14,28 +14,33 @@ import net.openhft.hashing.LongHashFunction
 import scala.util.Try
 
 class HashingFunctionResolver extends FunctionResolver {
-  override def resolve(name: String, args: List[Argument]): Option[IdmlFunction] = args match {
-    case Nil => HashingFunctions.hashes.get(name)
-    case _   => None
-  }
-  override def providedFunctions(): List[IdmlFunctionMetadata] =
-    HashingFunctions.hashes.map {
-      case (name, _) =>
-        IdmlFunctionMetadata(name, List.empty, s"hash the current object with $name and return the digest")
+  override def resolve(name: String, args: List[Argument]): Option[IdmlFunction] =
+    args match {
+      case Nil => HashingFunctions.hashes.get(name)
+      case _   => None
+    }
+  override def providedFunctions(): List[IdmlFunctionMetadata]                   =
+    HashingFunctions.hashes.map { case (name, _) =>
+      IdmlFunctionMetadata(
+        name,
+        List.empty,
+        s"hash the current object with $name and return the digest")
     }.toList
 }
 
 object HashingFunctions {
-  private def hashFunction(hashname: String)(hash: String => IString): (String, IdmlFunction0) = hashname -> new IdmlFunction0 {
-    override protected def apply(cursor: IdmlValue): IdmlValue = cursor match {
-      case (s: IdmlString) =>
-        Try {
-          hash(s.value)
-        }.getOrElse(IdmlNull)
-      case _ => InvalidCaller
+  private def hashFunction(hashname: String)(hash: String => IString): (String, IdmlFunction0) =
+    hashname -> new IdmlFunction0 {
+      override protected def apply(cursor: IdmlValue): IdmlValue =
+        cursor match {
+          case (s: IdmlString) =>
+            Try {
+              hash(s.value)
+            }.getOrElse(IdmlNull)
+          case _               => InvalidCaller
+        }
+      override def name: String                                  = hashname
     }
-    override def name: String = hashname
-  }
 
   implicit class BytesToHex(bs: Array[Byte]) {
     def toHex: String = BaseEncoding.base16().encode(bs).toLowerCase
@@ -43,10 +48,16 @@ object HashingFunctions {
 
   val hashes: Map[String, IdmlFunction0] = Map(
     hashFunction("xxHash32")((s: String) =>
-      IString(Ints.toByteArray(XXHashFactory.safeInstance().hash32().hash(ByteBuffer.wrap(s.getBytes), 0)).toHex)),
-    hashFunction("xxHash64")((s: String) => IString(Longs.toByteArray(LongHashFunction.xx().hashBytes(s.getBytes)).toHex)),
-    hashFunction("cityHash")((s: String) => IString(Longs.toByteArray(LongHashFunction.city_1_1().hashBytes(s.getBytes)).toHex)),
-    hashFunction("murmurHash3")((s: String) => IString(Longs.toByteArray(LongHashFunction.murmur_3().hashBytes(s.getBytes)).toHex)),
+      IString(
+        Ints
+          .toByteArray(XXHashFactory.safeInstance().hash32().hash(ByteBuffer.wrap(s.getBytes), 0))
+          .toHex)),
+    hashFunction("xxHash64")((s: String) =>
+      IString(Longs.toByteArray(LongHashFunction.xx().hashBytes(s.getBytes)).toHex)),
+    hashFunction("cityHash")((s: String) =>
+      IString(Longs.toByteArray(LongHashFunction.city_1_1().hashBytes(s.getBytes)).toHex)),
+    hashFunction("murmurHash3")((s: String) =>
+      IString(Longs.toByteArray(LongHashFunction.murmur_3().hashBytes(s.getBytes)).toHex)),
     hashFunction("sha1")((s: String) => IString(Hashing.sha1().hashBytes(s.getBytes).toString)),
     hashFunction("sha256")((s: String) => IString(Hashing.sha256().hashBytes(s.getBytes).toString)),
     hashFunction("sha512")((s: String) => IString(Hashing.sha512().hashBytes(s.getBytes).toString)),

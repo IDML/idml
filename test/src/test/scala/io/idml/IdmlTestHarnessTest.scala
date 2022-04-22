@@ -9,7 +9,7 @@ class IdmlTestHarnessTest extends AnyFunSuite {
 
   /** Counts the number of tests we find */
   class TestCounter extends IdmlTestHarness {
-    var testsRun: Int = 0
+    var testsRun: Int                                              = 0
     override def executeTest(name: String, test: IdmlObject): Unit = {
       testsRun += 1
     }
@@ -19,11 +19,13 @@ class IdmlTestHarnessTest extends AnyFunSuite {
   class TestImpl extends IdmlTestHarness
 
   test("fails if the resource is not a json object") {
-    intercept[IllegalArgumentException](new TestImpl().executeResourceDirectory("mock_tests", extension = "missing_object.json"))
+    intercept[IllegalArgumentException](
+      new TestImpl().executeResourceDirectory("mock_tests", extension = "missing_object.json"))
   }
 
   test("fails if the resource does not contain a test array") {
-    intercept[IllegalArgumentException](new TestImpl().executeResourceDirectory("mock_tests", extension = "missing_tests.json"))
+    intercept[IllegalArgumentException](
+      new TestImpl().executeResourceDirectory("mock_tests", extension = "missing_tests.json"))
   }
 
   test("can resolve a single suite from a resource folder") {

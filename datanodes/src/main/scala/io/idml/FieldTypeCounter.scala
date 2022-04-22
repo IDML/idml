@@ -1,15 +1,16 @@
 package io.idml
 
 /** Counts fields of particular types */
-case class FieldTypeCounter(var nothing: Int = 0,
-                            var strings: Int = 0,
-                            var doubles: Int = 0,
-                            var ints: Int = 0,
-                            var bools: Int = 0,
-                            var objects: Int = 0,
-                            var arrays: Int = 0,
-                            var nulls: Int = 0)
-    extends IdmlValueVisitor {
+case class FieldTypeCounter(
+    var nothing: Int = 0,
+    var strings: Int = 0,
+    var doubles: Int = 0,
+    var ints: Int = 0,
+    var bools: Int = 0,
+    var objects: Int = 0,
+    var arrays: Int = 0,
+    var nulls: Int = 0
+) extends IdmlValueVisitor {
 
   override def visitNothing(path: Seq[String], n: IdmlNothing): Unit = {
     nothing += 1

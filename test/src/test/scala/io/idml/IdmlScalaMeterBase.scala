@@ -5,14 +5,14 @@ import java.io.File
 import org.scalameter.Gen
 import org.scalameter.api._
 
-/**
-  * Links the IdmlTestHarness json syntax to ScalaMeter,
+/** Links the IdmlTestHarness json syntax to ScalaMeter,
   */
-class IdmlScalaMeterBase(directory: String,
-                         extension: String = "Suite.json",
-                         override val findUnmappedFields: Boolean = false,
-                         val verifyResults: Boolean = false)
-    extends PerformanceTest.Quickbenchmark
+class IdmlScalaMeterBase(
+    directory: String,
+    extension: String = "Suite.json",
+    override val findUnmappedFields: Boolean = false,
+    val verifyResults: Boolean = false
+) extends PerformanceTest.Quickbenchmark
     with IdmlTestHarness {
 
   // Define the test range. In this case we don't have any input parameters
@@ -21,8 +21,7 @@ class IdmlScalaMeterBase(directory: String,
   // Run the tests in a particular directory
   executeResourceDirectory(directory, extension)
 
-  /**
-    * Execute a file as a benchmark
+  /** Execute a file as a benchmark
     */
   override def executeFile(file: File): Unit = {
     performance of file.getName in {
@@ -30,8 +29,7 @@ class IdmlScalaMeterBase(directory: String,
     }
   }
 
-  /**
-    * Optionally compare results
+  /** Optionally compare results
     */
   protected override def compareResults(expected: IdmlValue, actual: IdmlValue): Unit = {
     if (verifyResults) {
@@ -39,10 +37,13 @@ class IdmlScalaMeterBase(directory: String,
     }
   }
 
-  /**
-    * Execute a parsed mapping as a test
+  /** Execute a parsed mapping as a test
     */
-  protected override def executeMappingTest(name: String, mapping: Mapping, input: IdmlValue, expected: IdmlValue): Unit = {
+  protected override def executeMappingTest(
+      name: String,
+      mapping: Mapping,
+      input: IdmlValue,
+      expected: IdmlValue): Unit = {
     measure method name in {
       using(range) in { i =>
         mapping.run(input)
@@ -50,10 +51,13 @@ class IdmlScalaMeterBase(directory: String,
     }
   }
 
-  /**
-    * Execute a parsed chain as a test
+  /** Execute a parsed chain as a test
     */
-  protected override def executeChainTest(name: String, chain: Mapping, input: IdmlValue, expected: IdmlValue): Unit = {
+  protected override def executeChainTest(
+      name: String,
+      chain: Mapping,
+      input: IdmlValue,
+      expected: IdmlValue): Unit = {
     measure method name in {
       using(range) config (
         exec.benchRuns          -> 5,

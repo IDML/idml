@@ -15,11 +15,11 @@ object GetSizeFunction extends IdmlFunction {
     ctx.cursor = ctx.cursor match {
       case nothing: IdmlNothing =>
         nothing
-      case array: IdmlArray =>
+      case array: IdmlArray     =>
         IInt(array.items.size)
-      case string: IdmlString =>
+      case string: IdmlString   =>
         IInt(string.value.length)
-      case _ =>
+      case _                    =>
         InvalidCaller
     }
   }

@@ -19,9 +19,9 @@ class IdmlJsonProperties extends Properties("IdmlJson") with ArbitraryInstances 
     (jacksonResult, circeResult) match {
       case (Right(jr), Right(cr)) =>
         jr == cr
-      case (Right(_), Left(_)) =>
+      case (Right(_), Left(_))    =>
         false
-      case (Left(_), _) =>
+      case (Left(_), _)           =>
         true // this JSON is a bit hard for jackson, so we'll give it some leeway
     }
   }

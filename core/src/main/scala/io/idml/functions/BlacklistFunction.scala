@@ -10,7 +10,7 @@ case class BlacklistFunction(args: List[Pipeline]) extends IdmlFunction {
     ctx.cursor = ctx.cursor match {
       case nothing: IdmlNothing =>
         nothing
-      case obj: IdmlObject =>
+      case obj: IdmlObject      =>
         val keys = args.flatMap(_.eval(ctx).toStringOption)
         if (keys.size != args.size) {
           InvalidParameters

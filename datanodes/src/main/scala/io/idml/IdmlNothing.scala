@@ -6,12 +6,12 @@ trait IdmlNothing extends IdmlValue
 /** Returned when a cast function rejected input because of its type. e.g. 123.csv() */
 case object CastUnsupported extends IdmlNothing
 
-/**
-  * Returned when a user supplied date format is invalid i.e. it's not a string or is an invalid format
+/** Returned when a user supplied date format is invalid i.e. it's not a string or is an invalid
+  * format
   */
 case object BadDateFormat extends IdmlNothing
 
-/** Returned when a cast function rejected input because of its value. e.g. "apples".email()  */
+/** Returned when a cast function rejected input because of its value. e.g. "apples".email() */
 case object CastFailed extends IdmlNothing
 
 /** Returned when an item in an array was missing */

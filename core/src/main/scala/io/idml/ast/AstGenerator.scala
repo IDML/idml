@@ -13,7 +13,9 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor
 import scala.collection.JavaConverters._
 
 /** Traverses the mapping language syntax tree to create the Node tree */
-class AstGenerator(functionResolver: FunctionResolverService) extends AbstractParseTreeVisitor[Node] with MappingVisitor[Node] {
+class AstGenerator(functionResolver: FunctionResolverService)
+    extends AbstractParseTreeVisitor[Node]
+    with MappingVisitor[Node] {
 
   /** Create a part pipeline stage */
   override def visitPart(ctx: PartContext): Expression = {
@@ -171,7 +173,7 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
     filter :: expr :: modifiers :: tail :: Pipeline(Nil)
   }
 
-  /** Signifies that the pipeline is a literal, like a string or int  */
+  /** Signifies that the pipeline is a literal, like a string or int */
   override def visitLiteralExpression(ctx: LiteralExpressionContext): Pipeline = {
     val literal   = visitLiteral(ctx.literal())
     val filter    = Option(ctx.filter()).map(visitFilter).toList
@@ -217,8 +219,9 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
     expr :: chain :: Pipeline(Nil)
   }
 
-  /** Signifies that the pipeline begins with a relative path with the 'this' keyword,
-    * e.g. 'this.a.b' */
+  /** Signifies that the pipeline begins with a relative path with the 'this' keyword, e.g.
+    * 'this.a.b'
+    */
   override def visitThisRelativePathExpression(ctx: ThisRelativePathExpressionContext): Pipeline = {
     val filter    = Option(ctx.filter()).map(visitFilter).toList
     val expr      = ExecNavRelative
@@ -228,9 +231,9 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
   }
 
   override def visitArrayPathExpression(ctx: ArrayPathExpressionContext): Pipeline = {
-    val filter = Option(ctx.filter()).map(visitFilter).toList
-    val expr   = ExecNavTemp
-    val arr = ctx.array() match {
+    val filter    = Option(ctx.filter()).map(visitFilter).toList
+    val expr      = ExecNavTemp
+    val arr       = ctx.array() match {
       case e: EmptyArrayContext       => AstArray(List())
       case s: ArrayWithStuffInContext => AstArray(s.pipeline().asScala.map(visitPipeline).toList)
     }
@@ -240,12 +243,17 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
   }
 
   override def visitObjectPathExpression(ctx: ObjectPathExpressionContext): Pipeline = {
-    val filter = Option(ctx.filter()).map(visitFilter).toList
-    val expr   = ExecNavTemp
-    val obj = ctx.`object`() match {
-      case e: EmptyObjectContext => AstObject(Map.empty)
+    val filter    = Option(ctx.filter()).map(visitFilter).toList
+    val expr      = ExecNavTemp
+    val obj       = ctx.`object`() match {
+      case e: EmptyObjectContext       => AstObject(Map.empty)
       case s: ObjectWithStuffInContext =>
-        AstObject(s.String().asScala.map(x => decodeString(x.toString())).zip(s.pipeline().asScala.map(visitPipeline)).toMap)
+        AstObject(
+          s.String()
+            .asScala
+            .map(x => decodeString(x.toString()))
+            .zip(s.pipeline().asScala.map(visitPipeline))
+            .toMap)
     }
     val modifiers = ctx.modifier().asScala.map(visitModifier).toList
     val chain     = Option(ctx.expressionChain()).map(visitExpressionChain).toList
@@ -259,7 +267,8 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
     Block(header, mappings)
   }
 
-  /** Create the top-level document object. It will always contain at least one section named 'main' */
+  /** Create the top-level document object. It will always contain at least one section named 'main'
+    */
   override def visitDocument(ctx: DocumentContext): Document = {
     if (!ctx.section().isEmpty) {
       val sections = ctx
@@ -273,7 +282,8 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
       Document(
         Map(
           "main" -> Block("main", ctx.mapping().asScala.map(visitMapping).toList)
-        ))
+        )
+      )
     } else {
       Document.empty
     }
@@ -302,8 +312,8 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
       .map(visitLabel)
       .map(_.name)
       .toList
-    val pipeline = visitPipeline(ctx.pipeline())
-    val positions = Positions(
+    val pipeline    = visitPipeline(ctx.pipeline())
+    val positions   = Positions(
       start = Position(ctx.start.getLine, ctx.start.getCharPositionInLine),
       end = Position(ctx.stop.getLine, ctx.stop.getCharPositionInLine)
     )
@@ -323,7 +333,7 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
       .map(visitLabel)
       .map(_.name)
       .toList
-    val pipeline = visitPipeline(ctx.pipeline())
+    val pipeline    = visitPipeline(ctx.pipeline())
     Variable(destination, pipeline)
   }
 
@@ -335,7 +345,7 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
       .map(visitLabel)
       .map(_.name)
       .toList
-    val callChain = visitCallChain(ctx.callChain())
+    val callChain   = visitCallChain(ctx.callChain())
     Reassignment(destination, callChain)
   }
 
@@ -346,30 +356,30 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
   /** Create a pipeline stage. It might be one of many different types */
   def visitPipeline(ctx: PipelineContext): Pipeline = {
     ctx match {
-      case a: AbsolutePathExpContext =>
+      case a: AbsolutePathExpContext      =>
         visitAbsolutePathExpression(a.absolutePathExpression())
-      case tv: TempVariableExpContext =>
+      case tv: TempVariableExpContext     =>
         visitTempVariableExpression(tv.tempVariableExpression())
-      case l: LiteralExpContext => visitLiteralExpression(l.literalExpression())
-      case r: RelativePathExpContext =>
+      case l: LiteralExpContext           => visitLiteralExpression(l.literalExpression())
+      case r: RelativePathExpContext      =>
         visitRelativePathExpression(r.relativePathExpression())
-      case v: VariableExpContext =>
+      case v: VariableExpContext          =>
         visitVariableExpression(v.variableExpression())
       case tr: ThisRelativePathExpContext =>
         visitThisRelativePathExpression(tr.thisRelativePathExpression())
-      case m: MatchExpContext =>
+      case m: MatchExpContext             =>
         visitMatchExp(m)
-      case i: IfExpContext =>
+      case i: IfExpContext                =>
         visitIfExp(i)
-      case a: ArrayPathExpContext =>
+      case a: ArrayPathExpContext         =>
         visitArrayPathExpression(a.arrayPathExpression())
-      case o: ObjectPathExpContext =>
+      case o: ObjectPathExpContext        =>
         visitObjectPathExpression(o.objectPathExpression())
-      case d: DivisionContext       => visitDivision(d) :: Pipeline(Nil)
-      case m: MultiplicationContext => visitMultiplication(m) :: Pipeline(Nil)
-      case a: AdditionContext       => visitAddition(a) :: Pipeline(Nil)
-      case s: SubtractionContext    => visitSubtraction(s) :: Pipeline(Nil)
-      case _                        => throw new IllegalStateException()
+      case d: DivisionContext             => visitDivision(d) :: Pipeline(Nil)
+      case m: MultiplicationContext       => visitMultiplication(m) :: Pipeline(Nil)
+      case a: AdditionContext             => visitAddition(a) :: Pipeline(Nil)
+      case s: SubtractionContext          => visitSubtraction(s) :: Pipeline(Nil)
+      case _                              => throw new IllegalStateException()
     }
   }
 
@@ -379,7 +389,8 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
 
     // Unicode escaped characters
     val unicode: Parser[Char] =
-      string("\\u") ~> count(4, hexDigit).map(ds => Integer.parseInt(new String(ds.toArray), 16).toChar)
+      string("\\u") ~> count(4, hexDigit).map(ds =>
+        Integer.parseInt(new String(ds.toArray), 16).toChar)
 
     def quotedString(outer: Char) = {
       // Unescaped characters
@@ -400,17 +411,24 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
       // Quoted strings
       char(outer) ~> many(nesc | esc | unicode).map(cs => new String(cs.toArray)) <~ char(outer)
     }
-    val singleQuoted = quotedString('\'')
-    val doubleQuoted = quotedString('"')
-    val triple       = "\"\"\""
-    val tripleQuoted = string(triple) *> manyUntil(unicode | anyChar, string(triple)).map(_.mkString(""))
+    val singleQuoted              = quotedString('\'')
+    val doubleQuoted              = quotedString('"')
+    val triple                    = "\"\"\""
+    val tripleQuoted              =
+      string(triple) *> manyUntil(unicode | anyChar, string(triple)).map(_.mkString(""))
     (singleQuoted | tripleQuoted | doubleQuoted).map(s => IString(s))
   }
 
   /** Decode a string from its parsed form */
   def decodeString(in: String): IString = {
     import atto._, Atto._, cats._, cats.implicits._
-    stringParser.parseOnly(in).done.either.leftMap(e => new Throwable(s"Couldn't parse string literal: $e")).toTry.get
+    stringParser
+      .parseOnly(in)
+      .done
+      .either
+      .leftMap(e => new Throwable(s"Couldn't parse string literal: $e"))
+      .toTry
+      .get
   }
 
   /** Create a literal value like a string or an int */
@@ -538,39 +556,45 @@ class AstGenerator(functionResolver: FunctionResolverService) extends AbstractPa
   }
 
   override def visitIfExpression(ctx: IfExpressionContext): If = {
-    If(visitPredicate(ctx.predicate()), visitPipeline(ctx.pipeline(0)), Option(ctx.pipeline(1)).map(visitPipeline))
+    If(
+      visitPredicate(ctx.predicate()),
+      visitPipeline(ctx.pipeline(0)),
+      Option(ctx.pipeline(1)).map(visitPipeline))
   }
 
   override def visitIfExp(ctx: IfExpContext): Pipeline = {
     Pipeline(List(visitIfExpression(ctx.ifExpression())))
   }
 
-  /**
-    * Visit a parse tree produced by the {@code matchExp}
-    * labeled alternative in {@link MappingParser#pipeline}.
+  /** Visit a parse tree produced by the {@code matchExp} labeled alternative in {@link
+    * MappingParser#pipeline}.
     *
-    * @param ctx the parse tree
-    * @return the visitor result
+    * @param ctx
+    *   the parse tree
+    * @return
+    *   the visitor result
     */
   override def visitMatchExp(ctx: MatchExpContext): Pipeline = {
     Pipeline(List(visitMatch(ctx.`match`())))
   }
 
-  /**
-    * Visit a parse tree produced by {@link MappingParser#caseBlock}.
+  /** Visit a parse tree produced by {@link MappingParser#caseBlock}.
     *
-    * @param ctx the parse tree
-    * @return the visitor result
+    * @param ctx
+    *   the parse tree
+    * @return
+    *   the visitor result
     */
   override def visitCaseBlock(ctx: CaseBlockContext): Case = {
     Case(visitPredicate(ctx.predicate()), visitPipeline(ctx.pipeline()))
   }
 
-  /**
-    * Visit a parse tree produced by {@link MappingParser#match}.
+  /** Visit a parse tree produced by {@link MappingParser#match}.
     *
-    * @param ctx the parse tree
-    * @return the visitor result
+    * @param ctx
+    *   the parse tree
+    * @return
+    *   the visitor result
     */
   override def visitMatch(ctx: MatchContext): Match = {
     Match(visitPipeline(ctx.pipeline()), ctx.caseBlock().asScala.toList.map(visitCaseBlock))

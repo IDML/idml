@@ -8,7 +8,7 @@ class Dev2680Test extends AnyFunSuite {
 
   test("DEV-2680: IndexOutOfBoundsException from empty field cleanup in Idml") {
     val ptolemy = Idml.autoBuilder().build()
-    val chain = ptolemy.chain(
+    val chain   = ptolemy.chain(
       ptolemy.compile("""
           |interaction.subtype = "ollie"
           |interaction.type = "twitter"
@@ -35,7 +35,7 @@ class Dev2680Test extends AnyFunSuite {
         """.stripMargin
       )
     )
-    val input = IdmlJackson.default.parse(
+    val input   = IdmlJackson.default.parse(
       """
         |{
         |  "ollie": {

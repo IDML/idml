@@ -17,11 +17,11 @@ object PRegexFactory {
     regexType match {
       case Some("java") =>
         new PRe2Regex(i) // can re-add java later
-      case Some("re2") =>
+      case Some("re2")  =>
         new PRe2Regex(i)
-      case None =>
+      case None         =>
         new PRe2Regex(i)
-      case _ =>
+      case _            =>
         new PRe2Regex(i)
     }
   }

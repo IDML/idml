@@ -15,7 +15,7 @@ object ParseXmlFunction extends IdmlFunction {
     ctx.cursor = ctx.cursor match {
       case IString(str) =>
         IdmlJsoup.parseXml(str)
-      case _ =>
+      case _            =>
         InvalidCaller
     }
   }

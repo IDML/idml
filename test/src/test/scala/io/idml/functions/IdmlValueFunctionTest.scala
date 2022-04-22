@@ -21,12 +21,17 @@ class IdmlValueFunctionTest extends AnyFunSuite {
   }
 
   test("ensure we support methods which accept PValues as parameters") {
-    IdmlValueFunction(pv.getMethod("slice", classOf[IdmlValue], classOf[IdmlValue]), List(pipl, pipl))
+    IdmlValueFunction(
+      pv.getMethod("slice", classOf[IdmlValue], classOf[IdmlValue]),
+      List(pipl, pipl))
   }
 
   test("ensure we don't support methods that don't accept PValues") {
     intercept[IllegalArgumentException](
-      IdmlValueFunction(pv.getMethod("slice", classOf[Option[Int]], classOf[Option[Int]]), List(pipl, pipl)))
+      IdmlValueFunction(
+        pv.getMethod("slice", classOf[Option[Int]], classOf[Option[Int]]),
+        List(pipl, pipl))
+    )
   }
 
   test("ensure arg count and method arity match - int() with 1 extra argument") {
@@ -34,7 +39,8 @@ class IdmlValueFunctionTest extends AnyFunSuite {
   }
 
   test("ensure arg count and method arity match - slice(f,t) with only 1 argument") {
-    intercept[IllegalArgumentException](IdmlValueFunction(pv.getMethod("slice", classOf[IdmlValue], classOf[IdmlValue]), List(pipl)))
+    intercept[IllegalArgumentException](
+      IdmlValueFunction(pv.getMethod("slice", classOf[IdmlValue], classOf[IdmlValue]), List(pipl)))
   }
 
   test("evaluate arguments for the current context") {

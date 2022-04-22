@@ -10,7 +10,7 @@ object Tracer {
   class Annotator(json: IdmlJson) extends IdmlListener {
     val results = mutable.ListBuffer[(Position, IdmlValue)]()
 
-    override def exitAssignment(ctx: IdmlContext, assignment: Assignment): Unit = {
+    override def exitAssignment(ctx: IdmlContext, assignment: Assignment): Unit  = {
       assignment.positions.map(p => (p.end, ctx.cursor)).foreach(results.append(_))
     }
     override def enterAssignment(ctx: IdmlContext, assignment: Assignment): Unit = ()
@@ -29,9 +29,8 @@ object Tracer {
 
     def render(s: String): String = {
       val output = s.lines.toArray
-      results.foreach {
-        case (Position(line, char), r) =>
-          output(line - 1) = output(line - 1) + " # " + json.compact(r)
+      results.foreach { case (Position(line, char), r) =>
+        output(line - 1) = output(line - 1) + " # " + json.compact(r)
       }
       output.mkString("\n")
     }

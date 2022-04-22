@@ -10,7 +10,7 @@ object DiffableParser {
   val jstring                 = stringLiteral.map(Json.fromString)
   val jnull                   = string("null").map(_ => Json.Null)
   val jnumber                 = bigDecimal.map(Json.fromBigDecimal)
-  val jarray = for {
+  val jarray                  = for {
     _     <- char('[') <* skipWhitespace
     items <- (skipWhitespace *> json <* skipWhitespace <* opt(char(',')) <* skipWhitespace).many
     _     <- char(']') <* skipWhitespace

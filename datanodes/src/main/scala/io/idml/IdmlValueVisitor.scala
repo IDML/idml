@@ -4,14 +4,14 @@ package io.idml
 abstract class IdmlValueVisitor {
 
   def visitObject(path: Seq[String], obj: IdmlObject) {
-    obj.fields.foreach {
-      case (key, value) => visitValue(path :+ key, value)
+    obj.fields.foreach { case (key, value) =>
+      visitValue(path :+ key, value)
     }
   }
 
   def visitArray(path: Seq[String], array: IdmlArray) {
-    array.items.foreach {
-      case value: Any => visitValue(path, value)
+    array.items.foreach { case value: Any =>
+      visitValue(path, value)
     }
   }
 

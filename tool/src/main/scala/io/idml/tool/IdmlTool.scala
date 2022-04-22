@@ -1,3 +1,5 @@
+package io.idml.tool
+
 import java.io.File
 import java.net.URI
 
@@ -12,9 +14,9 @@ import io.idml.BuildInfo
 import io.idml.tool.IOCommandApp
 
 object IdmlTool extends IOCommandApp[IO[ExitCode]] {
-  override def name: String    = "idml"
-  override def header: String  = "IDML command line tools"
-  override def version: String = BuildInfo.version
+  override def name: String                    = "idml"
+  override def header: String                  = "IDML command line tools"
+  override def version: String                 = BuildInfo.version
   override def commandLine: Opts[IO[ExitCode]] =
     NonEmptyList
       .of(
@@ -22,7 +24,8 @@ object IdmlTool extends IOCommandApp[IO[ExitCode]] {
         IdmlTools.apply,
         IdmlTools.server,
         io.idml.test.Main.execute(),
-        io.idml.tutor.Main.execute()
+        io.idml.tutor.Main.execute(),
+        SanityCheck.run
       )
       .map(c => Opts.subcommand(c))
       .reduceK

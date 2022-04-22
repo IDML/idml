@@ -4,8 +4,7 @@ import java.util.regex.Pattern
 
 import scala.collection.mutable.ListBuffer
 
-/**
-  * Implementation of PRegexLike for the standard Java regular expressions
+/** Implementation of PRegexLike for the standard Java regular expressions
   * @param regex
   */
 class PJavaRegex(regex: String) extends PRegexLike(regex) {
@@ -23,7 +22,7 @@ class PJavaRegex(regex: String) extends PRegexLike(regex) {
     builder.toList
   }
   // scalastyle:off method.name
-  override def `match`(target: String): List[String] = {
+  override def `match`(target: String): List[String]       = {
     val r = pattern.matcher(target)
     if (r.matches()) {
       val results = 1 to r.groupCount() map { i =>

@@ -9,7 +9,8 @@ case class Position(line: Int, character: Int)
 case class Positions(start: Position, end: Position)
 
 /** The assignment operator "=" */
-case class Assignment(dest: List[String], exps: Pipeline, positions: Option[Positions] = None) extends Rule {
+case class Assignment(dest: List[String], exps: Pipeline, positions: Option[Positions] = None)
+    extends Rule {
 
   /** Make an assignment */
   def invoke(ctx: IdmlContext) {
@@ -17,21 +18,22 @@ case class Assignment(dest: List[String], exps: Pipeline, positions: Option[Posi
 
     exps.invoke(ctx)
     ctx.cursor match {
-      case Deleted =>
+      case Deleted                        =>
         delete(ctx.output, dest)
-      case reason: IdmlNothing => ()
+      case reason: IdmlNothing            => ()
       case value: IObject if dest.isEmpty =>
         ctx.output.fields.clear()
         ctx.output.fields ++= value.deepCopy.fields
-      case value: Any if dest.isEmpty => ()
-      case value: Any =>
+      case value: Any if dest.isEmpty     => ()
+      case value: Any                     =>
         assign(ctx.output, dest, value.deepCopy)
     }
 
     ctx.exitAssignment(this)
   }
 
-  /** Traverse a JsonNode tree with a list of path parts with the ultimate goal of assigning a value */
+  /** Traverse a JsonNode tree with a list of path parts with the ultimate goal of assigning a value
+    */
   @tailrec
   final protected def assign(current: IdmlObject, path: List[String], value: IdmlValue) {
     path match {
@@ -46,7 +48,8 @@ case class Assignment(dest: List[String], exps: Pipeline, positions: Option[Posi
     current.fields(key) = value
   }
 
-  /** Traverse a JsonNode tree with a list of path parts with the ultimate goal of deleting a value */
+  /** Traverse a JsonNode tree with a list of path parts with the ultimate goal of deleting a value
+    */
   @tailrec
   final protected def delete(current: IdmlObject, path: List[String]) {
     path match {

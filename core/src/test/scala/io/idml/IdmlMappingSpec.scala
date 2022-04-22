@@ -24,7 +24,7 @@ class IdmlMappingSpec extends AnyFlatSpec with Matchers {
   }
 
   "IdmlMapping" should "work with nested fields" in {
-    val idml = Idml.autoBuilder().build()
+    val idml   = Idml.autoBuilder().build()
     val merged = Mapping.fromMultipleMappings(
       util.Arrays.asList[Mapping](
         idml.compile("interaction.content = text"),
@@ -32,7 +32,14 @@ class IdmlMappingSpec extends AnyFlatSpec with Matchers {
         idml.compile("interaction.content = real_text")
       )
     )
-    val input = IObject("text" -> IString("an example body"), "author" -> IString("bob"), "real_text" -> IString("an alternate body"))
-    merged.run(input) must equal(IObject("interaction" -> IObject("content" -> IString("an alternate body"), "author" -> IString("bob"))))
+    val input  = IObject(
+      "text"      -> IString("an example body"),
+      "author"    -> IString("bob"),
+      "real_text" -> IString("an alternate body"))
+    merged.run(input) must equal(
+      IObject(
+        "interaction" -> IObject(
+          "content" -> IString("an alternate body"),
+          "author"  -> IString("bob"))))
   }
 }

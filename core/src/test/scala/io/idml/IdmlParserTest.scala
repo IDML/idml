@@ -10,7 +10,11 @@ class IdmlParserTest extends AnyFunSuite with MockitoSugar {
 
   test("Parses text") {
     new IdmlParser().parse(null, "a = b").nodes == Document(
-      Map("main" -> Block("main", List(Assignment(List("a"), Pipeline(List(ExecNavRelative, Field("b"))))))))
+      Map(
+        "main" -> Block(
+          "main",
+          List(Assignment(List("a"), Pipeline(List(ExecNavRelative, Field("b")))))))
+    )
   }
 
   test("Throws parse error when input is invalid") {

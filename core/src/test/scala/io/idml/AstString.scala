@@ -35,6 +35,7 @@ class AstString extends AnyFunSuite with Matchers {
   test("escaping the current string terminator") {
     ast.decodeString("""'hello\'world'""") must equal(IString("""hello'world"""))
     ast.decodeString("\"hello\\\"world\"") must equal(IString("""hello"world"""))
-    ast.decodeString("\"\"\"hello\\\"\\\"\\\"world\"\"\"") must equal(IString("""hello\"\"\"world"""))
+    ast.decodeString("\"\"\"hello\\\"\\\"\\\"world\"\"\"") must equal(
+      IString("""hello\"\"\"world"""))
   }
 }

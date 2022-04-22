@@ -20,7 +20,8 @@ class DiffableFormatsSpec extends AnyFlatSpec with must.Matchers {
         "a" -> Json.fromInt(1),
         "z" -> Json.fromInt(26),
         "b" -> Json.fromInt(2)
-      )) must equal(Right("""{
+      )
+    ) must equal(Right("""{
         |  "a":
         |    1,
         |  "b":

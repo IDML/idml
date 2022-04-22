@@ -12,14 +12,15 @@ trait EmailModule {
   this: IdmlValue =>
 
   /** Construct a new Email by parsing a string */
-  def email(): IdmlValue = this match {
-    case _: IEmail | _: IdmlNothing => this
-    case n: IdmlString =>
-      Try(new InternetAddress(n.value, true))
-        .map(new IEmail(_))
-        .getOrElse(CastFailed)
-    case a: IdmlArray => new IArray(a.items.map { _.email() })
-    case _            => CastUnsupported
-  }
+  def email(): IdmlValue =
+    this match {
+      case _: IEmail | _: IdmlNothing => this
+      case n: IdmlString              =>
+        Try(new InternetAddress(n.value, true))
+          .map(new IEmail(_))
+          .getOrElse(CastFailed)
+      case a: IdmlArray               => new IArray(a.items.map { _.email() })
+      case _                          => CastUnsupported
+    }
 
 }

@@ -1,6 +1,11 @@
 package io.idml.datanodes
 
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatterBuilder, DateTimeParser, ISODateTimeFormat}
+import org.joda.time.format.{
+  DateTimeFormat,
+  DateTimeFormatterBuilder,
+  DateTimeParser,
+  ISODateTimeFormat
+}
 
 /** Date formats */
 object IDateFormats {
@@ -10,15 +15,15 @@ object IDateFormats {
   val maxDigits = 4
   val space     = " "
 
-  private val RFC822Day = new DateTimeFormatterBuilder()
+  private val RFC822Day      = new DateTimeFormatterBuilder()
     .appendDayOfWeekShortText()
     .appendLiteral(",")
     .toParser
-  private val RFC822Seconds = new DateTimeFormatterBuilder()
+  private val RFC822Seconds  = new DateTimeFormatterBuilder()
     .appendLiteral(":")
     .appendSecondOfMinute(minDigits)
     .toParser
-  private val RFC822Tz = new DateTimeFormatterBuilder()
+  private val RFC822Tz       = new DateTimeFormatterBuilder()
     .appendLiteral(space)
     .appendTimeZoneId()
     .toParser
@@ -26,7 +31,7 @@ object IDateFormats {
     .appendLiteral(space)
     .appendTimeZoneOffset("+0000", false, minFields, maxFields)
     .toParser
-  val RFC822 = new DateTimeFormatterBuilder()
+  val RFC822                 = new DateTimeFormatterBuilder()
     .appendOptional(RFC822Day)
     .appendOptional(DateTimeFormat.forPattern(space).getParser)
     .appendDayOfMonth(minDigits)
@@ -40,8 +45,8 @@ object IDateFormats {
     .appendOptional(RFC822Tz)
     .appendOptional(RFC822TzOffset)
     .toFormatter
-  val RFC822Printer = DateTimeFormat.forPattern("E, dd MMM y HH:mm:ss Z")
-  val TwitterDate   = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss Z yyyy")
+  val RFC822Printer          = DateTimeFormat.forPattern("E, dd MMM y HH:mm:ss Z")
+  val TwitterDate            = DateTimeFormat.forPattern("EEE MMM dd HH:mm:ss Z yyyy")
 
   val Formatters = List(
     TwitterDate,

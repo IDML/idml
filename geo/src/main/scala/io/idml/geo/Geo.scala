@@ -23,6 +23,6 @@ object Geo {
     (lat, long) match {
       case (lat: IdmlDouble, long: IdmlDouble) =>
         Geo(lat.value, long.value)
-      case _ => CastFailed
+      case _                                   => CastFailed
     }
 }

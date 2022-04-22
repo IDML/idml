@@ -3,23 +3,23 @@ package io.idml.functions
 import io.idml.{IdmlContext, IdmlValue}
 import io.idml.ast.IdmlFunction
 
-/**
-  * Base implementation of a function with no parameters
+/** Base implementation of a function with no parameters
   */
 abstract class IdmlFunction0 extends IdmlFunction {
 
-  /**
-    * The implementation of a variable-length function
+  /** The implementation of a variable-length function
     *
-    * @param cursor The call site
-    * @return The function return value
+    * @param cursor
+    *   The call site
+    * @return
+    *   The function return value
     */
   protected def apply(cursor: IdmlValue): IdmlValue
 
-  /**
-    * Invocation logic for handling variable-length functions
+  /** Invocation logic for handling variable-length functions
     *
-    * @param ctx The execution context
+    * @param ctx
+    *   The execution context
     */
   override def invoke(ctx: IdmlContext): Unit = {
     ctx.enterFunc(this)

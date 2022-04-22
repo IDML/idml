@@ -10,10 +10,11 @@ trait IdmlBool extends IdmlValue {
   /** The boolean value of this IdmlValue */
   def value: Boolean
 
-  override def equals(o: Any): Boolean = o match {
-    case n: IdmlBool => n.value == value
-    case _           => false
-  }
+  override def equals(o: Any): Boolean =
+    o match {
+      case n: IdmlBool => n.value == value
+      case _           => false
+    }
 
   override def toBoolOption: Some[Boolean] = Some(value)
 

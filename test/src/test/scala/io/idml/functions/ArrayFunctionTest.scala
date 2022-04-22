@@ -7,7 +7,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.must.Matchers
 
-/**  */
+/** */
 class ArrayFunctionTest extends AnyFunSuite with Matchers with MockitoSugar {
 
   val sizeTwoArray = IArray(IObject(), IObject())

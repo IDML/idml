@@ -17,12 +17,13 @@ trait StringModule {
   this: IdmlValue =>
 
   /** Transform this node to a string */
-  def string(): IdmlValue = this match {
-    case _: IdmlString | _: IdmlNothing => this
-    case n: IdmlInt                     => IdmlValue(n.value.toString)
-    case n: IdmlDouble                  => IdmlValue(n.value.toString)
-    case _                              => CastUnsupported
-  }
+  def string(): IdmlValue =
+    this match {
+      case _: IdmlString | _: IdmlNothing => this
+      case n: IdmlInt                     => IdmlValue(n.value.toString)
+      case n: IdmlDouble                  => IdmlValue(n.value.toString)
+      case _                              => CastUnsupported
+    }
 
   /** Make a string lowercase */
   def lowercase(): IdmlValue = this
@@ -59,11 +60,12 @@ trait StringModule {
     }
   }
 
-  def normalize(form: IdmlValue): IdmlValue = (this, form) match {
-    case (input: IdmlString, form: IdmlString) =>
-      StringModule.normalize(input.value, form.value)
-    case _ => InvalidCaller
-  }
+  def normalize(form: IdmlValue): IdmlValue =
+    (this, form) match {
+      case (input: IdmlString, form: IdmlString) =>
+        StringModule.normalize(input.value, form.value)
+      case _                                     => InvalidCaller
+    }
   import StringModule.stringTransformer
 
   def base64encode(): IdmlValue        = stringTransformer(this)(StringModule.base64encode)
@@ -84,25 +86,28 @@ object StringModule {
       }
       .getOrElse(CastFailed)
 
-  def stringTransformer(i: IdmlValue)(f: String => Option[String]): IdmlValue = i match {
-    case s: IdmlString => f(s.value).map(IString).getOrElse(CastFailed)
-    case _             => CastUnsupported
-  }
+  def stringTransformer(i: IdmlValue)(f: String => Option[String]): IdmlValue =
+    i match {
+      case s: IdmlString => f(s.value).map(IString).getOrElse(CastFailed)
+      case _             => CastUnsupported
+    }
 
-  def base64encode(s: String): Option[String] =
+  def base64encode(s: String): Option[String]        =
     Try { new String(Base64.getEncoder.encode(s.getBytes(StandardCharsets.UTF_8))) }.toOption
-  def base64decode(s: String): Option[String] =
+  def base64decode(s: String): Option[String]        =
     Try { new String(Base64.getDecoder.decode(s)) }.toOption
-  def base64mimeEncode(s: String): Option[String] =
+  def base64mimeEncode(s: String): Option[String]    =
     Try { Base64.getMimeEncoder.encodeToString(s.getBytes(StandardCharsets.UTF_8)) }.toOption
-  def base64mimeDecode(s: String): Option[String] =
+  def base64mimeDecode(s: String): Option[String]    =
     Try { new String(Base64.getMimeDecoder.decode(s)) }.toOption
   def base64urlsafeEncode(s: String): Option[String] =
-    Try { new String(Base64.getUrlEncoder.encodeToString(s.getBytes(StandardCharsets.UTF_8))) }.toOption
+    Try {
+      new String(Base64.getUrlEncoder.encodeToString(s.getBytes(StandardCharsets.UTF_8)))
+    }.toOption
   def base64urlsafeDecode(s: String): Option[String] =
     Try { new String(Base64.getUrlDecoder.decode(s)) }.toOption
-  def urlEncode(s: String): Option[String] =
+  def urlEncode(s: String): Option[String]           =
     Try { URLEncoder.encode(s, StandardCharsets.UTF_8.name) }.toOption
-  def urlDecode(s: String): Option[String] =
+  def urlDecode(s: String): Option[String]           =
     Try { URLDecoder.decode(s, StandardCharsets.UTF_8.name) }.toOption
 }

@@ -11,7 +11,7 @@ class IdmlTest extends AnyFunSuite with MockitoSugar {
   test("Passes strings to parser") {
     val parser = mock[IdmlParser]
 
-    val funcs = mock[FunctionResolverService]
+    val funcs   = mock[FunctionResolverService]
     val ptolemy = new Idml(
       parser,
       funcs,

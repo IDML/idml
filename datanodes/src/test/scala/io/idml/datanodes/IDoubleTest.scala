@@ -11,7 +11,8 @@ class IDoubleTest extends AnyFunSuite with Matchers {
   test("float max != min")(new IDouble(Float.MaxValue) must not equal new IDouble(Float.MinValue))
   test("double min == min")(new IDouble(Double.MinValue) must equal(new IDouble(Double.MinValue)))
   test("double max == max")(new IDouble(Double.MaxValue) must equal(new IDouble(Double.MaxValue)))
-  test("double max != min")(new IDouble(Double.MaxValue) must not equal new IDouble(Double.MinValue))
+  test("double max != min")(
+    new IDouble(Double.MaxValue) must not equal new IDouble(Double.MinValue))
 
   test("float = long")(new IDouble(1000f) must equal(new IDouble(1000L)))
   test("double = long")(new IDouble(1000.0) must equal(new IDouble(1000L)))

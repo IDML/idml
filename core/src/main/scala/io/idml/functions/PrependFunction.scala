@@ -12,17 +12,17 @@ case class PrependFunction(arg: Pipeline) extends IdmlFunction1 {
     cursor match {
       case nothing: IdmlNothing =>
         nothing
-      case arr: IdmlArray =>
+      case arr: IdmlArray       =>
         val1 match {
           case nothing: IdmlNothing =>
             // Do nothing to the cursor
             arr
-          case prependee: Any =>
+          case prependee: Any       =>
             arr.deepCopy
             // Create a new array with the original values and a new one on the end
             IArray(prependee +: arr.items.map(_.deepCopy))
         }
-      case other: Any =>
+      case other: Any           =>
         InvalidCaller
     }
   }

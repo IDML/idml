@@ -12,17 +12,17 @@ case class AppendFunction(arg: Pipeline) extends IdmlFunction1 {
     cursor match {
       case nothing: IdmlNothing =>
         nothing
-      case arr: IdmlArray =>
+      case arr: IdmlArray       =>
         input match {
           case nothing: IdmlNothing =>
             // Do nothing to the cursor
             arr
-          case _ =>
+          case _                    =>
             arr.deepCopy
             // Create a new array with the original values and a new one on the end
             IArray(arr.items.map(_.deepCopy) :+ input)
         }
-      case _ =>
+      case _                    =>
         InvalidCaller
     }
   }

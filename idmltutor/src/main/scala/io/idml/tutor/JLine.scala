@@ -11,8 +11,8 @@ import org.jline.reader.impl.history.DefaultHistory
 import scala.collection.JavaConverters._
 
 class JLine[F[_]](name: String, t: Terminal)(implicit F: Sync[F]) {
-  val history = new DefaultHistory()
-  val reader = LineReaderBuilder
+  val history     = new DefaultHistory()
+  val reader      = LineReaderBuilder
     .builder()
     .terminal(t)
     .appName(name)
@@ -27,7 +27,8 @@ class JLine[F[_]](name: String, t: Terminal)(implicit F: Sync[F]) {
     .variable(LineReader.SECONDARY_PROMPT_PATTERN, "~> ")
     .history(history)
     .parser(new Parser {
-      override def parse(currentLine: String, currentCursor: Int, context: Parser.ParseContext): ParsedLine = {
+      override def parse(currentLine: String, currentCursor: Int, context: Parser.ParseContext)
+          : ParsedLine = {
         if (!currentLine.endsWith("\n")) {
           throw new EOFError(-1, -1, "gotta end with double enter")
         }
@@ -43,9 +44,10 @@ class JLine[F[_]](name: String, t: Terminal)(implicit F: Sync[F]) {
     })
     .build()
 
-  def shutdown(): F[Unit] = F.delay {
-    history.save()
-  }
+  def shutdown(): F[Unit] =
+    F.delay {
+      history.save()
+    }
 
   // useful things
   def flush(): F[Unit] = F.delay { t.flush() }
@@ -55,12 +57,15 @@ class JLine[F[_]](name: String, t: Terminal)(implicit F: Sync[F]) {
   def readMultiline(prompt: String): F[String] = F.delay { multiReader.readLine(prompt) }
   def printAbove(string: String): F[Unit]      = F.delay { reader.printAbove(string) }
 }
-object JLine {
-  def apply[F[_]](name: String)(implicit F: Sync[F]): F[JLine[F]] = F.delay {
-    new JLine[F](name,
-                 TerminalBuilder
-                   .builder()
-                   .jansi(true)
-                   .build())
-  }
+object JLine                                                      {
+  def apply[F[_]](name: String)(implicit F: Sync[F]): F[JLine[F]] =
+    F.delay {
+      new JLine[F](
+        name,
+        TerminalBuilder
+          .builder()
+          .jansi(true)
+          .build()
+      )
+    }
 }

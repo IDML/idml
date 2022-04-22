@@ -20,7 +20,10 @@ class DiffJacksonModule extends Module {
 /** An object that activates the de-serialization of PValues */
 private object DiffJacksonSerializerResolver extends Serializers.Base {
   private val pvalue = classOf[IdmlValue]
-  override def findSerializer(config: SerializationConfig, theType: JavaType, beanDesc: BeanDescription): DiffSerializer = {
+  override def findSerializer(
+      config: SerializationConfig,
+      theType: JavaType,
+      beanDesc: BeanDescription): DiffSerializer = {
     if (!pvalue.isAssignableFrom(theType.getRawClass)) {
       // scalastyle:off null
       null
