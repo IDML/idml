@@ -5,6 +5,8 @@ run sbt "project tool" "docker:stage"
 workdir /build/tool/target/docker/stage
 
 FROM amazoncorretto:17-alpine3.18-full
+RUN apk update
+RUN apk add bash
 WORKDIR /opt/docker
 COPY --from=sbt --chown=daemon:daemon /build/tool/target/docker/stage/opt /opt
 EXPOSE 8081
