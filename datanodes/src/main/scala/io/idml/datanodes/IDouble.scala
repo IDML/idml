@@ -9,7 +9,7 @@ case class IDouble(value: Double) extends IdmlDouble {
   override def float(): IDouble = this
 
   /** Transform this value into a natural number */
-  override def int(): IdmlValue = IdmlValue(value.toInt)
+  override def int(): IdmlValue = IdmlValue(value.toLong)
 
   override def toDoubleOption = Some(value)
 }
