@@ -1,4 +1,4 @@
-from hseeberger/scala-sbt:8u212_1.2.8_2.13.0 as sbt
+from sbtscala/scala-sbt:amazoncorretto-al2023-17.0.16_1.12.11_2.13.18 as sbt
 copy . /build/
 workdir /build/
 run sbt "project tool" "docker:stage"

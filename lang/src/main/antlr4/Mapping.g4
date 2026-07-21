@@ -1,7 +1,6 @@
 grammar Mapping;
 
-document : section* |
-           mapping*;
+document : (section* | mapping*) EOF;
 
 section : header mapping*;
 

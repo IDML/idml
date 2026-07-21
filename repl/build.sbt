@@ -9,7 +9,7 @@ libraryDependencies ++= Seq(
   "com.lihaoyi"   %% "fansi"               % "0.2.13",
   "org.jline"      % "jline-terminal-jna"  % "3.13.3",
   "org.jline"      % "jline-reader"        % "3.13.3",
-  "org.mockito"    % "mockito-all"         % "1.9.5" % Test,
+  "org.mockito"    % "mockito-core"        % "4.11.0" % Test,
   "org.scalatest" %% "scalatest"           % "3.2.8" % Test
 )
 

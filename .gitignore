@@ -8,3 +8,4 @@ scalastyle-output.xml
 idml.jar
 .bloop
 .metals
+.bsp

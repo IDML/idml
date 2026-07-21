@@ -74,13 +74,7 @@ lazy val commonSettings = Seq(
   }
 )
 
-lazy val lang = project
-  .settings(commonSettings)
-  .settings(
-    Antlr4 / antlr4Version     := "4.8-1",
-    Antlr4 / antlr4PackageName := Some("io.idml.lang"),
-    Antlr4 / antlr4GenVisitor  := true
-  )
+lazy val lang = project.settings(commonSettings)
 
 lazy val datanodes = project.settings(commonSettings)
 
