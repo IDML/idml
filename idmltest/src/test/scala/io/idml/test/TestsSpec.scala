@@ -22,7 +22,7 @@ class TestsSpec extends AnyWordSpec with must.Matchers with CirceEitherEncoders 
         "original" : null
       }"""
 
-  val test = Test[Either[Ref, ?], Either[Ref, ?], Json](
+  val test = Test[Either[Ref, *], Either[Ref, *], Json](
     "example test",
     Right(Left("r = a + b")),
     Right(

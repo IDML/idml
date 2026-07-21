@@ -23,8 +23,8 @@ licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
 
 import xerial.sbt.Sonatype._
 
-lazy val scala212               = "2.12.13"
-lazy val scala213               = "2.13.5"
+lazy val scala212               = "2.12.20"
+lazy val scala213               = "2.13.16"
 lazy val supportedScalaVersions = List(scala212, scala213)
 
 lazy val commonSettings = Seq(
@@ -48,16 +48,17 @@ lazy val commonSettings = Seq(
       email = "teamrobin@meltwater.com",
       url = url("https://meltwater.com"))
   ),
-  scalacOptions += "-target:jvm-1.8",
   Docker / version          := version.value,
   Docker / dockerUsername   := Some("idml"),
-  addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.3" cross CrossVersion.full),
+  addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.3" cross CrossVersion.full),
   scalacOptions ++= {
     import Ordering.Implicits._
     if (VersionNumber(scalaVersion.value).numbers >= Seq(2L, 13L)) {
-      List("-Ymacro-annotations")
+      // only the 2.13 backend can actually emit bytecode newer than Java 8 (verified via javap;
+      // 2.12's backend is hard-capped at major version 52 even with -release/-target set higher)
+      List("-release", "17", "-Ymacro-annotations")
     } else {
-      List("-Ypartial-unification")
+      List("-target:jvm-1.8", "-Ypartial-unification")
     }
   },
   libraryDependencies ++= {
@@ -68,7 +69,14 @@ lazy val commonSettings = Seq(
       List(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full))
     }
   },
-  javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
+  javacOptions ++= {
+    import Ordering.Implicits._
+    if (VersionNumber(scalaVersion.value).numbers >= Seq(2L, 13L)) {
+      Seq("--release", "17")
+    } else {
+      Seq("-source", "1.8", "-target", "1.8")
+    }
+  },
   git.gitTagToVersionNumber := { tag: String =>
     if (tag matches "[0-9].*") Some(tag) else None
   }

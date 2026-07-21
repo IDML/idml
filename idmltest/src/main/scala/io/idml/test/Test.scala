@@ -63,8 +63,8 @@ final case class Test[F[_], F2[_], T](
 )
 
 object Test {
-  type ParsedTest[T]    = Test[Either[Ref, ?], Either[Ref, ?], T]
-  type UpdatableTest[T] = Test[Id, Either[Ref, ?], T]
+  type ParsedTest[T]    = Test[Either[Ref, *], Either[Ref, *], T]
+  type UpdatableTest[T] = Test[Id, Either[Ref, *], T]
   type ResolvedTest[T]  = Test[Id, Id, T]
 
   type ParsedSingleTest    = ParsedTest[Json]
@@ -124,7 +124,7 @@ object Test {
           .traverse(r => reportErrorWithRef(r, load(r).flatMap(parse).flatMap(decodeRaise[F, T])))
           .map(_.merge)
       ).mapN { case (c, i) =>
-        Test[Id, Either[Ref, ?], T](
+        Test[Id, Either[Ref, *], T](
           t.name,
           c,
           i,
